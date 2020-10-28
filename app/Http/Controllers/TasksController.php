@@ -47,11 +47,11 @@ class TasksController extends Controller
 //            'body' => request('body')
 //        ]);
 
-        $this->validate(request(), [
+        $attributes = request()->validate( [
             'title' => 'required',
             'body' => 'required'
         ]);
-        Task::create(request()->all());
+        Task::create($attributes);
 
 
         // Редирект на список задач
@@ -60,12 +60,19 @@ class TasksController extends Controller
 
     public function edit(Task $task)
     {
-
+        return view('tasks.edit', compact('task'));
     }
 
     public function update(Task $task)
     {
+        $attributes = request()->validate( [
+            'title' => 'required',
+            'body' => 'required'
+        ]);
 
+        //$task->update(request(['title', 'body']));
+        $task->update($attributes);
+        return redirect('/tasks');
     }
 
     public function destroy(Task $task)

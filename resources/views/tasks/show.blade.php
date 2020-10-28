@@ -9,6 +9,7 @@
     {{ $task->body }}
 
     <hr>
-    <a href="/tasks">Вернуться к списку</a>
+    <a href="{{route('tasks.index')}}">Вернуться к списку</a>
+
 </div>
 @endsection
