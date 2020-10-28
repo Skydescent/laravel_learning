@@ -58,4 +58,19 @@ class TasksController extends Controller
         return redirect('/tasks');
     }
 
+    public function edit(Task $task)
+    {
+
+    }
+
+    public function update(Task $task)
+    {
+
+    }
+
+    public function destroy(Task $task)
+    {
+
+    }
+
 }

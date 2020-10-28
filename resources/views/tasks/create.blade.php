@@ -8,7 +8,7 @@
 
         @include('layout.errors')
 
-        <form method="post" action="/tasks">
+        <form method="post" action="{{route('tasks.store')}}">
 
             @csrf
 
