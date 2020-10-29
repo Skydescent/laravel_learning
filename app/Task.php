@@ -2,8 +2,11 @@
 
 namespace App;
 
-class Task extends Model
+class Task extends \Illuminate\Database\Eloquent\Model
 {
+    //Защита от массового заполнения
+    //public $fillable = ['title', 'body'];
+    public $guarded = [];
 
     // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()
