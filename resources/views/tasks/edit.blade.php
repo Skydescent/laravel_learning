@@ -27,5 +27,10 @@
 
             <button type="submit" class="btn btn-primary">Изменить</button>
         </form>
+        <form method="POST" action="{{route('tasks.destroy', ['task' => $task])}}">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Удалить</button>
+        </form>
     </div>
 @endsection

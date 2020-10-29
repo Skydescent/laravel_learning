@@ -77,7 +77,8 @@ class TasksController extends Controller
 
     public function destroy(Task $task)
     {
-
+        $task->delete();
+        return redirect('/tasks');
     }
 
 }
