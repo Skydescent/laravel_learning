@@ -9,6 +9,29 @@
 
     {{ $task->body }}
 
+    @if($task->steps->isNotEmpty())
+        <ul class="lsit-group">
+            @foreach($task->steps as $step)
+                <li class="list-group-item">
+                    <form method="POST" action="/steps/{{ $step->id }}">
+                        @method('PATCH')
+                        @csrf
+                        <label class="form-check-label">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                name="completed"
+                                onclick="this.form.submit()"
+                            >
+                            {{$step->description}}
+                        </label>
+                    </form>
+                </li>
+
+            @endforeach
+        </ul>
+    @endif
+
     <hr>
     <a href="{{route('tasks.index')}}">Вернуться к списку</a>
 

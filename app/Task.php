@@ -24,4 +24,9 @@ class Task extends \Illuminate\Database\Eloquent\Model
     {
         return $query->where('completed', 0);
     }
+
+    public function steps()
+    {
+        return $this->hasMany(Step::class);
+    }
 }
