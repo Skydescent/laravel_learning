@@ -3,24 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Task;
-use Illuminate\Http\Request;
 
 class TasksController extends Controller
 {
     public function index()
     {
-        $tasks = Task::latest()->get();
-
-        //dd($tasks);
-        //return $tasks;
-        //return view('welcome', ['name' => $name]); альтернативный синтаксис
-        //return view('welcome')->with('name', $name);
+        //Все задачи от самых новых до самых старых с тэгами
+        $tasks = Task::with('tags')->latest()->get();
         return view('tasks.index', compact( 'tasks'));
     }
 
     public function show(Task $task) { // laravel сопоставил $task с моделью Task и выбрал её по id
-        //$task = Task::find($task);
-        //dd($id);
         return view('tasks.show', compact('task'));
     }
 
@@ -31,22 +24,6 @@ class TasksController extends Controller
 
     public function store()
     {
-       // dd(request()->all()); // метод выводит все поля формы, если хотим конкретное поле, то ->get('title) или request('title'); request(['title', 'body])
-
-        // Создать новую задачу
-//        $task = new Task;
-//        $task->title = request('title');
-//        $task->body = request('body');
-
-        // Сохранить её в БД
-        //$task->save();
-
-        //Весь код выше можно заменить:
-//        Task::create([
-//            'title' => request('title'),
-//            'body' => request('body')
-//        ]);
-
         $attributes = request()->validate( [
             'title' => 'required',
             'body' => 'required'
@@ -72,6 +49,14 @@ class TasksController extends Controller
 
         //$task->update(request(['title', 'body']));
         $task->update($attributes);
+
+        //Получаем текущую коллекцию тэгов и ключами делаем поля name
+        $taskTags = $task->tags->keyBy('name');
+
+        //Получаем из request строку с тэгами, преоразуем в массив, затем в коллекцию,
+        // а затем в коллекции ключами делаем значения элементов коллекции
+        $tag = collect(explode(',', request('tags')))->keyBy(function ($item) { return $item; });
+
         return redirect('/tasks');
     }
 

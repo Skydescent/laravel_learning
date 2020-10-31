@@ -7,6 +7,8 @@
         <a href="{{route('tasks.edit', ['task' => $task])}}">Изменить</a>
     </h3>
 
+    @include('tasks.tags', ['tags' => $task->tags])
+
     {{ $task->body }}
 
     @if($task->steps->isNotEmpty())
