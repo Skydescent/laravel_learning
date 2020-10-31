@@ -13,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 
     /**
@@ -23,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        //Функция composer принимает вид и колбэк функцию
+        // Вид можно указать как маску, например * - все шаблоны
+        view()->composer('layout.sidebar', function($view) {
+            $view->with('tagsCloud', \App\Tag::tagsCloud());
+        });
     }
 }

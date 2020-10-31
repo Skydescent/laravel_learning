@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Tag;
 use App\Task;
 
 class TasksController extends Controller
@@ -51,11 +52,36 @@ class TasksController extends Controller
         $task->update($attributes);
 
         //Получаем текущую коллекцию тэгов и ключами делаем поля name
+        /** @var Collection $taskTags */
         $taskTags = $task->tags->keyBy('name');
 
         //Получаем из request строку с тэгами, преоразуем в массив, затем в коллекцию,
         // а затем в коллекции ключами делаем значения элементов коллекции
-        $tag = collect(explode(',', request('tags')))->keyBy(function ($item) { return $item; });
+        $tags = collect(explode(',', request('tags')))->keyBy(function ($item) { return $item; });
+
+        //Находим пересечение ключей тэгов из модели и из request, приводим к массиву с id
+        $syncIds = $taskTags->intersectByKeys($tags)->pluck('id')->toArray();
+
+        $tagsToAttach = $tags->diffKeys($taskTags);
+
+        foreach ($tagsToAttach as $tag) {
+            $tag = Tag::firstOrCreate(['name' => $tag]);
+            $syncIds[] = $tag->id;
+        }
+//        $tagsToDetach = $taskTags->diffKeys($tags);
+//
+//        foreach ($tagsToAttach as $tag) {
+//            //Статичный метод либо вернёт этот тэг, либо создаст новый
+//            $tag = Tag::firstOrCreate(['name' => $tag]);
+//            $task->tags()->attach($tag);
+//        }
+//
+//        foreach ($tagsToDetach as $tag) {
+//            $task->tags()->detach($tag);
+//        }
+
+        //Синхронизируем id тэгов в задаче с id из request
+        $task->tags()->sync($syncIds);
 
         return redirect('/tasks');
     }

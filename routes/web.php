@@ -13,12 +13,16 @@ use App\Task;
  * DELETE /tasks/1 (destroy)
  */
 
+
+Route::get('/tasks/tags/{tag}', 'TagsController@index');
+
 Route::resource('/tasks', 'TasksController');
 
 Route::post('/tasks/{task}/steps', 'TaskStepsController@store');
 
 Route::post('/completed-steps/{step}', 'CompletedStepsController@store');
 Route::delete('/completed-steps/{step}', 'CompletedStepsController@destroy');
+
 
 //tasks
 

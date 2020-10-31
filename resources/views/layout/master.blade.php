@@ -21,12 +21,16 @@
     </style>
 </head>
 <body>
-<div class="container">
     @include('layout.nav')
-    @yield('content')
-</div>
+    <main role="main" class="container">
+        <div class="row">
+            @yield('content')
 
-@include('layout.footer')
+            @include('layout.sidebar')
+        </div>
+    </main>
+
+    @include('layout.footer')
 
 </body>
 </html>

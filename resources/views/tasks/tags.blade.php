@@ -7,7 +7,7 @@
 @if($tags->isNotEmpty())
     <div>
         @foreach($tags as $tag)
-            <a href="#" class="badge badge-secondary">{{$tag->name}}</a>
+            <a href="/tasks/tags/{{ $tag->getRouteKey() }}" class="badge badge-secondary">{{$tag->name}}</a>
         @endforeach
     </div>
 @endif
