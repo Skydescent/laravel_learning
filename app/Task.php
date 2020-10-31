@@ -29,4 +29,9 @@ class Task extends \Illuminate\Database\Eloquent\Model
     {
         return $this->hasMany(Step::class);
     }
+
+    public function addStep($attributes)
+    {
+        return $this->steps()->create($attributes);
+    }
 }

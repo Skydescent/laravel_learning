@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Step;
+use App\Task;
 use Illuminate\Http\Request;
 
 class TaskStepsController extends Controller
 {
-    public function update(Step $step)
+    public function store(Task $task)
     {
-        dd(\request()->all());
+        $task->addStep( \request()->validate([
+            'description' => 'required|min:5'
+        ]));
+
+        return back();
     }
 }

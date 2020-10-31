@@ -14,7 +14,11 @@ use App\Task;
  */
 
 Route::resource('/tasks', 'TasksController');
-Route::patch('/steps/{step}', 'TaskStepsController@update');
+
+Route::post('/tasks/{task}/steps', 'TaskStepsController@store');
+
+Route::post('/completed-steps/{step}', 'CompletedStepsController@store');
+Route::delete('/completed-steps/{step}', 'CompletedStepsController@destroy');
 
 //Route::get('/tasks', 'TasksController@index')->name('tasks.index');
 //Route::get('/tasks/create', 'TasksController@create')->name('tasks.create');
