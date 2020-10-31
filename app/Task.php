@@ -14,14 +14,23 @@ class Task extends \Illuminate\Database\Eloquent\Model
         return 'id';
     }
 
-
-//    public static function completed()
-//    {
-//        return static::where('completed', 1)->get();
-//    }
-
     public function scopeIncompleted($query) // Task::incomplete(false);
     {
         return $query->where('completed', 0);
+    }
+
+    public function steps()
+    {
+        return $this->hasMany(Step::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    public function addStep($attributes)
+    {
+        return $this->steps()->create($attributes);
     }
 }

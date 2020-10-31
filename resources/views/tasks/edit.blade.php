@@ -18,11 +18,21 @@
                 <input type="text" class="form-control" id="inputTitle" placeholder="Введите название задачи"
                        name= "title"
                        value="{{ old('title', $task->title) }}">
-
             </div>
+
             <div class="form-group">
                 <label for="inputBody">Описание задачи</label>
                 <textarea name="body" class="form-control" id="inputBody" cols="30" rows="10">{{ old('body', $task->body) }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="inputTags">Тэги</label>
+                <input type="text"
+                       name="tags"
+                       class="form-control"
+                       id="inputTags"
+                       value="{{ old('tags', $task->tags->pluck('name')->implode(',')) }}"
+                >
             </div>
 
             <button type="submit" class="btn btn-primary">Изменить</button>

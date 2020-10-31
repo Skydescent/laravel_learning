@@ -7,7 +7,51 @@
         <a href="{{route('tasks.edit', ['task' => $task])}}">Изменить</a>
     </h3>
 
+    @include('tasks.tags', ['tags' => $task->tags])
+
     {{ $task->body }}
+
+    @if($task->steps->isNotEmpty())
+        <ul class="list-group">
+            @foreach($task->steps as $step)
+                <li class="list-group-item">
+                    <form method="POST" action="/completed-steps/{{ $step->id }}">
+                        @if ($step->completed)
+                            @method('DELETE')
+                        @endif
+                        @csrf
+                        <div class="form-check">
+                            <label class="form-check-label {{ $step->completed ? 'completed' : '' }}">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="completed"
+                                    onclick="this.form.submit()"
+                                    {{ $step->completed ? 'checked' : '' }}
+                                >
+                                {{$step->description}}
+                            </label>
+                        </div>
+                    </form>
+                </li>
+            @endforeach
+        </ul>
+    @endif
+
+    <form method="POST" action="/tasks/{{ $task->id }}/steps" class="card card-body">
+        @csrf
+        <div class="form-group">
+            <input
+                type="text" class="form-control"
+                placeholder="Шаг"
+                value="{{ old('description') }}"
+                name="description"
+            >
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+
+    @include('layout.errors')
 
     <hr>
     <a href="{{route('tasks.index')}}">Вернуться к списку</a>
