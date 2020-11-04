@@ -13,10 +13,6 @@ use App\Task;
  * DELETE /tasks/1 (destroy)
  */
 
-Route::get('/test', function() {
-    dd(app(\App\Service\Pushall::class));
-});
-
 Route::get('/tasks/tags/{tag}', 'TagsController@index');
 
 Route::resource('/tasks', 'TasksController');
