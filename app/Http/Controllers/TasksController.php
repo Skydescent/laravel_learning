@@ -8,10 +8,17 @@ use Illuminate\Filesystem\Filesystem;
 
 class TasksController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('can:update,task')->except(['index', 'store', 'create']);
+    }
+
     public function index()
     {
         //Все задачи от самых новых до самых старых с тэгами
-        $tasks = Task::with('tags')->latest()->get();
+        //$tasks = Task::where('owner_id', auth()->id())->with('tags')->latest()->get();
+        $tasks = auth()->user()->tasks()->with('tags')->latest()->get();
         return view('tasks.index', compact( 'tasks'));
     }
 
@@ -32,8 +39,10 @@ class TasksController extends Controller
             'title' => 'required',
             'body' => 'required'
         ]);
-        Task::create($attributes);
 
+        $attributes['owner_id'] = auth()->id();
+
+        Task::create($attributes);
 
         // Редирект на список задач
         return redirect('/tasks');
@@ -41,6 +50,9 @@ class TasksController extends Controller
 
     public function edit(Task $task)
     {
+        //abort_if($task->ownder_id !== auth()->id(), 403);
+        //$this->authorize('update', $task);
+
         return view('tasks.edit', compact('task'));
     }
 

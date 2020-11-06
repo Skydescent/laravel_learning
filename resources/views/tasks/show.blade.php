@@ -4,7 +4,9 @@
 <div class="col-md-8 blog-main">
     <h3 class="pb-4 mb-4 font-italic border-bottom">
         {{ $task->title }}
-        <a href="{{route('tasks.edit', ['task' => $task])}}">Изменить</a>
+        @can('update', $task)
+            <a href="{{route('tasks.edit', ['task' => $task])}}">Изменить</a>
+        @endcan
     </h3>
 
     @include('tasks.tags', ['tags' => $task->tags])

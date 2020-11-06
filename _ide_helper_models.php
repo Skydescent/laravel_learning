@@ -20,6 +20,6 @@ namespace App{
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User query()
  */
-	class User extends \Eloquent {}
+	//class User extends \Eloquent {}
 }
 
