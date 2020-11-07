@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Mail\TaskCreated;
+use App\Events\TaskCreated;
 
 class Task extends \Illuminate\Database\Eloquent\Model
 {
@@ -10,16 +10,9 @@ class Task extends \Illuminate\Database\Eloquent\Model
     //public $fillable = ['title', 'body'];
     public $guarded = [];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function($task) {
-            \Mail::to($task->owner->email)->send(
-                new TaskCreated($task)
-            );
-        });
-    }
+    protected $dispatchesEvents = [
+        'created' => TaskCreated::class,
+    ];
 
     // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()

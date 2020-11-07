@@ -44,7 +44,10 @@ class TasksController extends Controller
         $attributes['owner_id'] = auth()->id();
 
         $task = Task::create($attributes);
-        event(new TaskCreated($task));
+
+        //session()->flash('message', 'Задача успешно создана');
+        flash('Задача успешно создана');
+
 
         // Редирект на список задач
         return redirect('/tasks');
@@ -99,6 +102,7 @@ class TasksController extends Controller
 
         //Синхронизируем id тэгов в задаче с id из request
         $task->tags()->sync($syncIds);
+        flash('Задача успешно обновлена');
 
         return redirect('/tasks');
     }
@@ -106,7 +110,8 @@ class TasksController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-        return redirect('/tasks');
+        flash('Задача удалена', 'warning');
+        return redirect('/tasks')->with('message', 'Задача удалена');
     }
 
 }
