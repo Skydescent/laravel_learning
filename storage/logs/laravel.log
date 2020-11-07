@@ -13332,3 +13332,15 @@ Kirill_Laravel
 #53 /var/www/kirill_laravel/public/index.php(55): Illuminate\\Foundation\\Http\\Kernel->handle()
 #54 {main}
 "} 
+[2020-11-07 03:06:49] local.ERROR: Not enough arguments (missing: "name"). {"exception":"[object] (Symfony\\Component\\Console\\Exception\\RuntimeException(code: 0): Not enough arguments (missing: \"name\"). at /var/www/kirill_laravel/vendor/symfony/console/Input/Input.php:76)
+[stacktrace]
+#0 /var/www/kirill_laravel/vendor/symfony/console/Command/Command.php(253): Symfony\\Component\\Console\\Input\\Input->validate()
+#1 /var/www/kirill_laravel/vendor/laravel/framework/src/Illuminate/Console/Command.php(121): Symfony\\Component\\Console\\Command\\Command->run()
+#2 /var/www/kirill_laravel/vendor/symfony/console/Application.php(920): Illuminate\\Console\\Command->run()
+#3 /var/www/kirill_laravel/vendor/symfony/console/Application.php(266): Symfony\\Component\\Console\\Application->doRunCommand()
+#4 /var/www/kirill_laravel/vendor/symfony/console/Application.php(142): Symfony\\Component\\Console\\Application->doRun()
+#5 /var/www/kirill_laravel/vendor/laravel/framework/src/Illuminate/Console/Application.php(93): Symfony\\Component\\Console\\Application->run()
+#6 /var/www/kirill_laravel/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Console\\Application->run()
+#7 /var/www/kirill_laravel/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle()
+#8 {main}
+"} 

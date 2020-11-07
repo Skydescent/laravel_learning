@@ -44,7 +44,6 @@ class TasksController extends Controller
         $attributes['owner_id'] = auth()->id();
 
         $task = Task::create($attributes);
-        event(new TaskCreated($task));
 
         // Редирект на список задач
         return redirect('/tasks');
