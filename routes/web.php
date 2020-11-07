@@ -13,6 +13,16 @@ use App\Task;
  * DELETE /tasks/1 (destroy)
  */
 
+function flash($message, $type = 'success')
+{
+    session()->flash('message', $message);
+    session()->flash('message_type', $type);
+}
+
+Route::get('/test', function (\Illuminate\Http\Request $request) {
+    dd($request->session()->all());
+});
+
 Route::get('/tasks/tags/{tag}', 'TagsController@index');
 
 Route::resource('/tasks', 'TasksController');

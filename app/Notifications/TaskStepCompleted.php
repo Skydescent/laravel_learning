@@ -29,7 +29,7 @@ class TaskStepCompleted extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -41,6 +41,7 @@ class TaskStepCompleted extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+                    ->subject('Шаг Выполнен')
                     ->line('The introduction to the notification.')
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
