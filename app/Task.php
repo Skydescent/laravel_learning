@@ -2,11 +2,24 @@
 
 namespace App;
 
+use App\Mail\TaskCreated;
+
 class Task extends \Illuminate\Database\Eloquent\Model
 {
     //Защита от массового заполнения
     //public $fillable = ['title', 'body'];
     public $guarded = [];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function($task) {
+            \Mail::to($task->owner->email)->send(
+                new TaskCreated($task)
+            );
+        });
+    }
 
     // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()
@@ -33,4 +46,10 @@ class Task extends \Illuminate\Database\Eloquent\Model
     {
         return $this->steps()->create($attributes);
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

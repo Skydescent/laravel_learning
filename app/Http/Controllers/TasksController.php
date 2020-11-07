@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TaskCreated;
 use App\Tag;
 use App\Task;
-use Illuminate\Filesystem\Filesystem;
 
 class TasksController extends Controller
 {
@@ -19,6 +19,7 @@ class TasksController extends Controller
         //Все задачи от самых новых до самых старых с тэгами
         //$tasks = Task::where('owner_id', auth()->id())->with('tags')->latest()->get();
         $tasks = auth()->user()->tasks()->with('tags')->latest()->get();
+
         return view('tasks.index', compact( 'tasks'));
     }
 
@@ -42,7 +43,8 @@ class TasksController extends Controller
 
         $attributes['owner_id'] = auth()->id();
 
-        Task::create($attributes);
+        $task = Task::create($attributes);
+        event(new TaskCreated($task));
 
         // Редирект на список задач
         return redirect('/tasks');
