@@ -3,26 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Task;
 
-/**
- * GET /tasks (index)
- * GET /tasks/create (create)
- * GET /tasks/1 (show)
- * POST /tasks (store)
- * GET /tasks/1/edit (edit)
- * PATCH /tasks/1 (update)
- * DELETE /tasks/1 (destroy)
- */
-
-function flash($message, $type = 'success')
-{
-    session()->flash('message', $message);
-    session()->flash('message_type', $type);
-}
-
-Route::get('/test', function (\Illuminate\Http\Request $request) {
-    dd($request->session()->all());
-});
-
 Route::get('/tasks/tags/{tag}', 'TagsController@index');
 
 Route::resource('/tasks', 'TasksController');
@@ -31,12 +11,6 @@ Route::post('/tasks/{task}/steps', 'TaskStepsController@store');
 
 Route::post('/completed-steps/{step}', 'CompletedStepsController@store');
 Route::delete('/completed-steps/{step}', 'CompletedStepsController@destroy');
-
-
-//tasks
-
-//tags
-
 
 
 Route::get('/', 'PostsController@index')->name('posts.index');

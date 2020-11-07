@@ -111,7 +111,7 @@ class TasksController extends Controller
     {
         $task->delete();
         flash('Задача удалена', 'warning');
-        return redirect('/tasks')->with('message', 'Задача удалена');
+        return redirect('/tasks');
     }
 
 }
