@@ -10,18 +10,22 @@
 
         @include('layout.errors')
 
-        <form method="post" action="{{route('posts.store')}}">
+        <form method="post" action="{{ route('posts.store') }}">
 
             @csrf
 
             <div class="form-group">
-                <label for="slug">Название статьи</label>
-                <input type="text" class="form-control" id="slug" name= "slug" value="{{old('slug')}}" placeholder="Slug статьи">
+                <label for="slug">Slug статьи</label>
+                <input type="text" class="form-control" id="slug"  placeholder="введите slug статьи"
+                       name= "slug"
+                       value="{{ old('slug') }}">
 
             </div>
             <div class="form-group">
                 <label for="inputTitle">Название статьи</label>
-                <input type="text" class="form-control" id="inputTitle" name= "title" value="{{old('title')}}" placeholder="Введите заголовок статьи">
+                <input type="text" class="form-control" id="inputTitle" placeholder="Введите заголовок статьи"
+                       name= "title"
+                       value="{{old('title')}}">
 
             </div>
 
@@ -31,10 +35,15 @@
             </div>
             <div class="form-group">
                 <label for="body">Детальное описание статьи</label>
-                <textarea name="body" cols="30" rows="7" class="form-control">{{old('body')}}</textarea>
+                <textarea name="body" cols="30" rows="7" class="form-control">
+                    {{old('body')}}
+                </textarea>
             </div>
             <div class="form-group form-check">
-                <input type="checkbox" value="1" name="published" class="form-check-input" id="isPublished" {{ old('published') == '1' ? 'checked' : ''}}>
+                <input type="checkbox" class="form-check-input" id="isPublished"
+                       value="1"
+                       name="published"
+                        {{ old('published') == '1' ? 'checked' : ''}}>
                 <label class="form-check-label" for="isPublished">Опубликовать</label>
             </div>
 

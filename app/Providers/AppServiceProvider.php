@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
         //Функция composer принимает вид и колбэк функцию
         // Вид можно указать как маску, например * - все шаблоны
         view()->composer('layout.sidebar', function($view) {
+            dd($view);
             $view->with('tagsCloud', \App\Tag::tagsCloud());
         });
     }

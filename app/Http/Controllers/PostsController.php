@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\Tag;
 use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
     public function index()
     {
-        $posts = Post::latest()->get();
+        $posts = Post::latest()->where('published', 1)->with('tags')->get();
         return view('posts.index', compact( 'posts'));
     }
 
@@ -26,7 +27,7 @@ class PostsController extends Controller
 
     public function store(Request $request)
     {
-        $input = $this->validate($request, [
+        $attributes = $this->validate($request, [
             'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts',
             'title' => 'required|between:5,100',
             'short_text' => 'required|max:255',
@@ -34,10 +35,51 @@ class PostsController extends Controller
             'published' => ''
         ]);
 
-        $input['published'] = isset($input['published']) ? 1 : 0;
+        $attributes['published'] = isset($attributes['published']) ? 1 : 0;
 
-        Post::create($input);
+        Post::create($attributes);
 
-        return redirect('/');
+        flash('Статья успешно добавлена');
+        return redirect()->route('posts.index');
+    }
+
+    public function edit(Post $post)
+    {
+        return view('posts.edit', compact('post'));
+    }
+
+    public function update(Post $post)
+    {
+        $attributes = request()->validate( [
+            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts,slug,' . $post->id,
+            'title' => 'required|between:5,100',
+            'short_text' => 'required|max:255',
+            'body' => 'required',
+            'published' => ''
+        ]);
+
+        $attributes['published'] = isset($attributes['published']) ? 1 : 0;
+
+        $post->update($attributes);
+        $taskTags = $post->tags->keyBy('name');
+        $tags = collect(explode(',', request('tags')))->keyBy(function ($item) { return $item; });
+        $syncIds = $taskTags->intersectByKeys($tags)->pluck('id')->toArray();
+        $tagsToAttach = $tags->diffKeys($taskTags);
+        foreach ($tagsToAttach as $tag) {
+            $tag = Tag::firstOrCreate(['name' => $tag]);
+            $syncIds[] = $tag->id;
+        }
+        $post->tags()->sync($syncIds);
+
+        flash('Статья успешно обновлена');
+
+        return redirect()->route('posts.index');
+    }
+
+    public function destroy(Post $post)
+    {
+        $post->delete();
+        flash('Статья удалена', 'warning');
+        return redirect()->route('posts.index');
     }
 }

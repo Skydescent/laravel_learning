@@ -13,6 +13,11 @@ class Tag extends Model
         return $this->belongsToMany(Task::class);
     }
 
+    public function posts()
+    {
+        return $this->belongsToMany(Post::class);
+    }
+
     //переопределяем метод, для того, чтобы ключём для маршрута стало
     //поле name из БД
     public function getRouteKeyName()
@@ -20,8 +25,8 @@ class Tag extends Model
         return 'name';
     }
 
-    public static function tagsCloud()
+    public static function tagsCloud($relatedWith)
     {
-        return (new static)->has('tasks')->get();
+        return (new static)->has($relatedWith)->get();
     }
 }
