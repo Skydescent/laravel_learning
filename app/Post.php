@@ -13,4 +13,9 @@ class Post extends \App\Model
     {
         return $this->belongsToMany(Tag::class);
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

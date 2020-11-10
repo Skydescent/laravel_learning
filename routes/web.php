@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Task;
+
 Route::get('/', 'PostsController@index');
 
-Route::get('/tasks/tags/{tag}', 'TagsController@index');
+Route::get('/{model}/tags/{tag}', 'TagsController@index');
 
 Route::resource('/tasks', 'TasksController');
 
@@ -22,6 +22,4 @@ Route::get('/admin/feedbacks','FeedbacksController@index')->name('feedbacks.inde
 Route::post('/feedbacks','FeedbacksController@store')->name('feedbacks.store');
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
 

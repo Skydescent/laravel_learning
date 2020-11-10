@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\PostStatusChanged;
 use App\Post;
+use App\Recipients\AdminRecipient;
 use App\Tag;
+use App\User;
 use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth')->only(['create','update']);
+        $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
+    }
+
     public function index()
     {
-        $posts = Post::latest()->where('published', 1)->with('tags')->get();
+        $posts = Post::latest()->with('tags')->get();
         return view('posts.index', compact( 'posts'));
     }
 
@@ -36,10 +45,19 @@ class PostsController extends Controller
         ]);
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
+        $attributes['owner_id'] = auth()->id();
 
-        Post::create($attributes);
+        $post = Post::create($attributes);
 
         flash('Статья успешно добавлена');
+
+        $recipient = new AdminRecipient();
+        $recipient->notify(new PostStatusChanged(
+            'создана статья',
+            $post->title,
+            route('posts.show', ['post' => $post])
+        ));
+
         return redirect()->route('posts.index');
     }
 
@@ -73,6 +91,13 @@ class PostsController extends Controller
 
         flash('Статья успешно обновлена');
 
+        $recipient = new AdminRecipient();
+        $recipient->notify(new PostStatusChanged(
+            'обновлена статья',
+            $post->title,
+            route('posts.show', ['post' => $post])
+        ));
+
         return redirect()->route('posts.index');
     }
 
@@ -80,6 +105,13 @@ class PostsController extends Controller
     {
         $post->delete();
         flash('Статья удалена', 'warning');
+
+        $recipient = new AdminRecipient();
+        $recipient->notify(new PostStatusChanged(
+            'удалена статья',
+            $post->title
+        ));
+
         return redirect()->route('posts.index');
     }
 }
