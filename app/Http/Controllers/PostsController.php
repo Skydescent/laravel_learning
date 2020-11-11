@@ -34,15 +34,16 @@ class PostsController extends Controller
         return view('posts.create');
     }
 
-    public function store(Request $request)
+    public function store()
     {
-        $attributes = $this->validate($request, [
-            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts',
-            'title' => 'required|between:5,100',
-            'short_text' => 'required|max:255',
-            'body' => 'required',
-            'published' => ''
-        ]);
+//        $attributes = $this->validate($request, [
+//            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts',
+//            'title' => 'required|between:5,100',
+//            'short_text' => 'required|max:255',
+//            'body' => 'required',
+//            'published' => ''
+//        ]);
+        $attributes = Post::validate(request());
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
         $attributes['owner_id'] = auth()->id();
@@ -68,13 +69,14 @@ class PostsController extends Controller
 
     public function update(Post $post)
     {
-        $attributes = request()->validate( [
-            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts,slug,' . $post->id,
-            'title' => 'required|between:5,100',
-            'short_text' => 'required|max:255',
-            'body' => 'required',
-            'published' => ''
-        ]);
+//        $attributes = request()->validate( [
+//            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts,slug,' . $post->id,
+//            'title' => 'required|between:5,100',
+//            'short_text' => 'required|max:255',
+//            'body' => 'required',
+//            'published' => ''
+//        ]);
+        $attributes = Post::validate(request(),$post->id);
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
 
