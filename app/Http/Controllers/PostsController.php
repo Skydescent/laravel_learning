@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
-use App\Tag;
-use App\User;
-use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth')->only(['create','update']);
@@ -36,19 +34,14 @@ class PostsController extends Controller
 
     public function store()
     {
-//        $attributes = $this->validate($request, [
-//            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts',
-//            'title' => 'required|between:5,100',
-//            'short_text' => 'required|max:255',
-//            'body' => 'required',
-//            'published' => ''
-//        ]);
         $attributes = Post::validate(request());
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
         $attributes['owner_id'] = auth()->id();
 
         $post = Post::create($attributes);
+
+        $post->syncTags(request('tags'));
 
         flash('Статья успешно добавлена');
 
@@ -69,27 +62,13 @@ class PostsController extends Controller
 
     public function update(Post $post)
     {
-//        $attributes = request()->validate( [
-//            'slug' => 'required|regex:/^[a-z0-9-_]+$/i|unique:posts,slug,' . $post->id,
-//            'title' => 'required|between:5,100',
-//            'short_text' => 'required|max:255',
-//            'body' => 'required',
-//            'published' => ''
-//        ]);
         $attributes = Post::validate(request(),$post->id);
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
 
         $post->update($attributes);
-        $taskTags = $post->tags->keyBy('name');
-        $tags = collect(explode(',', request('tags')))->keyBy(function ($item) { return $item; });
-        $syncIds = $taskTags->intersectByKeys($tags)->pluck('id')->toArray();
-        $tagsToAttach = $tags->diffKeys($taskTags);
-        foreach ($tagsToAttach as $tag) {
-            $tag = Tag::firstOrCreate(['name' => $tag]);
-            $syncIds[] = $tag->id;
-        }
-        $post->tags()->sync($syncIds);
+
+        $post->syncTags(request('tags'));
 
         flash('Статья успешно обновлена');
 

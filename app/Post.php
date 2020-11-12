@@ -4,6 +4,8 @@ namespace App;
 
 class Post extends \App\Model
 {
+    use SynchronizeTags;
+
     public function getRouteKeyName()
     {
         return 'slug';
@@ -22,9 +24,9 @@ class Post extends \App\Model
     public static function validate(\Illuminate\Http\Request $request, $postId = null)
     {
         if (!is_null($postId)) {
-            $slug = 'required|regex:/^[a-z0-9-_]+$/i|unique:posts';
-        } else {
             $slug = 'required|regex:/^[a-z0-9-_]+$/i|unique:posts,slug,' . $postId;
+        } else {
+            $slug = 'required|regex:/^[a-z0-9-_]+$/i|unique:posts';
         }
 
         $validationRules = [

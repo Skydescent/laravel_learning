@@ -14,4 +14,5 @@ class Model extends \Illuminate\Database\Eloquent\Model
 
     //Поля защищённые от массового заполнения
     public $guarded = [];
+
 }

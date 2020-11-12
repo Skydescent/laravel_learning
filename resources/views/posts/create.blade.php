@@ -14,40 +14,10 @@
 
             @csrf
 
-            <div class="form-group">
-                <label for="slug">Slug статьи</label>
-                <input type="text" class="form-control" id="slug"  placeholder="введите slug статьи"
-                       name= "slug"
-                       value="{{ old('slug') }}">
-
-            </div>
-            <div class="form-group">
-                <label for="inputTitle">Название статьи</label>
-                <input type="text" class="form-control" id="inputTitle" placeholder="Введите заголовок статьи"
-                       name= "title"
-                       value="{{old('title')}}">
-
-            </div>
-
-            <div class="form-group">
-                <label for="shortText">Краткое описание статьи</label>
-                <textarea name="short_text" id="shortText" cols="30" rows="2" class="form-control" >{{old('short_text')}}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="body">Детальное описание статьи</label>
-                <textarea name="body" cols="30" rows="7" class="form-control">
-                    {{old('body')}}
-                </textarea>
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="isPublished"
-                       value="1"
-                       name="published"
-                        {{ old('published') == '1' ? 'checked' : ''}}>
-                <label class="form-check-label" for="isPublished">Опубликовать</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Создать</button>
+            @include('posts.createOrUpdate', [
+                'post' => new \App\Post(),
+                'btnText' => 'Создать',
+            ])
         </form>
     </div>
 @endsection
