@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'PostsController@index');
 
-Route::get('/{model}/tags/{tag}', 'TagsController@index');
+Route::get('/{model}/tags/{tag}', 'TagsController@index')->name('tags.cloud');
 
 Route::resource('/tasks', 'TasksController');
 
