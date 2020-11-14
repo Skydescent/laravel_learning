@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
@@ -32,9 +33,9 @@ class PostsController extends Controller
         return view('posts.create');
     }
 
-    public function store()
+    public function store(PostStoreAndUpdateRequest $request)
     {
-        $attributes = Post::validate(request());
+        $attributes = $request->validated();
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
         $attributes['owner_id'] = auth()->id();
@@ -60,9 +61,9 @@ class PostsController extends Controller
         return view('posts.edit', compact('post'));
     }
 
-    public function update(Post $post)
+    public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $attributes = Post::validate(request(),$post->id);
+        $attributes = $request->validated();
 
         $attributes['published'] = isset($attributes['published']) ? 1 : 0;
 
