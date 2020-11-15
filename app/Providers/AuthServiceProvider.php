@@ -13,7 +13,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        \App\Task::class => \App\Policies\TaskPolicy::class
+        \App\Task::class => \App\Policies\TaskPolicy::class,
+        \App\Post::class => \App\Policies\PostPolicy::class
     ];
 
     /**
@@ -26,10 +27,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        $gate->before(function ($user) {
-            if ($user->id == 2) {
-                return true;
-            }
-        });
+//        $gate->before(function ($user) {
+//            if ($user->isAdmin()) {
+//                return true;
+//            }
+//        });
     }
 }

@@ -31,8 +31,7 @@
                        name="tags"
                        class="form-control"
                        id="inputTags"
-                       value="{{ old('tags', $task->tags->pluck('name')->implode(',')) }}"
-                >
+                       value="{{ old('tags', $task->tags->pluck('name')->implode(',')) }}">
             </div>
 
             <button type="submit" class="btn btn-primary">Изменить</button>

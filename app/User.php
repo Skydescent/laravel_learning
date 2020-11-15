@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Notifications\PostStatusChanged;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,6 +22,11 @@ class User extends Authenticatable
     public function tasks()
     {
         return $this->hasMany(Task::class, 'owner_id');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'owner_id');
     }
 
 }

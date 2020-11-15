@@ -7,18 +7,28 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskStepCompleted extends Notification
+class PostStatusChanged extends Notification
 {
     use Queueable;
+
+    public $postTitle;
+
+    public $postUri;
+
+    public $status;
 
     /**
      * Create a new notification instance.
      *
-     * @return void
+     * @param $status
+     * @param $postTitle
+     * @param null $postUri
      */
-    public function __construct()
+    public function __construct($status, $postTitle, $postUri = null)
     {
-        //
+        $this->status = $status;
+        $this->postTitle = $postTitle;
+        $this->postUri = $postUri;
     }
 
     /**
@@ -29,7 +39,7 @@ class TaskStepCompleted extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail'];
     }
 
     /**
@@ -40,11 +50,19 @@ class TaskStepCompleted extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->subject('Шаг Выполнен')
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+        $mailMessage = new MailMessage();
+
+        $mailMessage
+            ->greeting('Здравствуйте!')
+            ->subject("В блоге {$this->status}")
+            ->line("В блоге {$this->status}: {$this->postTitle}");
+
+        if (!is_null($this->postUri)) {
+            $mailMessage->action('Смотреть', url($this->postUri));
+        }
+
+        $mailMessage->salutation('Хорошего дня!');
+        return $mailMessage;
     }
 
     /**

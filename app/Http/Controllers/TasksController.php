@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\TaskCreated;
 use App\Tag;
 use App\Task;
 
