@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', 'PostsController@index');
+Route::view('/demo', 'demo');
+Route::view('/', 'welcome');
+
+//Route::get('/', 'PostsController@index');
 
 Route::get('/{model}/tags/{tag}', 'TagsController@index')->name('tags.cloud');
 

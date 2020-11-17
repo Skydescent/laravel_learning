@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 
+use App\View\Components\Alert;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,6 +36,12 @@ class AppServiceProvider extends ServiceProvider
             $relatedWith = isset($view->task) ? 'tasks' : 'posts';
             $view->with('modelAlias', $relatedWith);
             $view->with('tagsCloud', \App\Tag::tagsCloud($relatedWith));
+        });
+
+
+        Blade::component('alert', Alert::class);
+        Blade::directive('datetime', function ($value) {
+            return "<?php echo ($value)->format('d.m.Y') ?>";
         });
     }
 }
