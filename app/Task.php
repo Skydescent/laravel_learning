@@ -5,7 +5,7 @@ namespace App;
 use App\Events\TaskCreated;
 use Illuminate\Database\Eloquent\Collection;
 
-class Task extends \Illuminate\Database\Eloquent\Model
+class Task extends Model
 {
     //Защита от массового заполнения
     //public $fillable = ['title', 'body'];

@@ -1,9 +1,12 @@
 <?php
 
+use Database\Seeders\TasksToUserSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+
     /**
      * Seed the application's database.
      *
@@ -11,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UserSeeder::class);
+        $this->call([
+            TasksToUserSeeder::class,
+            UserSeeder::class,
+
+        ]);
     }
 }
