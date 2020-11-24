@@ -17,7 +17,7 @@ Route::post('/completed-steps/{step}', 'CompletedStepsController@store');
 Route::delete('/completed-steps/{step}', 'CompletedStepsController@destroy');
 
 
-//Route::resource('/posts', 'PostsController');
+Route::resource('/posts', 'PostsController');
 
 Route::view('/about', 'about')->name('about');
 Route::get('/contacts', 'FeedbacksController@create')->name('feedbacks.create');
@@ -25,4 +25,11 @@ Route::get('/admin/feedbacks','FeedbacksController@index')->name('feedbacks.inde
 Route::post('/feedbacks','FeedbacksController@store')->name('feedbacks.store');
 
 Auth::routes();
+
+Route::middleware('auth')->post('/companies', function () {
+    $attributes = request()->validate(['name' => 'required']);
+    $attributes['owner_id'] = auth()->id();
+
+    \App\Company::create($attributes);
+});
 

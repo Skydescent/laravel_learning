@@ -36,4 +36,13 @@ class TasksTest extends TestCase
         // Что нужно получить на выходе: Запись в БД о ноовой задаче
         $this->assertDatabaseHas('tasks', $attributes);
     }
+
+    public function testGuestMayNotCreateATask()
+    {
+        //При обращении незарегистрированноо пользователя,
+        //должен срабатывть middlewear для редиректа на страницу login
+        $this->post('/tasks')->assertRedirect('/login');
+    }
+
+
 }
