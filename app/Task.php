@@ -11,9 +11,9 @@ class Task extends Model
     //public $fillable = ['title', 'body'];
     public $guarded = [];
 
-    protected $dispatchesEvents = [
-        'created' => TaskCreated::class,
-    ];
+//    protected $dispatchesEvents = [
+//        'created' => TaskCreated::class,
+//    ];
 
     // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()

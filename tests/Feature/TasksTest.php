@@ -2,12 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Task;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class TaskTest extends TestCase
+class TasksTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
     // RefreshDatabase - необходимо чтобы данный трейт использовался
@@ -21,15 +22,18 @@ class TaskTest extends TestCase
     public function testAUserCanCreateATask()
         //Метод должен называться с test
     {
+        $this->withoutExceptionHandling();
+
         // Что - входные данные: Авторизованный пользователь
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($user = User::factory()->create());
 
         // Когда: Приходит на страницу /tasks для создания новой задачи
-        $this->post('/tasks', [
-           'title' => $this->faker->words(4, true),
-           'body' => $this->faker->sentence,
-        ]);
 
-        // Что нужно получить на выходе
+        // воспользуемся фабрикой для генерации случайной задачи
+        $attributes = Task::factory()->raw(['owner_id' => $user]);
+        $this->post('/tasks', $attributes);
+
+        // Что нужно получить на выходе: Запись в БД о ноовой задаче
+        $this->assertDatabaseHas('tasks', $attributes);
     }
 }

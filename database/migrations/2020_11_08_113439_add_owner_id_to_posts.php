@@ -14,7 +14,7 @@ class AddOwnerIdToPosts extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->unsignedBigInteger('owner_id');
+            $table->unsignedBigInteger('owner_id')->default(1);
         });
     }
 
