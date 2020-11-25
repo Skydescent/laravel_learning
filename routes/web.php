@@ -33,3 +33,5 @@ Route::middleware('auth')->post('/companies', function () {
     \App\Company::create($attributes);
 });
 
+Route::get('/service', 'PushServiceController@form');
+Route::post('/service', 'PushServiceController@send');
