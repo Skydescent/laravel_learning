@@ -24,4 +24,12 @@ class UsersTest extends TestCase
         // совпадает с заголовком первой задачи из базы данных по данному пользователю
         $this->assertEquals($attributes['title'], $user->tasks->first()->title);
     }
+
+    public function testAUserCanHaveACompany()
+    {
+        $user = User::factory()->create();
+
+        $user->company()->create(['name' => 'Skillbox']);
+        $this->assertEquals('Skillbox', $user->company->name);
+    }
 }

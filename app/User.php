@@ -30,4 +30,9 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'owner_id');
     }
 
+    public function company()
+    {
+        return $this->hasOne(Company::class, 'owner_id');
+    }
+
 }
