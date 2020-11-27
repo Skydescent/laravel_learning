@@ -6,9 +6,29 @@ namespace App\Service;
 
 class Pushall
 {
+    private $id;
     private $apiKey;
-    public function __construct($apiKey)
+
+    protected $url = "https://pushall.ru/api.php";
+
+    public function __construct($apiKey, $id)
     {
         $this->apiKey = $apiKey;
+        $this->id = $id;
+    }
+
+    public function send($title, $text)
+    {
+        $data = [
+            'type' => 'self',
+            'id' => $this->id,
+            'key' => $this->apiKey,
+            'text' => $text,
+            'title' => $title
+        ];
+
+        $client = new \GuzzleHttp\Client();
+        return $client->post( $this->url, ['form_params' => $data]);
+
     }
 }

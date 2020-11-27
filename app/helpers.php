@@ -12,4 +12,24 @@ if (!function_exists('flash')) {
     }
 }
 
+if (!function_exists('push_all')) {
+
+    /**
+     * @param null $title
+     * @param null $text
+     * @return \App\Service\Pushall|mixed
+     */
+    function push_all($title = null, $text = null)
+    {
+        //Если заголовок или текст = null,
+        // просто возвращаем объект Pushall
+        if (is_null($title) || is_null($text)) {
+            return app(\App\Service\Pushall::class);
+        }
+
+        return app(\App\Service\Pushall::class)->send($title, $text);
+
+    }
+}
+
 

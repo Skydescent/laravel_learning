@@ -1,6 +1,8 @@
 /node_modules
 /public/hot
 /public/storage
+/public/vendor
+/public/cgi-bin
 /public_html
 /storage/logs
 /vendor

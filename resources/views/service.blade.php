@@ -8,22 +8,22 @@
 
         @include('layout.errors')
 
-        <form method="post" action="{{route('tasks.store')}}">
+        <form method="post" action="/service">
 
             @csrf
 
             <div class="form-group">
-                <label for="inputTitle">Название задачи</label>
-                <input type="text" class="form-control" id="inputTitle"  placeholder="Введите название задачи"
+                <label for="inputTitle">Заголовок уведомления</label>
+                <input type="text" class="form-control" id="inputTitle"  placeholder="Введите заголовок уведомления"
                        name= "title"
                        value="{{ old('title')}}">
             </div>
             <div class="form-group">
-                <label for="inputBody">Описание задачи</label>
-                <textarea name="body"  class="form-control" id="inputBody">{{ old('body', 'Введите описание')}}</textarea>
+                <label for="inputText">Текст уведомления</label>
+                <textarea name="text"  class="form-control" id="inputText">{{ old('text')}}</textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">Создать задачу</button>
+            <button type="submit" class="btn btn-primary">Отправить</button>
         </form>
     </div>
 @endsection
