@@ -46,6 +46,6 @@
         <a class="p-2 text-muted" href="{{route('about')}}">О нас</a>
         <a class="p-2 text-muted" href="{{route('feedbacks.create')}}">Контакты</a>
         <a class="p-2 text-muted" href="{{route('posts.create')}}">Создать статью</a>
-        <a class="p-2 text-muted" href="{{route('feedbacks.index')}}">Админ. раздел</a>
+{{--        <a class="p-2 text-muted" href="{{route('feedbacks.index')}}">Админ. раздел</a>--}}
     </nav>
 </div>

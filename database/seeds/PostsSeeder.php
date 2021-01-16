@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\User;
+use App\Post;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
 
-class UserSeeder extends Seeder
+class PostsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,9 +15,8 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-
-        User::factory()
-            ->times(10)
-            ->create(); // Создаёт модель и сохраняет в ДБ
+        Post::factory()
+            ->times(5)
+            ->create();
     }
 }

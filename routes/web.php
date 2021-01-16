@@ -1,9 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+class Test11
+{
+    use Illuminate\Foundation\Testing\WithFaker;
+}
 
 Route::view('/demo', 'demo');
-//Route::view('/', 'welcome');
+Route::get('/test11', 'TestController@test');
 
 Route::get('/', 'PostsController@index');
 
@@ -21,8 +25,15 @@ Route::resource('/posts', 'PostsController');
 
 Route::view('/about', 'about')->name('about');
 Route::get('/contacts', 'FeedbacksController@create')->name('feedbacks.create');
-Route::get('/admin/feedbacks','FeedbacksController@index')->name('feedbacks.index');
+//Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
 Route::post('/feedbacks','FeedbacksController@store')->name('feedbacks.store');
+Route::get('/greeting', function () {
+    return 'Hello World';
+});
+Route::prefix('admin')->group(function () {
+    Route::get('/posts', 'Admin\PostsController@index')->name('adminPosts.index');
+    Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
+});
 
 Auth::routes();
 

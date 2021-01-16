@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Testing\WithFaker;
+
 
 class TestController extends Controller
 {
-    /**
-     * TestController constructor.
-     */
+    use WithFaker;
+
     public function __construct()
     {
-        $this->middleware('test', ['except' => ['index']]);
+        $this->setUpFaker();
     }
 
     public function index()
@@ -19,9 +20,11 @@ class TestController extends Controller
         return 'hello';
     }
 
-    public function show()
+    public function test()
     {
-        return 'show';
+        $faker = $this->faker;
+        return $faker->regexify('^[a-z0-9-_]+$');
+
     }
 
 }
