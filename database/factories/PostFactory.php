@@ -29,7 +29,7 @@ class PostFactory extends Factory
         return [
                 'slug' => $this->faker->unique()->regexify('/^[a-z0-9-_]+$/i'),
                 'title' => $this->faker->valid($titleValidator)->sentence(5, true),
-                'short_text' => $this->text(255),
+                'short_text' => $this->faker->text(255),
                 'body' => $this->faker->paragraph(5,true), // одно предложение
                 'owner_id' => User::all()->random()->id // случайный id из пользователей
         ];

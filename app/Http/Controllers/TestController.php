@@ -17,7 +17,7 @@ class TestController extends Controller
 
     public function index()
     {
-        return 'hello';
+        return ;
     }
 
     public function test()

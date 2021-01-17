@@ -3,12 +3,9 @@
 @section('title', 'Администрирование статей')
 
 @section('content')
-    <div class="col-md-8 blog-main">
-        <h3 class="pb-4 mb-4 font-italic border-bottom">
-            Список статей
-        </h3>
+    <div class="col-md-8 p-0">
         <table class="table">
-            <thead class="thead-dark">
+            <thead class="thead-dark table-bordered ">
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Slug</th>
@@ -26,11 +23,11 @@
             @endforeach
             </tbody>
         </table>
-
-        <nav class="blog-pagination">
-            <a class="btn btn-outline-primary" href="#">Старше</a>
-            <a class="btn btn-outline-secondary disabled" href="#" tabindex="-1" aria-disabled="true">Новее</a>
-        </nav>
-
+        <div class="col pl-15">
+            <nav class="blog-pagination">
+                <a class="btn btn-outline-primary" href="#">Старше</a>
+                <a class="btn btn-outline-secondary disabled" href="#" tabindex="-1" aria-disabled="true">Новее</a>
+            </nav>
+        </div>
     </div>
 @endsection

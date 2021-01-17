@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     {
 
         User::factory()
-            ->times(10)
+            ->times(3)
             ->create(); // Создаёт модель и сохраняет в ДБ
     }
 }

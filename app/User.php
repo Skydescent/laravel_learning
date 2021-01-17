@@ -35,4 +35,9 @@ class User extends Authenticatable
         return $this->hasOne(Company::class, 'owner_id');
     }
 
+    public function  isAdmin()
+    {
+        return $this->role_id === 1;
+    }
+
 }

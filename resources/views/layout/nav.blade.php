@@ -36,6 +36,7 @@
 
 
         </div>
+
     </div>
 </header>
 <div class="nav-scroller py-1 mb-2">
@@ -46,6 +47,10 @@
         <a class="p-2 text-muted" href="{{route('about')}}">О нас</a>
         <a class="p-2 text-muted" href="{{route('feedbacks.create')}}">Контакты</a>
         <a class="p-2 text-muted" href="{{route('posts.create')}}">Создать статью</a>
+
+        @if (Auth::user() && Auth::user()->isAdmin())
+            <a class="p-2 text-muted" href="{{route('admin.posts.index')}}">Административный раздел</a>
+        @endif
 {{--        <a class="p-2 text-muted" href="{{route('feedbacks.index')}}">Админ. раздел</a>--}}
     </nav>
 </div>

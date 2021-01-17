@@ -1,10 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-class Test11
-{
-    use Illuminate\Foundation\Testing\WithFaker;
-}
 
 Route::view('/demo', 'demo');
 Route::get('/test11', 'TestController@test');
@@ -30,9 +26,9 @@ Route::post('/feedbacks','FeedbacksController@store')->name('feedbacks.store');
 Route::get('/greeting', function () {
     return 'Hello World';
 });
-Route::prefix('admin')->group(function () {
-    Route::get('/posts', 'Admin\PostsController@index')->name('adminPosts.index');
-    Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
+Route::middleware(['auth', 'permissions'])->prefix('admin')->group(function () {
+    Route::get('/posts', 'Admin\PostsController@index')->name('admin.posts.index');
+    Route::get('/feedbacks','FeedbacksController@index')->name('admin.feedbacks.index');
 });
 
 Auth::routes();
