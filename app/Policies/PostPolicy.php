@@ -19,6 +19,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post)
     {
-        return $post->owner_id == $user->id;
+        //dd($post->owner_id == $user->id, $user->isAdmin());
+        return $post->owner_id == $user->id || $user->isAdmin();
     }
 }

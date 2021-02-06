@@ -22,9 +22,22 @@ class TestController extends Controller
 
     public function test()
     {
-        $faker = $this->faker;
-        return $faker->regexify('^[a-z0-9-_]+$');
+//        $faker = $this->faker;
+//        return $faker->regexify('^[a-z0-9-_]{15}$');
+//        $arr = [];
+//        try {
+//            $p = $arr['pub'];
+//            return $p;
+//        } catch (\Exception $e) {}
+//
+//        return 'Всё ок';
 
+        $arr = ['a' => 'a', 'b'=> 'b', 'c' => 'c'];
+        $tags = ['tags' => $arr['a']];
+        unset($arr['a']);
+
+        var_dump($tags);
+        var_dump($arr);
     }
 
 }

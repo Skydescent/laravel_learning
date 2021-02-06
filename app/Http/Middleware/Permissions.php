@@ -19,8 +19,8 @@ class Permissions
         $user = $request->user();
         $actions = $request->route()->getAction();
 
-        if (! $user->isAdmin()) {
-            flash("Доступ к административному разделу запрещён", "danger");
+        if (!$user->isAdmin()) {
+            flash("Доступ запрещён", "danger");
             return redirect()->route("posts.index");
         }
 

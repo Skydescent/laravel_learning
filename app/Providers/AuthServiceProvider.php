@@ -26,11 +26,5 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(\Illuminate\Contracts\Auth\Access\Gate $gate)
     {
         $this->registerPolicies();
-
-//        $gate->before(function ($user) {
-//            if ($user->isAdmin()) {
-//                return true;
-//            }
-//        });
     }
 }

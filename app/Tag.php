@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Tag extends Model
 {
@@ -28,6 +29,11 @@ class Tag extends Model
 
     public static function tagsCloud($relatedWith)
     {
+        if ($relatedWith === 'posts') {
+            return (new static)->whereHas($relatedWith, function (Builder $query) {
+                $query->where('published',1);
+            })->get();
+        }
         return (new static)->has($relatedWith)->get();
     }
 }

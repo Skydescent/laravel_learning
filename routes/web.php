@@ -26,10 +26,18 @@ Route::post('/feedbacks','FeedbacksController@store')->name('feedbacks.store');
 Route::get('/greeting', function () {
     return 'Hello World';
 });
-Route::middleware(['auth', 'permissions'])->prefix('admin')->group(function () {
-    Route::get('/posts', 'Admin\PostsController@index')->name('admin.posts.index');
-    Route::get('/feedbacks','FeedbacksController@index')->name('admin.feedbacks.index');
+
+Route::group([
+    'prefix' => 'admin',
+    'as' => 'admin.',
+    'middleware' => ['auth', 'permissions']
+], function () {
+    Route::resource('posts', 'Admin\PostsController')->only('index', 'update', 'edit');
+    Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
 });
+
+
+
 
 Auth::routes();
 

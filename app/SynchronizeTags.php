@@ -8,6 +8,7 @@ trait SynchronizeTags
 {
     public function syncTags($requestTags)
     {
+        if (is_null($requestTags)) return;
         $syncIds = [];
         $tags = collect(explode(',', $requestTags));
 

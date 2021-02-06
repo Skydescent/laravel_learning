@@ -6,17 +6,27 @@ class Post extends \App\Model
 {
     use SynchronizeTags;
 
-    public function getRouteKeyName()
+
+    /**
+     * @return string
+     */
+    public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    public function tags()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function owner()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
