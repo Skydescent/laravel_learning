@@ -31,7 +31,8 @@ class PostFactory extends Factory
                 'title' => $this->faker->valid($titleValidator)->sentence(5, true),
                 'short_text' => $this->faker->text(255),
                 'body' => $this->faker->paragraph(5,true), // одно предложение
-                'owner_id' => User::all()->random()->id // случайный id из пользователей
+                'owner_id' => User::all()->random()->id, // случайный id из пользователей
+                'published' => 1
         ];
     }
 }

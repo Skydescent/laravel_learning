@@ -38,7 +38,7 @@ class PostsService
     public function storeOrUpdate($attributes)
     {
         $attributes['published'] = $attributes['published'] ?? 0;
-        $attributes['owner_id'] = auth()->id();
+        $attributes['owner_id'] = $this->post->owner ? $this->post->owner->id :auth()->id();
 
         $tags = $attributes['tags']?? null;
         unset($attributes['tags']);

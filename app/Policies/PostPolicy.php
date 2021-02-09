@@ -19,7 +19,18 @@ class PostPolicy
      */
     public function update(User $user, Post $post)
     {
-        //dd($post->owner_id == $user->id, $user->isAdmin());
-        return $post->owner_id == $user->id || $user->isAdmin();
+        return $post->owner_id == $user->id;
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     *
+     * @param  \App\User  $user
+     * @param  \App\Post  $post
+     * @return mixed
+     */
+    public function view(?User $user, Post $post)
+    {
+        return $post->owner_id == optional($user)->id || $post->published === 1;
     }
 }

@@ -22,9 +22,16 @@ class PostsController extends Controller
         return redirect()->route('admin.posts.index');
     }
 
-    public function edit(Request $request, Post $post)
+    public function edit(Post $post)
     {
-        //$extendedView = auth()->user()->isAdmin() ? ''
-        dd(auth()->user());
+        $isAdmin = true;
+        return view('posts.edit', compact('post', 'isAdmin'));
+    }
+
+    public function destroy(Post $post)
+    {
+        PostsService::postDestroy($post, 'удалена статья');
+        flash('Статья удалена', 'warning');
+        return redirect()->route('admin.posts.index');
     }
 }

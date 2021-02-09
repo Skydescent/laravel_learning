@@ -41,5 +41,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('datetime', function ($value) {
             return "<?php echo ($value)->format('d.m.Y') ?>";
         });
+        Blade::if('admin', function ($user) { return $user && $user->isAdmin(); });
     }
 }

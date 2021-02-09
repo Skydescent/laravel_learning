@@ -32,12 +32,9 @@ Route::group([
     'as' => 'admin.',
     'middleware' => ['auth', 'permissions']
 ], function () {
-    Route::resource('posts', 'Admin\PostsController')->only('index', 'update', 'edit');
+    Route::resource('posts', 'Admin\PostsController')->only('index', 'update', 'edit', 'destroy');
     Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
 });
-
-
-
 
 Auth::routes();
 

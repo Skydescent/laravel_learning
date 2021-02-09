@@ -16,11 +16,12 @@ class PostsController extends Controller
     {
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
+        $this->middleware('can:view,post')->only(['show']);
     }
 
     public function index()
     {
-        $posts = Post::latest()->with('tags')->where('published', 1)->get();
+        $posts = Post::latest()->with('tags')->where('published', 1)->orWhere('owner_id', '=', auth()->id())->get();
         return view('posts.index', compact( 'posts'));
     }
 
@@ -49,9 +50,10 @@ class PostsController extends Controller
         return redirect()->route('posts.index');
     }
 
-    public function edit(Request $request, Post $post)
+    public function edit(Post $post)
     {
-        return view('posts.edit', compact('post'));
+        $isAdmin = false;
+        return view('posts.edit', compact('post', 'isAdmin'));
     }
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
