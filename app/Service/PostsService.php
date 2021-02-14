@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
@@ -18,10 +17,10 @@ class PostsService
      * PostsService constructor.
      * @param Post $post
      */
-    public function __construct(Post $post = null)
+    public function setPost(Post $post)
     {
-        $post = $post ?? new Post;
         $this->post = $post;
+        return $this;
     }
 
     /**
@@ -44,8 +43,9 @@ class PostsService
         unset($attributes['tags']);
 
         $this->post = Post::updateOrCreate(['id' => $this->post->id], $attributes);
-
         $this->post->syncTags($tags);
+
+        return $this;
     }
 
     /**
@@ -69,21 +69,6 @@ class PostsService
             $this->post->title,
             $route
         ));
-    }
-
-    public static function postStoreOrUpdate($request, $post, $message = null, $routeName = null)
-    {
-        $postService = new static($post);
-        $postService->storeOrUpdate($request->validated());
-        if (!is_null($message)) {
-            $postService->notifyAdmin($message, $routeName);
-        }
-    }
-
-    public static function postDestroy($post, $message)
-    {
-        $postService = new static($post);
-        $postService->destroy();
-        $postService->notifyAdmin($message);
+        return $this;
     }
 }

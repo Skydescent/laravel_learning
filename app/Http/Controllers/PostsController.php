@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreAndUpdateRequest;
-use App\Notifications\PostStatusChanged;
 use App\Post;
-use App\Recipients\AdminRecipient;
 use App\Service\PostsService;
-use Illuminate\Http\Request;
+
 
 class PostsController extends Controller
 {
+    private $postService;
 
-    public function __construct()
+    public function __construct(PostsService $postService)
     {
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
         $this->middleware('can:view,post')->only(['show']);
+        $this->postService = $postService;
     }
 
     public function index()
@@ -38,12 +38,10 @@ class PostsController extends Controller
 
     public function store(PostStoreAndUpdateRequest $request)
     {
-        PostsService::postStoreOrUpdate(
-            $request,
-            null,
-            'добавлена статья',
-            'posts.show'
-        );
+        $this->postService
+            ->setPost(new Post)
+            ->storeOrUpdate($request->validated())
+            ->notifyAdmin('добавлена статья', 'posts.show');
 
         flash('Статья успешно добавлена');
 
@@ -58,12 +56,11 @@ class PostsController extends Controller
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        PostsService::postStoreOrUpdate(
-            $request,
-            $post,
-            'обновлена статья',
-            'posts.show'
-        );
+        $this->postService
+            ->setPost($post)
+            ->storeOrUpdate($request->validated())
+            ->notifyAdmin('обновлена статья', 'posts.show');
+
         flash('Статья успешно обновлена');
 
         return redirect()->route('posts.index');
@@ -71,7 +68,10 @@ class PostsController extends Controller
 
     public function destroy(Post $post)
     {
-        PostsService::postDestroy($post, 'удалена статья');
+        $this->postService
+            ->setPost($post)
+            ->destroy()
+            ->notifyAdmin('удалена статья');
         flash('Статья удалена', 'warning');
         return redirect()->route('posts.index');
     }

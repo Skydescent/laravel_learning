@@ -27,13 +27,8 @@ class Tag extends Model
         return 'name';
     }
 
-    public static function tagsCloud($relatedWith)
+    public static function tagsCloud(callable $filter)
     {
-        if ($relatedWith === 'posts') {
-            return (new static)->whereHas($relatedWith, function (Builder $query) {
-                $query->where('published',1);
-            })->get();
-        }
-        return (new static)->has($relatedWith)->get();
+        return call_user_func($filter, (new static())->query())->get();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 
+use App\Service\TagService;
 use App\View\Components\Alert;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
@@ -31,9 +32,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('layout.sidebar', function($view) {
-            $relatedWith = isset($view->task) ? 'tasks' : 'posts';
-            $view->with('modelAlias', $relatedWith);
-            $view->with('tagsCloud', \App\Tag::tagsCloud($relatedWith));
+            $filter = (new TagService())->getFilterCallback();
+            $view->with('tagsCloud', \App\Tag::tagsCloud($filter));
         });
 
 

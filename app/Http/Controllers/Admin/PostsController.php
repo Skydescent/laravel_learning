@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
 use App\Service\PostsService;
-use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
+    private $postService;
+
+    public function __construct(PostsService $postService)
+    {
+        $this->postService = $postService;
+    }
     public function index()
     {
         $posts = Post::latest()->with('owner')->get();
@@ -18,7 +23,9 @@ class PostsController extends Controller
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        PostsService::postStoreOrUpdate($request,$post);
+        $this->postService
+            ->setPost($post)
+            ->storeOrUpdate($request->validated());
         return redirect()->route('admin.posts.index');
     }
 
@@ -30,7 +37,9 @@ class PostsController extends Controller
 
     public function destroy(Post $post)
     {
-        PostsService::postDestroy($post, 'удалена статья');
+        $this->postService
+            ->setPost($post)
+            ->destroy();
         flash('Статья удалена', 'warning');
         return redirect()->route('admin.posts.index');
     }
