@@ -13,6 +13,9 @@ class PostStoreAndUpdateRequest extends FormRequest
      */
     public function rules()
     {
+        if ($this->user()->isAdmin() && !$this->slug) {
+            return ['published'=>''];
+        }
         $slugRule = 'required|regex:/^[a-z0-9-_]+$/i|unique:posts';
 
         if ($this->route()->hasParameter('post')) {
@@ -24,7 +27,8 @@ class PostStoreAndUpdateRequest extends FormRequest
             'title' => 'required|between:5,100',
             'short_text' => 'required|max:255',
             'body' => 'required',
-            'published' => ''
+            'published' => '',
+            'tags' => ''
         ];
 
     }

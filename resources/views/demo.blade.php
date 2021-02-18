@@ -1,7 +1,7 @@
-@extends('app')
+@extends('layout.app')
 @section('title', 'Page Demo Title')
 
-@section('content')
+@section('app_content')
     Содержимое страницы Demo
 @endsection
 

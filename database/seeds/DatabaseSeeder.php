@@ -2,7 +2,9 @@
 
 use Database\Seeders\TasksToUserSeeder;
 use Database\Seeders\UserSeeder;
+use Database\Seeders\PostsSeeder;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TasksToUserSeeder::class,
             UserSeeder::class,
-
+            PostsSeeder::class,
         ]);
     }
 }

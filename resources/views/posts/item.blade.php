@@ -2,12 +2,17 @@
     <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
         <div class="col p-4 d-flex flex-column position-static">
             <h3 class="mb-0">{{ $post->title }}</h3>
-            @include('layout.tags', [
+            @include('tags.cloud', [
                 'tags' => $post->tags,
                 'alias' => 'posts',
             ])
             <div class="mb-1 text-muted">{{ $post->created_at->toFormattedDateString() }}</div>
             <p class="card-text mb-auto">{{ $post->short_text }}</p>
+            @admin(Auth::user())
+                <h5>
+                    <a href="{{ route('admin.posts.edit', ['post' => $post]) }}" class="badge badge-success">Редактировать</a>
+                </h5>
+            @endadmin
             <a href="{{ route('posts.show', ['post' => $post]) }}">Продолжить читать</a>
         </div>
         <div class="col-auto d-none d-lg-block">

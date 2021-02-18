@@ -3,22 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreAndUpdateRequest;
-use App\Notifications\PostStatusChanged;
 use App\Post;
-use App\Recipients\AdminRecipient;
+use App\Service\PostsService;
+
 
 class PostsController extends Controller
 {
+    private $postService;
 
-    public function __construct()
+    public function __construct(PostsService $postService)
     {
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
+        $this->middleware('can:view,post')->only(['show']);
+        $this->postService = $postService;
     }
 
     public function index()
     {
-        $posts = Post::latest()->with('tags')->get();
+        $posts = Post::latest()->with('tags')->where('published', 1)->orWhere('owner_id', '=', auth()->id())->get();
         return view('posts.index', compact( 'posts'));
     }
 
@@ -35,65 +38,41 @@ class PostsController extends Controller
 
     public function store(PostStoreAndUpdateRequest $request)
     {
-        $attributes = $request->validated();
-
-        $attributes['published'] = isset($attributes['published']) ? 1 : 0;
-        $attributes['owner_id'] = auth()->id();
-
-        $post = Post::create($attributes);
-
-        $post->syncTags(request('tags'));
+        $this->postService
+            ->setPost(new Post)
+            ->storeOrUpdate($request->validated())
+            ->notifyAdmin('добавлена статья', 'posts.show');
 
         flash('Статья успешно добавлена');
-
-        $recipient = new AdminRecipient();
-        $recipient->notify(new PostStatusChanged(
-            'создана статья',
-            $post->title,
-            route('posts.show', ['post' => $post])
-        ));
 
         return redirect()->route('posts.index');
     }
 
     public function edit(Post $post)
     {
-        return view('posts.edit', compact('post'));
+        $isAdmin = false;
+        return view('posts.edit', compact('post', 'isAdmin'));
     }
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $attributes = $request->validated();
-
-        $attributes['published'] = isset($attributes['published']) ? 1 : 0;
-
-        $post->update($attributes);
-
-        $post->syncTags(request('tags'));
+        $this->postService
+            ->setPost($post)
+            ->storeOrUpdate($request->validated())
+            ->notifyAdmin('обновлена статья', 'posts.show');
 
         flash('Статья успешно обновлена');
-
-        $recipient = new AdminRecipient();
-        $recipient->notify(new PostStatusChanged(
-            'обновлена статья',
-            $post->title,
-            route('posts.show', ['post' => $post])
-        ));
 
         return redirect()->route('posts.index');
     }
 
     public function destroy(Post $post)
     {
-        $post->delete();
+        $this->postService
+            ->setPost($post)
+            ->destroy()
+            ->notifyAdmin('удалена статья');
         flash('Статья удалена', 'warning');
-
-        $recipient = new AdminRecipient();
-        $recipient->notify(new PostStatusChanged(
-            'удалена статья',
-            $post->title
-        ));
-
         return redirect()->route('posts.index');
     }
 }

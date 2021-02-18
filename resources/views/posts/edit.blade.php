@@ -1,8 +1,18 @@
-@extends('layout.master')
+@php
+    $extendedView = 'layout.app';
+    $content = 'app_content';
+    $methodPrefix = '';
+    if ($isAdmin) {
+        $extendedView = 'layout.admin';
+        $content = 'admin_content';
+        $methodPrefix = 'admin.';
+    }
+@endphp
+@extends("{$extendedView}")
 
 @section('title', 'Изменение статьи')
 
-@section('content')
+@section("{$content}")
     <div class="col-md-8 blog-main">
         <h3 class="pb-4 mb-4 font-italic border-bottom">
             Изменение статьи
@@ -10,7 +20,7 @@
 
         @include('layout.errors')
 
-        <form method="post" action="{{ route('posts.update', ['post' => $post]) }}">
+        <form method="post" action="{{ route($methodPrefix . 'posts.update', ['post' => $post]) }}">
 
             @csrf
             @method('PATCH')
@@ -20,7 +30,7 @@
             ])
         </form>
 
-        <form method="POST" action="{{route('posts.destroy', ['post' => $post])}}" class="mt-4">
+        <form method="POST" action="{{route($methodPrefix . 'posts.destroy', ['post' => $post])}}" class="mt-4">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">Удалить</button>

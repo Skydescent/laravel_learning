@@ -8,8 +8,9 @@ trait SynchronizeTags
 {
     public function syncTags($requestTags)
     {
+        if (is_null($requestTags)) return;
         $syncIds = [];
-        $tags = collect(explode(',', $requestTags));
+        $tags = collect($this->cleanTagsString($requestTags));
 
         if ($this->tags->isNotEmpty()) {
             $taskTags = $this->tags->keyBy('name');
@@ -27,5 +28,10 @@ trait SynchronizeTags
 
         $this->tags()->sync($syncIds);
 
+    }
+
+    private function cleanTagsString(string $tags) : array
+    {
+        return preg_split("/(^\s*)|(\s*,\s*)/", $tags, 0,PREG_SPLIT_NO_EMPTY);
     }
 }

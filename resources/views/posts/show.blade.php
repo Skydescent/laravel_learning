@@ -1,8 +1,8 @@
-@extends('layout.master')
+@extends('layout.app')
 
 @section('title', $title)
 
-@section('content')
+@section('app_content')
 <div class="col-md-8 blog-main">
     <h3 class="mb-2 font-italic">
         {{ $post->title }}

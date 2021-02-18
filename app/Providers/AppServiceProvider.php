@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 
+use App\Service\TagService;
 use App\View\Components\Alert;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
@@ -30,12 +31,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //Функция composer принимает вид и колбэк функцию
-        // Вид можно указать как маску, например * - все шаблоны
         view()->composer('layout.sidebar', function($view) {
-            $relatedWith = isset($view->task) ? 'tasks' : 'posts';
-            $view->with('modelAlias', $relatedWith);
-            $view->with('tagsCloud', \App\Tag::tagsCloud($relatedWith));
+            $filter = (new TagService())->getFilterCallback();
+            $view->with('tagsCloud', \App\Tag::tagsCloud($filter));
         });
 
 
@@ -43,5 +41,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('datetime', function ($value) {
             return "<?php echo ($value)->format('d.m.Y') ?>";
         });
+        Blade::if('admin', function ($user) { return $user && $user->isAdmin(); });
     }
 }

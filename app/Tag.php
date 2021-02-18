@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Tag extends Model
 {
@@ -26,8 +27,8 @@ class Tag extends Model
         return 'name';
     }
 
-    public static function tagsCloud($relatedWith)
+    public static function tagsCloud(callable $filter)
     {
-        return (new static)->has($relatedWith)->get();
+        return call_user_func($filter, (new static())->query())->get();
     }
 }
