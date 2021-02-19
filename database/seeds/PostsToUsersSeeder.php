@@ -16,17 +16,15 @@ class PostsToUsersSeeder extends Seeder
      */
     public function run()
     {
-        $users = User::factory()
-            ->times(2)
-            ->create();
-        $tags = Tag::factory()
-            ->times(10)
-            ->create();
+        $userIds = User::factory(rand(2,4))->create()->pluck('id')->toArray();
 
-        Post::factory()
-            ->times(20)
-            ->for()
-            ->hasAttached($tags->random(3))
-            ->create(['owner_id' => $users->random(1)->id()]); // в атрибутах первый пользователь
+        $tags = Tag::factory(rand(5,10))->create();
+
+
+        for($i = 1; $i <= rand(20,25); $i++){
+            Post::factory()
+                ->create(['owner_id' =>$userIds[array_rand($userIds)]])
+                ->tags()->saveMany($tags->random(3));
+        }
     }
 }
