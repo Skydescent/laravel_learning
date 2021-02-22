@@ -48,11 +48,8 @@ class NotifyAboutNewPostsCommandGiven extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->greeting('Здавствуйте!')
             ->subject("Подборка статей за последние {$this->days} дней")
-            ->view('mail.new-posts-index', ['posts'=> $this->posts])
-            ->salutation('Спасибо, что подписаны на наш блог!');
-
+            ->view('mail.new-posts-index', ['posts'=> $this->posts]);
     }
 
     /**
