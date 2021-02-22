@@ -37,6 +37,6 @@ class DemoCommand extends Command
      */
     public function handle()
     {
-        $this->line('Эта команда' . $this->signature);
+        $this->line('Эта команда ' . $this->signature);
     }
 }
