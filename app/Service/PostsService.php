@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Events\PostCreated;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
@@ -42,7 +43,11 @@ class PostsService
         $tags = $attributes['tags']?? null;
         unset($attributes['tags']);
 
-        $this->post = Post::updateOrCreate(['id' => $this->post->id], $attributes);
+        $post = Post::updateOrCreate(['id' => $this->post->id], $attributes);
+        if (!$this->post->id) {
+            event(new PostCreated($post));
+        }
+        $this->post = $post;
         $this->post->syncTags($tags);
 
         return $this;

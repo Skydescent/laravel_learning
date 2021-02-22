@@ -41,13 +41,12 @@ class NotifyAboutNewPosts extends Command
      */
     public function handle()
     {
-        $this->arguments();
-        $users = User::all();
+        $users = User::get('email');
         $posts = Post::where('published', 1)
-            ->whereDate('created_at', '>', now()->subDays($this->argument('days')))
+            ->whereDate('created_at', '>', now()->subDays($this->argument('days'))->toDateString())
             ->get();
         foreach ($users as $user) {
-            $user->notify(new \App\Notifications\NotifyAboutNewPostsCommandGiven( $posts, $this->argument('days')));
+            $user->notify(new \App\Notifications\NotifyAboutNewPostsCommandGiven($posts, $this->argument('days')));
         }
 
     }
