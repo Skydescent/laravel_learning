@@ -19,12 +19,6 @@ class PushAllChannel
     {
         ['title' => $title, 'text' => $text] = $notification->toPushAll($notifiable);
 
-        if (method_exists($notifiable, 'configNotificationPushAll')) {
-            ['apiKey'=>$apiKey, 'id' => $id] = $notifiable->configNotificationPushAll();
-            (new Pushall($apiKey, $id))->send($title, $text);
-        } else {
-            $title = ''
             push_all($title, $text);
-        }
     }
 }
