@@ -10,7 +10,7 @@ class PostCreated
 {
     use Dispatchable, SerializesModels;
 
-    private $post;
+    public $post;
 
     /**
      * Create a new event instance.

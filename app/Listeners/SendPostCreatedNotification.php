@@ -26,6 +26,8 @@ class SendPostCreatedNotification
      */
     public function handle(PostCreated $event)
     {
-        //
+        $post = $event->post;
+        $text = "Статья: {$post->title} по ссылке: " . route('posts.show', ['post' => $post])   ;
+        push_all('Новая статья в блоге', $text);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\PostCreated;
 use App\Events\TaskCreated;
+use App\Listeners\SendPostCreatedNotification;
 use App\Listeners\SendTaskCreatedNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -22,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         TaskCreated::class => [
             SendTaskCreatedNotification::class,
+        ],
+        PostCreated::class => [
+          SendPostCreatedNotification::class,
         ],
     ];
 
