@@ -18,5 +18,9 @@
 
     <hr>
     <a href="{{route('posts.index')}}">Вернуться на главную</a>
+    @auth
+        @include('comments.create')
+    @endauth
+    @include('comments.index')
 </div>
 @endsection

@@ -28,7 +28,8 @@ class PostsController extends Controller
     public function show(Post $post)
     {
         $title = $post->title;
-        return view('posts.show', compact('post', 'title'));
+        $comments = $post->comments();
+        return view('posts.show', compact('post', 'title', 'comments'));
     }
 
     public function create()
