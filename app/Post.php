@@ -42,4 +42,13 @@ class Post extends \App\Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * @param $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function addComment($attributes) : \Illuminate\Database\Eloquent\Model
+    {
+        return $this->comments()->create($attributes);
+    }
 }

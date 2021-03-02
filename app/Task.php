@@ -71,12 +71,12 @@ class Task extends Model
 
 //            public static function range($from, $to)
 //            {
-//                // TODO: Implement range() method.
+//
 //            }
 //
 //            public function chunkWhile(callable $callback)
 //            {
-//                // TODO: Implement chunkWhile() method.
+//
 //            }
         };
     }
