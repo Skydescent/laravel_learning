@@ -25,7 +25,8 @@ class TaskFactory extends Factory
         return [
             'title' => $this->faker->words(3,true), // true - слова в виде строки
             'body' => $this->faker->sentence, // одно предложение
-            'owner_id' => User::all()->random()->id // случайный id из пользователей
+            'owner_id' => User::all()->random()->id, // случайный id из пользователей
+            'type' => $this->faker->randomElement(['new', 'old', 'fast'])
         ];
     }
 }

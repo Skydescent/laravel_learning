@@ -4,6 +4,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'PostsController@index');
 
+Route::get('test', function () {
+    $tasks = DB::table('users')
+        ->sharedLock() //Блокировка модификации записей до тех пор, пока транзакция не завершена
+        ->lockForUpdate() //Запрет на чтение записей до тех пор пока эти записи не будут обновлены
+    ;
+});
 Route::get('/tags/{tag}', 'TagsController@index')->name('tags.cloud');
 
 Route::resource('/tasks', 'TasksController');

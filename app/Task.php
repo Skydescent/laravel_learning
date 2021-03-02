@@ -4,16 +4,46 @@ namespace App;
 
 use App\Events\TaskCreated;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
+    use SoftDeletes;
     //Защита от массового заполнения
     //public $fillable = ['title', 'body'];
     public $guarded = [];
 
+//    protected $appends = [
+//        'double_type'
+//    ];
+
 //    protected $dispatchesEvents = [
 //        'created' => TaskCreated::class,
 //    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('onlyNew', function(\Illuminate\Database\Eloquent\Builder $builder) {
+            $builder->new();
+        }); //Если логика фильтрации сложная, то можно вынести в класс, наследующий Eloquent/Scope
+    }
+
+    public function getTypeAttribute($value)
+    {
+        return ucfirst($value);
+    }
+
+    public function getDoubleTypeAttribute()
+    {
+        return $this->attributes['double_type'] = str_repeat($this->type, 2);
+    }
+
+    public function setTypeAttribute($value)
+    {
+        $this->attributes['type'] = ucfirst(strtolower($value));
+    }
+
 
     // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()
@@ -24,6 +54,16 @@ class Task extends Model
     public function scopeIncompleted($query) // Task::incomplete(false);
     {
         return $query->where('completed', 0);
+    }
+
+    public function scopeOfType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    public function scopeNew($query)
+    {
+        return $query->ofType('new');
     }
 
     public function steps()

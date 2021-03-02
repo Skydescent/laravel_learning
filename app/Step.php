@@ -5,6 +5,9 @@ namespace App;
 class Step extends Model
 {
     public $guarded = [];
+
+    protected $touches = ['task'];
+
     public function task()
     {
         return $this->belongsTo(Task::class);

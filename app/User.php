@@ -32,7 +32,7 @@ class User extends Authenticatable
 
     public function company()
     {
-        return $this->hasOne(Company::class, 'owner_id');
+        return $this->hasOne(Company::class, 'owner_id')->withDefault(['name' => 'Нет компании']);
     }
 
     public function  isAdmin()
