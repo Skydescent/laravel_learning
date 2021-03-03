@@ -15,6 +15,10 @@ class PostHistory extends Model
      */
     protected $guarded = [];
 
+    protected $casts = [
+        'changed_fields' => 'array'
+    ];
+
     /**
      * @return BelongsTo
      */

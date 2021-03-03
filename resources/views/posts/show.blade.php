@@ -25,8 +25,11 @@
     <hr>
     @forelse($post->history as $item)
         <p>
-            {{$item->email}} -- {{$item->pivot->created_at->diffForHumans()}}
-            - {{$item->pivot->before}} - {{$item->pivot->after}}
+            Пользоватьель: {{$item->name}} -- {{$item->pivot->created_at->diffForHumans()}}
+            - обновил поля:
+            @foreach(json_decode($item->pivot->changed_fields) as $field)
+                {{$field}},
+            @endforeach
         </p>
     @empty
         <p>Нет истории изменений</p>

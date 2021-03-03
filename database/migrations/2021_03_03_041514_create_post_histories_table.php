@@ -16,12 +16,12 @@ class CreatePostHistoriesTable extends Migration
         Schema::create('post_histories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->text('before')->nullable();
-            $table->text('after')->nullable();
+            $table->text('changed_fields')->nullable();
             $table->unsignedBigInteger('post_id');
-            $table->unsignedBigInteger('author_id');
-            $table->foreign('author_id')->references('id')->on('users');
+            $table->unsignedBigInteger('user_id');
+
             $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

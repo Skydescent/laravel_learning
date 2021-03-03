@@ -15,16 +15,9 @@ class Post extends \App\Model
         parent::boot();
 
         static::updating(function($post) {
-            $after = $post->getDirty();
-		    $post->history()->attach(
+		    $post->history()->attach(auth()->id(),
                 [
-                    'post_id' => $post->id,
-//                    'author_id' => auth()->id(),
-//                    'before' =>json_encode(\Arr::only(
-//                        $post->fresh()->toArray(),
-//                        array_keys($after)
-//                    )),
-//                    'after' => json_encode($after),
+                    'changed_fields' =>json_encode(array_keys($post->getDirty())),
                 ]
             );
         });
@@ -68,13 +61,8 @@ class Post extends \App\Model
     public function history() : BelongsToMany
     {
         return $this
-            ->belongsToMany(
-                \App\User::class,
-                'post_histories',
-                'author_id',
-                'id'
-            )
-            ->withPivot(['before', 'after'])
+            ->belongsToMany(\App\User::class, 'post_histories')
+            ->withPivot(['changed_fields'])
             ->withTimestamps();
     }
 
