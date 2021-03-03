@@ -10,6 +10,25 @@ class Post extends \App\Model
 {
     use SynchronizeTags;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function($post) {
+            $after = $post->getDirty();
+		    $post->history()->attach(
+                [
+                    'post_id' => $post->id,
+//                    'author_id' => auth()->id(),
+//                    'before' =>json_encode(\Arr::only(
+//                        $post->fresh()->toArray(),
+//                        array_keys($after)
+//                    )),
+//                    'after' => json_encode($after),
+                ]
+            );
+        });
+    }
 
     /**
      * @return string
@@ -41,6 +60,22 @@ class Post extends \App\Model
     public function owner() : BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function history() : BelongsToMany
+    {
+        return $this
+            ->belongsToMany(
+                \App\User::class,
+                'post_histories',
+                'author_id',
+                'id'
+            )
+            ->withPivot(['before', 'after'])
+            ->withTimestamps();
     }
 
     /**
