@@ -1,7 +1,8 @@
  <div class="col-md-8 blog-main">
-     @forelse($comments as $comment)
+     @forelse($post->comments as $comment)
          @include('comments.item')
      @empty
-         <p>Нет комментариев</p>
+         <hr>
+         <p>Здесь пока нет комментариев...</p>
      @endforelse
  </div>

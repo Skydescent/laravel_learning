@@ -3,8 +3,8 @@
 use Database\Seeders\TasksToUserSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\PostsSeeder;
+use Database\Seeders\CommentSeeder;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             TasksToUserSeeder::class,
             UserSeeder::class,
             PostsSeeder::class,
+            CommentSeeder::class,
         ]);
     }
 }

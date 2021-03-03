@@ -8,17 +8,25 @@ use Illuminate\Http\RedirectResponse;
 class CommentsController extends Controller
 {
     /**
+     * CommentsController constructor.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth')->only(['store']);
+    }
+
+    /**
      * @param Post $post
      * @return RedirectResponse
      */
     public function store(Post $post) : RedirectResponse
     {
-        // TODO: add author to attributes - may be array merge, or Eloquent attach use
-        // TODO: add comments factory to test comments
-        // TODO: may be add some tests to comments
-        $post->addComment( \request()->validate([
-            'body' => 'required'
-        ]));
+        $attributes = \request()->validate([
+           'body' => 'required',
+        ]);
+        $attributes['author_id'] = auth()->id();
+
+        $post->addComment($attributes);
 
         return back();
     }

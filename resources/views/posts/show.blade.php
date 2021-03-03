@@ -1,6 +1,6 @@
 @extends('layout.app')
 
-@section('title', $title)
+@section('title', $post->title)
 
 @section('app_content')
 <div class="col-md-8 blog-main">

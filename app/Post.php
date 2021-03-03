@@ -49,6 +49,11 @@ class Post extends \App\Model
      */
     public function addComment($attributes) : \Illuminate\Database\Eloquent\Model
     {
-        return $this->comments()->create($attributes);
+        return $this
+            ->comments()
+            ->create(array_merge(
+                $attributes,
+                ['post_id' => $this->id]
+            ));
     }
 }
