@@ -1,6 +1,6 @@
 @extends('layout.app')
 
-@section('title', $title)
+@section('title', $post->title)
 
 @section('app_content')
 <div class="col-md-8 blog-main">
@@ -18,5 +18,21 @@
 
     <hr>
     <a href="{{route('posts.index')}}">Вернуться на главную</a>
+    @auth
+        @include('comments.create')
+    @endauth
+    @include('comments.index')
+    <hr>
+    @forelse($post->history as $item)
+        <p>
+            Пользоватьель: {{$item->name}} -- {{$item->pivot->created_at->diffForHumans()}}
+            - обновил поля:
+            @foreach(json_decode($item->pivot->changed_fields) as $field)
+                {{$field}},
+            @endforeach
+        </p>
+    @empty
+        <p>Нет истории изменений</p>
+    @endforelse
 </div>
 @endsection
