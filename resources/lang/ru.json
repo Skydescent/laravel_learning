@@ -1,4 +1,6 @@
 {
     "Login": "Логин",
-    "Register": "Регистрация"
+    "Register": "Регистрация",
+    "Pagination.next": "Следующие",
+    "Pagination.prev": "Предыдущие"
 }

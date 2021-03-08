@@ -7,6 +7,9 @@
             <li class="nav-item {{ Request::is('admin/posts') ? 'bg-light rounded' : '' }}">
                 <a class="nav-link text-{{ Request::is('admin/posts') ? 'dark' : 'light' }}" href="{{route('admin.posts.index')}}">Cтатьи</a>
             </li>
+            <li class="nav-item {{ Request::is('admin/news') ? 'bg-light rounded' : '' }}">
+                <a class="nav-link text-{{ Request::is('admin/news') ? 'dark' : 'light' }}" href="{{route('admin.news.index')}}">Новости</a>
+            </li>
             <li class="nav-item {{ Request::is('admin/feedbacks') ? 'bg-light rounded' : '' }}">
                 <a class="nav-link text-{{ Request::is('admin/feedbacks') ? 'dark' : 'light' }}" href="{{route('admin.feedbacks.index')}}">Отзывы</a>
             </li>

@@ -15,3 +15,6 @@
         @include('admin.posts.item')
     @endforeach
 @endsection
+@section('table_pagination')
+    {{$posts->links()}}
+@endsection

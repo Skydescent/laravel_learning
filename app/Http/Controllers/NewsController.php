@@ -14,7 +14,7 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news = News::latest()->where('published', 1)->get();
+        $news = News::latest()->where('published', 1)->simplePaginate(10);
         return view('news.index', compact( 'news'));
     }
 
