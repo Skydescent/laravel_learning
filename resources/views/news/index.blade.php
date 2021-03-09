@@ -12,5 +12,4 @@
         @endforeach
         {{$news->links()}}
     </div>
-    {{--TODO: add pagination--}}
 @endsection

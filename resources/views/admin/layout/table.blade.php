@@ -13,7 +13,6 @@
                 @yield('table_body')
             </tbody>
         </table>
-{{--        TODO: fix pagination view--}}
         @yield('table_pagination')
     </div>
 @endsection
