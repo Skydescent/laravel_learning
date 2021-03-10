@@ -1,17 +1,15 @@
 @extends('layout.app')
 
-@section('title', 'Главная')
+@section('title', 'Новости')
 
 @section('app_content')
     <div class="col-md-8 blog-main">
         <h3 class="pb-4 mb-4 font-italic border-bottom">
-            Список статей
+            Наши новости:
         </h3>
-        @foreach($posts as $post)
-            @include('posts.item')
+        @foreach($news as $pieceOfNews)
+            @include('news.item')
         @endforeach
-
-        {{$posts->links()}}
-
+        {{$news->links()}}
     </div>
 @endsection

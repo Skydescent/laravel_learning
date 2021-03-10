@@ -6,6 +6,7 @@ namespace App\Providers;
 use App\Channels\PushAllChannel;
 use App\Service\TagService;
 use App\View\Components\Alert;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
@@ -44,5 +45,8 @@ class AppServiceProvider extends ServiceProvider
             return "<?php echo ($value)->format('d.m.Y') ?>";
         });
         Blade::if('admin', function ($user) { return $user && $user->isAdmin(); });
+
+        Paginator::defaultSimpleView('pagination::simple-default');
+        Paginator::defaultView('pagination::bootstrap-4');
     }
 }

@@ -15,9 +15,10 @@ class PostsController extends Controller
     {
         $this->postService = $postService;
     }
+
     public function index()
     {
-        $posts = Post::latest()->with('owner')->get();
+        $posts = Post::latest()->with('owner')->paginate(20);
         return view('admin.posts.index', compact( 'posts'));
     }
 

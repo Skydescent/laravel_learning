@@ -42,11 +42,14 @@
 <div class="nav-scroller py-1 mb-2">
     <nav class="nav d-flex justify-content-between">
         <a class="p-2 text-muted" href="{{route('posts.index')}}">Главная</a>
-        <a class="p-2 text-muted" href="{{route('tasks.index')}}">Задачи</a>
-        <a class="p-2 text-muted" href="{{route('tasks.create')}}">Создать задачу</a>
-        <a class="p-2 text-muted" href="{{route('about')}}">О нас</a>
+        <a class="p-2 text-muted" href="{{route('news.index')}}">Новости</a>
         <a class="p-2 text-muted" href="{{route('feedbacks.create')}}">Контакты</a>
-        <a class="p-2 text-muted" href="{{route('posts.create')}}">Создать статью</a>
+        <a class="p-2 text-muted" href="{{route('about')}}">О нас</a>
+        @auth
+            <a class="p-2 text-muted" href="{{route('tasks.index')}}">Задачи</a>
+            <a class="p-2 text-muted" href="{{route('tasks.create')}}">Создать задачу</a>
+            <a class="p-2 text-muted" href="{{route('posts.create')}}">Создать статью</a>
+        @endauth
 
         @if (Auth::user() && Auth::user()->isAdmin())
             <a class="p-2 text-muted" href="{{route('admin.posts.index')}}">Административный раздел</a>

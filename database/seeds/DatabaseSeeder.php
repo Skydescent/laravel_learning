@@ -1,5 +1,6 @@
 <?php
 
+use Database\Seeders\NewsSeeder;
 use Database\Seeders\TasksToUserSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\PostsSeeder;
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PostsSeeder::class,
             CommentSeeder::class,
+            NewsSeeder::class,
         ]);
     }
 }

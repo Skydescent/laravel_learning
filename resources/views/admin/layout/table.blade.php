@@ -5,9 +5,7 @@
         <table class="table table-bordered">
             <div class="fixed-top">
                 <thead class="thead-dark">
-                <tr class="admin-tb-header">
                     @yield('table_header')
-                </tr>
                 </thead>
             </div>
 
@@ -15,5 +13,6 @@
                 @yield('table_body')
             </tbody>
         </table>
+        @yield('table_pagination')
     </div>
 @endsection

@@ -15,6 +15,7 @@ Route::delete('/completed-steps/{step}', 'CompletedStepsController@destroy');
 
 
 Route::resource('/posts', 'PostsController');
+Route::resource('/news', 'NewsController')->only('index','show');
 
 Route::view('/about', 'about')->name('about');
 Route::get('/contacts', 'FeedbacksController@create')->name('feedbacks.create');
@@ -29,7 +30,8 @@ Route::group([
     'as' => 'admin.',
     'middleware' => ['auth', 'permissions']
 ], function () {
-    Route::resource('posts', 'Admin\PostsController')->only('index', 'update', 'edit', 'destroy');
+    Route::resource('/posts', 'Admin\PostsController')->only('index', 'update', 'edit', 'destroy');
+    Route::resource('/news', 'Admin\NewsController');
     Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
 });
 

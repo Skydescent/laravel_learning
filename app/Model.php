@@ -11,10 +11,21 @@ class Model extends \Illuminate\Database\Eloquent\Model
 {
     use HasFactory;
 
-    //Поля разрешённые к массовуму заполнению
-    //public $fillable = ['title', 'body'];
-
-    //Поля защищённые от массового заполнения
     public $guarded = [];
+
+    public function incrementSlug($slug) {
+
+        $original = $slug;
+
+        $count = 2;
+
+        while (static::whereSlug($slug)->exists()) {
+
+            $slug = "{$original}_" . $count++;
+        }
+
+        return $slug;
+
+    }
 
 }

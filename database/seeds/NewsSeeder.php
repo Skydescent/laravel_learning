@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Post;
+use App\News;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 
-class PostsSeeder extends Seeder
+class NewsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +14,7 @@ class PostsSeeder extends Seeder
      */
     public function run()
     {
-        Post::factory()
+        News::factory()
             ->times(100)
             ->create();
     }
