@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddOwnerIdToPosts extends Migration
+class CreateImagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,21 @@ class AddOwnerIdToPosts extends Migration
      */
     public function up()
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->unsignedBigInteger('owner_id')->default(1);
+        Schema::create('images', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('imageable');
+            $table->string('path');
+            $table->timestamps();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
+     *$im
      * @return void
      */
     public function down()
     {
-        Schema::table('posts', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('images');
     }
 }

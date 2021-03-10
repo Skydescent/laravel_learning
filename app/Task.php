@@ -121,5 +121,24 @@ class Task extends Model
         };
     }
 
+    public function company()
+    {
+        return $this->hasOneThrough(
+            \App\Company::class,
+            \App\User::class,
+            'id',
+            'owner_id'
+        );
+        // описываем связь, первый аргумнет - конечная модель
+        //, второй - через какую модель связь,
+        // третий - поле через которое связь,
+        // четвёртый - поле конечной модели
+    }
+
+    public function comments()
+    {
+        return $this->morphMany('\App\Comment', 'commentable' );
+    }
+
 }
 
