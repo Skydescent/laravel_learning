@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class News extends \App\Model
 {
@@ -35,5 +36,10 @@ class News extends \App\Model
         }
 
         $this->attributes['slug'] = $slug;
+    }
+
+    public function tags() : \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 }

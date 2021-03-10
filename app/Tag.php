@@ -13,14 +13,25 @@ class Tag extends Model
     protected $guarded = [];
 
 
+
     public function tasks()
     {
-        return $this->belongsToMany(Task::class);
+        return $this->morphedByMany(Task::class, 'taggable');
     }
 
     public function posts()
     {
-        return $this->belongsToMany(Post::class);
+        return $this->morphedByMany(Post::class, 'taggable');
+    }
+
+    public function news()
+    {
+        return $this->morphedByMany(News::class, 'taggable');
+    }
+
+    public function users()
+    {
+        return $this->morphedByMany(User::class, 'taggable');
     }
 
     //переопределяем метод, для того, чтобы ключём для маршрута стало

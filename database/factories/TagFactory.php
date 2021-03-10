@@ -2,7 +2,11 @@
 
 namespace Database\Factories;
 
+use App\News;
+use App\Post;
 use App\Tag;
+use App\Task;
+use App\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TagFactory extends Factory
@@ -21,6 +25,18 @@ class TagFactory extends Factory
      */
     public function definition()
     {
+//        $taggable = [
+//            User::class,
+//            Post::class,
+//            Task::class,
+//            News::class,
+//        ];
+//
+//        return [
+//            'noteable_id' => $faker->numberBetween(0,20),
+//            'noteable_type' => $this->faker->randomElement($taggable),
+//        ];
+
         return [
             'name' => $this->faker->unique()->word()
         ];

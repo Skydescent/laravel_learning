@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'owner_id');
     }
 
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+
     public function company()
     {
         return $this->hasOne(Company::class, 'owner_id');
