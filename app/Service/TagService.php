@@ -16,11 +16,11 @@ class TagService
 
     private function getModelQueryFilter($models, $query, $queryFilterName = 'queryFilter')
     {
-        foreach ($models as $model => $relationMethod){
+        foreach ($models as $model => $options){
             if(method_exists( new $model(), $queryFilterName)) {
                 $query = call_user_func_array([new $model(), $queryFilterName], [$query]);
             } else {
-                $query = $query->orHas($relationMethod);
+                $query = $query->orHas($options['relation']);
             }
         }
         return $query;

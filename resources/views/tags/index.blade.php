@@ -8,17 +8,16 @@
             Поиск по тэгу: {{$tag->name}}
         </h3>
 
-{{--        TODO: --}}
-
-        @foreach($publicModels as $model => $relation)
-
-            <ul class="list-group">
-                @foreach($tag[$relation] as $item)
-                    <li class="list-group-item" href="#"><a>{{$item->title}}</a></li>
-                @endforeach
-            </ul>
-            <hr>
-
+        @foreach($publicModels as $model => $options)
+            @if($tag[$options['relation']]->isNotEmpty())
+                <h4>{{$options['title']}}</h4>
+                <ul class="list-group">
+                    @foreach($tag[$options['relation']] as $item)
+                        <li class="list-group-item" ><a href="{{ route($options['showView'], [$options['item'] => $item]) }}">{{$item->title}}</a></li>
+                    @endforeach
+                </ul>
+                <hr>
+            @endif
         @endforeach
     </div>
 @endsection
