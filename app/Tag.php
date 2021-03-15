@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class Tag extends Model
+class Tag extends \App\Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    public $guarded = [];
 
 
 
@@ -41,8 +41,12 @@ class Tag extends Model
         return 'name';
     }
 
-    public static function tagsCloud(callable $filter)
+    public static function tagsCloud(callable $filter = null)
     {
+        if (!$filter) {
+            return (new static())->all();
+        }
+
         return call_user_func($filter, (new static())->query())->get();
     }
 }

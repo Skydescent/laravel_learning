@@ -35,12 +35,17 @@ class NewsService
             $this->news->slug = $attributes['title'];
         }
 
+        $tags = $attributes['tags'] ?? null;
+        unset($attributes['tags']);
+
         if ($this->news->id) {
             $this->news->update($attributes);
         } else {
             $this->news->fill($attributes);
             $this->news->save();
         }
+
+        $this->news->syncTags($tags);
 
         return $this;
     }

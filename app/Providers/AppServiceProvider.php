@@ -6,8 +6,8 @@ namespace App\Providers;
 use App\Channels\PushAllChannel;
 use App\Service\TagService;
 use App\View\Components\Alert;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 
@@ -37,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('layout.sidebar', function($view) {
             $filter = (new TagService())->getFilterCallback();
             $view->with('tagsCloud', \App\Tag::tagsCloud($filter));
+
         });
 
 
@@ -48,5 +49,14 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::defaultSimpleView('pagination::simple-default');
         Paginator::defaultView('pagination::bootstrap-4');
+
+        Relation::morphMap([
+            'tasks' => 'App\Task',
+            'posts' => 'App\Post',
+            'news' => 'App\News',
+            'users' => 'App\User',
+        ]);
+
+
     }
 }

@@ -9,7 +9,7 @@ use App\Task;
 use App\User;
 use Illuminate\Database\Seeder;
 
-class TagSeeder extends Seeder
+class TagToTaggablesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,9 +19,6 @@ class TagSeeder extends Seeder
     public function run()
     {
 
-        //TODO: ensure that tasks,posts,users tables not empty (first or create?)
-        //TODO: rename seeder TagsToTaggableSeeder
-
         $tags = Tag::factory()
             ->times(50)
             ->create();
@@ -29,16 +26,19 @@ class TagSeeder extends Seeder
         $taggable = collect([
             User::class,
             Post::class,
-            Task::class,
             News::class,
+            Task::class,
         ]);
 
-        for($i = 1; $i <= rand(100,150); $i++){
+        $taggable->each(function ($model){
+           if ($model::all()->isEmpty())  $model::factory(50)->create();
+        });
+
+        for($i = 1; $i <= rand(400,500); $i++){
             $model = $taggable->random(1)->first();
-            $model::inRandomOrder()
-                ->first()
-                ->tags()
-                ->save($tags->random(1)->first());
+            $item = $model::inRandomOrder()->first();
+            $tag = $tags->random(1)->first();
+             if (!$item->tags->contains($tag)) $item->tags()->save($tag);
         }
     }
 }

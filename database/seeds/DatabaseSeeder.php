@@ -4,7 +4,7 @@ use Database\Seeders\NewsSeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\PostsSeeder;
 use Database\Seeders\CommentSeeder;
-use Database\Seeders\TagSeeder;
+use Database\Seeders\TagToTaggablesSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             PostsSeeder::class,
             CommentSeeder::class,
             NewsSeeder::class,
-            TagSeeder::class,
+            TagToTaggablesSeeder::class,
         ]);
     }
 }

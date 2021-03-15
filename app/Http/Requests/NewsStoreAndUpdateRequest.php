@@ -21,6 +21,7 @@ class NewsStoreAndUpdateRequest extends FormRequest
             'title' => 'required|between:5,100',
             'body' => 'required',
             'published' => '',
+            'tags' => '',
         ];
     }
 }

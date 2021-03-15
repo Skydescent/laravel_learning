@@ -13,10 +13,10 @@ trait SynchronizeTags
         $tags = collect($this->cleanTagsString($requestTags));
 
         if ($this->tags->isNotEmpty()) {
-            $taskTags = $this->tags->keyBy('name');
+            $itemTags = $this->tags->keyBy('name');
             $tags = $tags->keyBy(function ($item) { return $item; });
-            $syncIds = $taskTags->intersectByKeys($tags)->pluck('id')->toArray();
-            $tagsToAttach = $tags->diffKeys($taskTags);
+            $syncIds = $itemTags->intersectByKeys($tags)->pluck('id')->toArray();
+            $tagsToAttach = $tags->diffKeys($itemTags);
         } else {
             $tagsToAttach = $tags;
         }

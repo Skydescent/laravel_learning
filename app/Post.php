@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,6 +31,13 @@ class Post extends \App\Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function queryFilter($query)
+    {
+            return $query->orWhereHas('posts', function (Builder $subQuery) {
+                $subQuery->where('published', 1)->orWhere('owner_id', '=', auth()->id());
+            });
     }
 
     /**
