@@ -1,5 +1,5 @@
  <div class="col-md-8 blog-main">
-     @forelse($post->comments as $comment)
+     @forelse($model->comments as $comment)
          @include('comments.item')
      @empty
          <hr>

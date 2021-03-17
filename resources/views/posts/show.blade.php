@@ -19,9 +19,9 @@
     <hr>
     <a href="{{route('posts.index')}}">Вернуться на главную</a>
     @auth
-        @include('comments.create')
+        @include('comments.create', ['model' => $post])
     @endauth
-    @include('comments.index')
+    @include('comments.index', ['model' => $post])
     <hr>
     @forelse($post->history as $item)
         <p>

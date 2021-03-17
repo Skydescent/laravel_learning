@@ -11,6 +11,13 @@ class Comment extends Model
     use HasFactory;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'commentable';
+
+    /**
      * @var array
      */
     protected $guarded = [];
@@ -22,20 +29,14 @@ class Comment extends Model
         'created_at' => 'datetime:Y-m-d'
     ];
 
-    /**
-     * @return BelongsTo
-     */
-    public function author() : BelongsTo
+    public function commentable()
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
-    /**
-     * @return BelongsTo
-     */
-    public function post() : BelongsTo
+    public function author()
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(User::class);
     }
 
 }

@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             PostsSeeder::class,
-            CommentSeeder::class,
             NewsSeeder::class,
             TagToTaggablesSeeder::class,
+            CommentSeeder::class,
         ]);
     }
 }

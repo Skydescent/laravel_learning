@@ -48,12 +48,9 @@ class Post extends \App\Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    /**
-     * @return HasMany
-     */
-    public function comments() : HasMany
+    public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->morphMany(\App\Comment::class, 'commentable' );
     }
 
     /**
@@ -75,6 +72,8 @@ class Post extends \App\Model
             ->withTimestamps();
     }
 
+    // TODO: Move addComment to App\Model
+    // TODO: Add relation Comment-News
     /**
      * @param $attributes
      * @return \Illuminate\Database\Eloquent\Model
