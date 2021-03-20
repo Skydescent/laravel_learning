@@ -4,9 +4,11 @@
 namespace App\Service;
 
 
+use App\Commentable;
+
 class CommentsService
 {
-    public function store($model, $request)
+    public function store(Commentable $model, $request)
     {
         $attributes = $request->validate([
             'body' => 'required',

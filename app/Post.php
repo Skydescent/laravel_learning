@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class Post extends \App\Model
+class Post extends \App\Model implements Commentable
 {
     use SynchronizeTags;
 
