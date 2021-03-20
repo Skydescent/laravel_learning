@@ -1,6 +1,6 @@
 @include('layout.errors')
 
-<form method="post" action="{{ route('comments.store', ['post' => $post]) }}">
+<form method="post" action="{{$action}}">
 
     @csrf
 

@@ -23,6 +23,15 @@ class CommentFactory extends Factory
      */
     public function definition(): array
     {
+        $commentable = [
+            \App\Post::class,
+            \App\News::class,
+        ];
+        $class = $this->faker->randomElement($commentable);
+        $alias = (new $class())->getMorphClass();
+
+        $commentable = $class::inRandomOrder()->first() ?? $class::factory()->create() ;
+
         return [
             'body' => $this->faker->sentence(6, true),
             'author_id' => User::all()
@@ -30,7 +39,8 @@ class CommentFactory extends Factory
                     return !$item->isAdmin();
                 })->random()
                 ->id,
-            'post_id' => Post::all()->random()->id,
+            'commentable_type' => $alias,
+            'commentable_id' => $commentable->id,
         ];
     }
 }

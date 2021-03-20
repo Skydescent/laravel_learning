@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'owner_id');
     }
 
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+
     public function company()
     {
         return $this->hasOne(Company::class, 'owner_id');
@@ -38,6 +43,11 @@ class User extends Authenticatable
     public function  isAdmin()
     {
         return $this->role_id === 1;
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(\App\Comment::class, 'author_id');
     }
 
 }

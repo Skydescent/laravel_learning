@@ -2,11 +2,13 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class Post extends \App\Model
+class Post extends \App\Model implements Commentable
 {
     use SynchronizeTags;
 
@@ -31,20 +33,24 @@ class Post extends \App\Model
         return 'slug';
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function tags() : BelongsToMany
+    public function queryFilter($query)
     {
-        return $this->belongsToMany(Tag::class);
+            return $query->orWhereHas('posts', function (Builder $subQuery) {
+                $subQuery->where('published', 1)->orWhere('owner_id', '=', auth()->id());
+            });
     }
 
     /**
-     * @return HasMany
+     * @return MorphToMany
      */
-    public function comments() : HasMany
+    public function tags() : MorphToMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(\App\Comment::class, 'commentable' );
     }
 
     /**
@@ -66,6 +72,8 @@ class Post extends \App\Model
             ->withTimestamps();
     }
 
+    // TODO: Move addComment to App\Model
+    // TODO: Add relation Comment-News
     /**
      * @param $attributes
      * @return \Illuminate\Database\Eloquent\Model

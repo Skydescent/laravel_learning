@@ -3,23 +3,27 @@
 
 namespace App\Service;
 
-
-use Illuminate\Database\Eloquent\Builder;
-
 class TagService
 {
     public function getFilterCallback()
     {
         return function ($query)
         {
-            return $this->postsQueryFilter($query);
+            $models = config('tags.public_visible_related_models');
+            return $this->getModelQueryFilter($models,$query);
         };
     }
 
-    private function postsQueryFilter($query)
+    private function getModelQueryFilter($models, $query, $queryFilterName = 'queryFilter')
     {
-           return $query->whereHas('posts', function (Builder $subQuery) {
-                $subQuery->where('published', 1)->orWhere('owner_id', '=', auth()->id());
-            });
+        foreach ($models as $model => $options){
+            if(method_exists( new $model(), $queryFilterName)) {
+                $query = call_user_func_array([new $model(), $queryFilterName], [$query]);
+            } else {
+                $query = $query->orHas($options['relation']);
+            }
+        }
+        return $query;
     }
+
 }

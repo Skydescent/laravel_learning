@@ -9,6 +9,14 @@
     <label for="body">Текст</label>
     <textarea cols="30" rows="7" class="form-control" name="body">{{ old('body', $news->body) }}</textarea>
 </div>
+<div class="form-group">
+    <label for="inputTags">Тэги</label>
+    <input type="text"
+           name="tags"
+           class="form-control"
+           id="inputTags"
+           value="{{ old('tags', $news->tags->pluck('name')->implode(',')) }}">
+</div>
 <div class="form-group form-check">
     <input type="checkbox" value="1" class="form-check-input" id="isPublished"
            name="published"

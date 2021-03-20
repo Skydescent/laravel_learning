@@ -3,13 +3,12 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'PostsController@index');
+Route::get('/statistics', 'StatisticsController@index')->name('statistics.index');
 
 Route::get('/tags/{tag}', 'TagsController@index')->name('tags.cloud');
-
 Route::resource('/tasks', 'TasksController');
 
 Route::post('/tasks/{task}/steps', 'TaskStepsController@store');
-
 Route::post('/completed-steps/{step}', 'CompletedStepsController@store');
 Route::delete('/completed-steps/{step}', 'CompletedStepsController@destroy');
 
@@ -46,4 +45,11 @@ Route::middleware('auth')->post('/companies', function () {
 
 Route::get('/service', 'PushServiceController@form');
 Route::post('/service', 'PushServiceController@send');
-Route::post('/posts/{post}/comments', 'CommentsController@store')->name('comments.store');
+
+Route::middleware('auth')
+    ->post('/posts/{post}/comment', 'PostCommentsController@store')
+    ->name('post.comments.store');
+
+Route::middleware('auth')
+    ->post('/news/{news}/comment', 'NewsCommentsController@store')
+    ->name('news.comments.store');

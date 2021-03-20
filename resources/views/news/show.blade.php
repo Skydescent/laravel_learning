@@ -13,5 +13,10 @@
 
     <hr>
     <a href="{{route('news.index')}}">Вернуться к новостям</a>
+    @auth
+        @include('comments.create', ['action' => route('news.comments.store', ['news' => $news])])
+    @endauth
+    @include('comments.index', ['model' => $news])
+    <hr>
 </div>
 @endsection

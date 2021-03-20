@@ -8,6 +8,7 @@ class TagsController extends Controller
 {
     public function index(Tag $tag)
     {
-        return view('tags.index', compact('tag'));
+        $publicModels = config('tags.public_visible_related_models');
+        return view('tags.index', compact('tag', 'publicModels'));
     }
 }

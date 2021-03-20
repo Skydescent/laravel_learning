@@ -44,6 +44,7 @@
         <a class="p-2 text-muted" href="{{route('posts.index')}}">Главная</a>
         <a class="p-2 text-muted" href="{{route('news.index')}}">Новости</a>
         <a class="p-2 text-muted" href="{{route('feedbacks.create')}}">Контакты</a>
+        <a class="p-2 text-muted" href="{{route('statistics.index')}}">Статистика</a>
         <a class="p-2 text-muted" href="{{route('about')}}">О нас</a>
         @auth
             <a class="p-2 text-muted" href="{{route('tasks.index')}}">Задачи</a>

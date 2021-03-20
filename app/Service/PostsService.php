@@ -40,7 +40,7 @@ class PostsService
         $attributes['published'] = $attributes['published'] ?? 0;
         $attributes['owner_id'] = $this->post->owner ? $this->post->owner->id :auth()->id();
 
-        $tags = $attributes['tags']?? null;
+        $tags = $attributes['tags'] ?? null;
         unset($attributes['tags']);
 
         $post = Post::updateOrCreate(['id' => $this->post->id], $attributes);

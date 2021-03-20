@@ -2,11 +2,15 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class News extends \App\Model
+class News extends \App\Model implements Commentable
 {
+    use SynchronizeTags;
+
     protected $casts = [
         'published' => 'boolean'
     ];
@@ -27,6 +31,13 @@ class News extends \App\Model
         return mb_substr($this->body, 0, 150) . '...';
     }
 
+    public function queryFilter($query)
+    {
+        return $query->orWhereHas('news', function (Builder $subQuery) {
+            $subQuery->where('published', 1);
+        });
+    }
+
     public function setSlugAttribute($value) {
 
         if (static::whereSlug($slug = \Str::of($value)->slug('_'))->exists()) {
@@ -35,5 +46,15 @@ class News extends \App\Model
         }
 
         $this->attributes['slug'] = $slug;
+    }
+
+    public function tags() : \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(\App\Comment::class, 'commentable' );
     }
 }

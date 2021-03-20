@@ -7,13 +7,17 @@
         <h3 class="pb-4 mb-4 font-italic border-bottom">
             Поиск по тэгу: {{$tag->name}}
         </h3>
-        @foreach($tag->posts as $post)
-            @include('posts.item')
-        @endforeach
-        <nav class="blog-pagination">
-            <a class="btn btn-outline-primary" href="#">Старше</a>
-            <a class="btn btn-outline-secondary disabled" href="#" tabindex="-1" aria-disabled="true">Новее</a>
-        </nav>
 
+        @foreach($publicModels as $model => $options)
+            @if($tag[$options['relation']]->isNotEmpty())
+                <h4>{{$options['title']}}</h4>
+                <ul class="list-group">
+                    @foreach($tag[$options['relation']] as $item)
+                        <li class="list-group-item" ><a href="{{ route($options['showView'], [$options['item'] => $item]) }}">{{$item->title}}</a></li>
+                    @endforeach
+                </ul>
+                <hr>
+            @endif
+        @endforeach
     </div>
 @endsection
