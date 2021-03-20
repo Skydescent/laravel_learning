@@ -11,13 +11,6 @@ class Comment extends Model
     use HasFactory;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'commentable';
-
-    /**
      * @var array
      */
     protected $guarded = [];
