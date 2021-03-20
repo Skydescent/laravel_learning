@@ -19,7 +19,7 @@
     <hr>
     <a href="{{route('posts.index')}}">Вернуться на главную</a>
     @auth
-        @include('comments.create', ['model' => $post])
+        @include('comments.create', ['action' => route('post.comments.store', ['post' => $post])])
     @endauth
     @include('comments.index', ['model' => $post])
     <hr>

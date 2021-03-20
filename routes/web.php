@@ -45,4 +45,11 @@ Route::middleware('auth')->post('/companies', function () {
 
 Route::get('/service', 'PushServiceController@form');
 Route::post('/service', 'PushServiceController@send');
-Route::post('/comments/{model}/{slug}', 'CommentsController@store')->name('comments.store');
+
+Route::middleware('auth')
+    ->post('/posts/{post}/comment', 'PostCommentsController@store')
+    ->name('post.comments.store');
+
+Route::middleware('auth')
+    ->post('/news/{news}/comment', 'NewsCommentsController@store')
+    ->name('news.comments.store');

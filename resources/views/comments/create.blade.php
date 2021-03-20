@@ -1,6 +1,6 @@
 @include('layout.errors')
 
-<form method="post" action="{{ route('comments.store', ['model' => $model->getMorphClass(), 'slug' => $model->slug]) }}">
+<form method="post" action="{{$action}}">
 
     @csrf
 
