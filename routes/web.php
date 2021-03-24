@@ -32,6 +32,7 @@ Route::group([
     Route::resource('/posts', 'Admin\PostsController')->only('index', 'update', 'edit', 'destroy');
     Route::resource('/news', 'Admin\NewsController');
     Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
+    //Route::resource('/reports', 'Admin\ReportsController');
 });
 
 Auth::routes();
