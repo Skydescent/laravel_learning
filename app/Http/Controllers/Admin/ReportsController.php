@@ -4,82 +4,40 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    protected $reportsConfig;
+
+    public function __construct()
+    {
+        $this->reportsConfig = config('reports.reports');
+    }
+
     public function index()
     {
-        return view('admin.reports.index');
+        return view('admin.reports.index', ['reports' => $this->reportsConfig]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function make($reportAlias)
     {
-        //
+        $report = $this->reportsConfig[$reportAlias] ?? false;
+        if ($report) {
+            return view('admin.reports.make', compact( 'report', 'reportAlias'));
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function sendReport(\Illuminate\Http\Request $request, $reportAlias)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $report = $this->reportsConfig[$reportAlias];
+        $reportFields = array_intersect_key($report['reportable'], $request->input());
+        $data = [
+            'to_email' => Auth::user()->email,
+            'report_fields' => $reportFields,
+        ];
+        $report['job']::dispatch($data);
+        flash('Отчёт добавлен в очередь для обработки', 'warning');
+        return redirect()->route('admin.reports.index');
     }
 }

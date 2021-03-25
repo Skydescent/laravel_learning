@@ -8,22 +8,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 
 class ModelsCountReport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 
-    protected $reportable;
+    protected $data;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($class)
+    public function __construct(array $data)
     {
-        $this->class = $class;
+        $this->data = $data;
     }
 
     /**
@@ -33,10 +34,15 @@ class ModelsCountReport implements ShouldQueue
      */
     public function handle()
     {
-        //новости, статьи, комментарии, теги, пользователей
-        $reportable = config('reports.reportable');
-        if( in_array($this->class, $reportable)) {
-            echo "";
+        $report = [];
+        foreach ($this->data['report_fields'] as  $field) {
+            $report[] = [
+                'title' => $field['title'],
+                'value' => $field['data']::count(),
+            ];
         }
+        \Mail::to($this->data['to_email'])->send(
+            new \App\Mail\ReportGenerated($report)
+        );
     }
 }

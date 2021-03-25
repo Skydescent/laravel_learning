@@ -13,6 +13,9 @@
             <li class="nav-item {{ Request::is('admin/feedbacks') ? 'bg-light rounded' : '' }}">
                 <a class="nav-link text-{{ Request::is('admin/feedbacks') ? 'dark' : 'light' }}" href="{{route('admin.feedbacks.index')}}">Отзывы</a>
             </li>
+            <li class="nav-item {{ Request::is('admin/reports') ? 'bg-light rounded' : '' }}">
+                <a class="nav-link text-{{ Request::is('admin/reports') ? 'dark' : 'light' }}" href="{{route('admin.reports.index')}}">Отчёты</a>
+            </li>
         </ul>
     </section>
 </aside>
