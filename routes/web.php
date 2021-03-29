@@ -57,3 +57,7 @@ Route::middleware('auth')
 Route::middleware('auth')
     ->post('/news/{news}/comment', 'NewsCommentsController@store')
     ->name('news.comments.store');
+
+Route::post('/chat', function () {
+    broadcast(new \App\Events\ChatMessage(request('message'), auth()->user()))->toOthers();
+})->middleware('auth');

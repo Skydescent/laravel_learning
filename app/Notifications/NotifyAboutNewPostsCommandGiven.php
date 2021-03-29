@@ -64,4 +64,9 @@ class NotifyAboutNewPostsCommandGiven extends Notification
             //
         ];
     }
+
+    public function receivesBroadcastNotificationOn()
+    {
+        return 'users.' . $this->id;
+    }
 }

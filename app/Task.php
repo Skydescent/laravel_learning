@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Events\TaskCreated;
+use App\Events\TaskUpdated;
 use Illuminate\Database\Eloquent\Collection;
 
 class Task extends Model
@@ -11,9 +12,10 @@ class Task extends Model
     //public $fillable = ['title', 'body'];
     public $guarded = [];
 
-//    protected $dispatchesEvents = [
-//        'created' => TaskCreated::class,
-//    ];
+    protected $dispatchesEvents = [
+        'created' => TaskCreated::class,
+        'updated' => TaskUpdated::class,
+    ];
 
     // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()
