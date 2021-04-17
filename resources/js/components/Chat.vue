@@ -50,7 +50,6 @@
         mounted() {
             this.channel = Echo.join('chat');
             this.channel
-                .join('chat')
                 .listen('ChatMessage', (data) => {
                     this.addMessage(data.user.name + ': ' + data.message);
 

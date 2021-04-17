@@ -22,7 +22,7 @@ class PostsController extends Controller
     public function index()
     {
             $posts = Post::latest()->with('tags')->where('published', 1)->orWhere('owner_id', '=', auth()->id())->simplePaginate(10);
-        return view('posts.index', compact( 'posts'));
+            return view('posts.index', compact( 'posts'));
     }
 
     public function show(Post $post)

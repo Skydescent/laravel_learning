@@ -12,6 +12,14 @@ class Post extends \App\Model implements Commentable
 {
     use SynchronizeTags;
 
+
+    protected static function booted()
+    {
+        static::updated(function (\App\Post $post) {
+            broadcast(new \App\Events\PostUpdated($post, auth()->user()));
+        });
+    }
+
     protected static function boot()
     {
         parent::boot();

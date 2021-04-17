@@ -10,7 +10,7 @@
                 @include('layout.sidebar')
             @show
         </div>
+        <post-update></post-update>
     </main>
-
     @include('layout.footer')
 @endsection

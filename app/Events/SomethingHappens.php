@@ -14,14 +14,14 @@ class SomethingHappens implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $whatHappens;
+    public string $whatHappens;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($whatHappens)
+    public function __construct( string $whatHappens)
     {
         $this->whatHappens = $whatHappens;
     }
@@ -36,13 +36,13 @@ class SomethingHappens implements ShouldBroadcast
         return new Channel('hello');
     }
 
-    public function broadcastWith()
-    {
-        return ['what' => $this->whatHappens, 'other' => 'other'];
-    }
+//    public function broadcastWith()
+//    {
+//        return ['what' => $this->whatHappens, 'other' => 'other'];
+//    }
 
-    public function broadcastWhen()
-    {
-        return $this->value > 100;
-    }
+//    public function broadcastWhen()
+//    {
+//        return $this->value > 100;
+//    }
 }

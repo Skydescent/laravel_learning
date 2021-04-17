@@ -5,6 +5,8 @@
  */
 
 require('./bootstrap');
+require('./echo');
+
 
 window.Vue = require('vue');
 
@@ -22,6 +24,8 @@ window.Vue = require('vue');
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('task-update', require('./components/TaskUpdate.vue').default);
 Vue.component('chat', require('./components/Chat.vue').default);
+Vue.component('post-update', require('./components/PostUpdated.vue').default);
+Vue.component('report-generated', require('./components/ReportGenerated.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -33,4 +37,4 @@ const app = new Vue({
     el: '#app',
 });
 
-require('./echo');
+console.log('app');

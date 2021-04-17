@@ -33,7 +33,7 @@ class ReportsController extends Controller
         $report = $this->reportsConfig[$reportAlias];
         $reportFields = array_intersect_key($report['reportable'], $request->input());
         $data = [
-            'to_email' => Auth::user()->email,
+            'user' => Auth::user(),
             'report_fields' => $reportFields,
         ];
         $report['job']::dispatch($data);
