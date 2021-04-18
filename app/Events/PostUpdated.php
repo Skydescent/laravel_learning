@@ -32,7 +32,7 @@ class PostUpdated implements ShouldBroadcast
         $this->post = $post;
         $this->user = $user;
         $this->updatedFields = implode('; ', json_decode($post->history->last()->pivot['changed_fields']));
-        $this->postUrl = url("/posts/{$post->slug}");
+        $this->postUrl = route('posts.show',['post'=>$post],true);
     }
 
     /**

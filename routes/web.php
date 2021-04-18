@@ -62,11 +62,6 @@ Route::post('/chat', function () {
     broadcast(new \App\Events\ChatMessage(request('message'), auth()->user()))->toOthers();
 })->middleware('auth');
 
-Route::get('/test', function () {
-    event(new \App\Events\SomethingHappens('WS соединение'));
-    return 'ok';
-});
-
 Route::get('/send', function () {
     broadcast(new App\Events\EveryoneEvent());
     return response('Sent');
