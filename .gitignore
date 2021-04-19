@@ -21,3 +21,4 @@ yarn-error.log
 .phpsotrm.meta.php
 _ide_helper.php
 /app/Http/Controllers/TestController.php
+laravel-echo-server.lock
