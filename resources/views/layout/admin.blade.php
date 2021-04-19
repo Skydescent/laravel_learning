@@ -6,5 +6,10 @@
             @include('admin.layout.nav')
             @yield('admin_content')
         </div>
+        <post-update></post-update>
+        <report-generated
+                user-id="{{ auth()->user()->id }}"
+                accepted-url="{{route('admin.reports.index')}}"
+        ></report-generated>
     </main>
 @endsection

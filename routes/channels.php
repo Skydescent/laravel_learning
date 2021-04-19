@@ -22,3 +22,12 @@ Broadcast::channel('task.{task}', \App\Broadcasting\TaskChannel::class,['guards'
 Broadcast::channel('chat', function ($user) {
     return ['id' => $user->id, 'name' => $user->name];
 });
+
+Broadcast::channel('post_updated', function ($user) {
+    return ['id' => $user->id, 'name'=> $user->name];
+},['guards' => ['admin']]);
+
+Broadcast::channel('user.{userId}', function ($user, $userId) {
+    \Log::debug($user->id . "  " . $userId);
+    return (int ) $user->id === (int) $userId;
+}, ['guards' => ['admin']]);

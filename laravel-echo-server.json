@@ -1,5 +1,5 @@
 {
-	"authHost": "http://localhost",
+	"authHost": "http://kirill-laravel",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [
 		{
@@ -9,16 +9,25 @@
 	],
 	"database": "redis",
 	"databaseConfig": {
-		"redis": {},
+		"redis": {
+			"keyPrefix": "_krl"
+		},
 		"sqlite": {
 			"databasePath": "/database/laravel-echo-server.sqlite"
-		}
+		},
+		"port": "6379",
+		"host": "127.0.0.1"
 	},
 	"devMode": true,
-	"host": null,
+	"host": "127.0.0.1",
 	"port": "6001",
 	"protocol": "http",
-	"socketio": {},
+	"socketio": {
+		"cors": {
+			"origin": "127.0.0.1",
+			"credentials": true
+		}
+	},
 	"secureOptions": 67108864,
 	"sslCertPath": "",
 	"sslKeyPath": "",

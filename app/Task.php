@@ -12,6 +12,20 @@ class Task extends Model
     //public $fillable = ['title', 'body'];
     public $guarded = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function() {
+           \Cache::tags(['tasks'])->flush();
+        });
+        static::updated(function() {
+            \Cache::tags(['tasks'])->flush();
+        });
+        static::deleted(function() {
+            \Cache::tags(['tasks'])->flush();
+        });
+    }
+
     protected $dispatchesEvents = [
         'created' => TaskCreated::class,
         'updated' => TaskUpdated::class,
@@ -60,27 +74,7 @@ class Task extends Model
 
     public function newCollection(array $models = [])
     {
-        return new class($models) extends Collection {
-            public function allCompleted()
-            {
-                return $this->filter->isCompleted();
-            }
-
-            public function allNotCompleted()
-            {
-                return $this->filter->isNotCompleted();
-            }
-
-//            public static function range($from, $to)
-//            {
-//
-//            }
-//
-//            public function chunkWhile(callable $callback)
-//            {
-//
-//            }
-        };
+        return new TasksCollection($models);
     }
 
 }

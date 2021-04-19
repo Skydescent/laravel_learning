@@ -17,7 +17,10 @@ class TasksController extends Controller
     {
         //Все задачи от самых новых до самых старых с тэгами
         //$tasks = Task::where('owner_id', auth()->id())->with('tags')->latest()->get();
-        $tasks = auth()->user()->tasks()->with('tags')->latest()->get();
+
+        $tasks =\Cache::tags(['tasks'])->remember('uses_tasks|'. auth()->id(), 3600, function() {
+            return auth()->user()->tasks()->with('tags')->latest()->get();
+        });
 
         return view('tasks.index', compact( 'tasks'));
     }

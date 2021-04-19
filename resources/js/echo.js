@@ -1,17 +1,12 @@
-Echo
-    .channel('hello')
-    .listen('.newEventName', (e) => {
-      alert(e.whatHappens);
-    });
 
-Echo
-    .private('task.1')
-    .listen('event', (data) => {
-        console.log(data);
-    });
-
-Echo
-  .private('App.User' + userId)
-  .notification((notification) => {
-    alert(notification.type + ': ' + notification.subject);
-  })
+// if(['http://kirill-laravel/admin/reports', 'http://kirill-laravel/admin/reports/total'].indexOf(window.location.href) !== -1)
+// {
+//   Echo
+//     .private(`user.1`)
+//     .listen('ReportGenerated', (e) => {
+//       JSON.parse(e.report).forEach((item) => {
+//         console.log(item.title);
+//         console.log(item.value);
+//       })
+//     });
+// }

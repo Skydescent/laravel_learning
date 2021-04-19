@@ -1,10 +1,15 @@
-@extends('layout.app')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Laravel</title>
+</head>
+<body>
 
-@section('app_content')
-<div class="col-md-8 blog-main">
-    <h3 class="pb-4 mb-4 font-italic border-bottom">
-        From the Firehose
-    </h3>
+<script src="{{ mix('/js/app.js') }}"></script>
 
-</div>
-@endsection
+
+</body>
+</html>

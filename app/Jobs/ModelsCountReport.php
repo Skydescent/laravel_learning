@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,7 +42,9 @@ class ModelsCountReport implements ShouldQueue
                 'value' => $field['data']::count(),
             ];
         }
-        \Mail::to($this->data['to_email'])->send(
+        event(new \App\Events\ReportGenerated($report, $this->data['user']));
+
+        \Mail::to($this->data['user']->email)->send(
             new \App\Mail\ReportGenerated($report)
         );
     }
