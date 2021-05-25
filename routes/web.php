@@ -2,22 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('test', function () {
-    // Использование тэгов кэша
-    Cache::tags(['people', 'artists'])->put('John', $john, $seconds);
-    Cache::tags(['people', 'authors'])->put('Anna', $anna, $seconds);
-
-    // Чтобы получить ключи тэги обязательно использовать
-    Cache::tags(['people', 'artists'])->get('John');
-    Cache::tags(['people', 'authors'])->get('Anna');
-
-    //Чтобы два раза не писать одно и то же, можено использовать метод remember
-    $john = Cache::tags(['people', 'artists'])->remember('John', $john, $seconds);
-
-    //Сбрасываем кэш по тэгам:
-    Cache::tags(['people', 'artists'])->flush(); // сбросит кэш и для John и для Anna
-    Cache::tags(['artists'])->flush(); //сбросит только Anna
-
+Route::get('/test', function () {
+   $posts = \App\Tag::all();
+   dd($posts);
 });
 
 Route::get('/', 'PostsController@index');

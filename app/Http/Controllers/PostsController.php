@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
+use App\Repositories\EloquentRepositoryInterface;
+use App\Service\CacheService;
 use App\Service\PostsService;
 
 
@@ -11,22 +13,25 @@ class PostsController extends Controller
 {
     private $postService;
 
-    public function __construct(PostsService $postService)
+    public function __construct(EloquentRepositoryInterface $postInterface)
     {
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
-        $this->middleware('can:view,post')->only(['show']);
-        $this->postService = $postService;
+        //$this->middleware('can:view,post')->only(['show']);
+        $this->postInterface = $postInterface;
     }
 
     public function index()
     {
-            $posts = Post::latest()->with('tags')->where('published', 1)->orWhere('owner_id', '=', auth()->id())->simplePaginate(10);
+
+        $currentPage = request()->get('page',1);
+        $posts = $this->postInterface->publicAll(auth()->user(), ['page' => $currentPage] );
             return view('posts.index', compact( 'posts'));
     }
 
-    public function show(Post $post)
+    public function show($slug)
     {
+        $post = $this->postInterface->find(['slug' => $slug]);
         return view('posts.show', compact('post'));
     }
 

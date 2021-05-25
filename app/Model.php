@@ -4,6 +4,7 @@
 namespace App;
 
 
+use App\Service\CacheService;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -27,7 +28,4 @@ class Model extends \Illuminate\Database\Eloquent\Model
         return $slug;
 
     }
-
-
-
 }

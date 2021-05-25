@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Scopes\CacheScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,7 +25,7 @@ class Post extends \App\Model implements Commentable
     {
         parent::boot();
 
-        static::updating(function($post) {
+            static::updating(function($post) {
 		    $post->history()->attach(auth()->id(),
                 [
                     'changed_fields' =>json_encode(array_keys($post->getDirty())),
@@ -44,8 +45,17 @@ class Post extends \App\Model implements Commentable
     public function queryFilter($query)
     {
             return $query->orWhereHas('posts', function (Builder $subQuery) {
-                $subQuery->where('published', 1)->orWhere('owner_id', '=', auth()->id());
+                $subQuery
+                    ->where('published', 1)
+                    ->orWhere('owner_id', '=', auth()->id());
             });
+    }
+
+    public function postQueryFilter($query)
+    {
+        return $query
+            ->where('published', 1)
+            ->orWhere('owner_id', '=', auth()->id());
     }
 
     /**
@@ -80,8 +90,6 @@ class Post extends \App\Model implements Commentable
             ->withTimestamps();
     }
 
-    // TODO: Move addComment to App\Model
-    // TODO: Add relation Comment-News
     /**
      * @param $attributes
      * @return \Illuminate\Database\Eloquent\Model

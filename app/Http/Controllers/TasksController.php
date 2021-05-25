@@ -15,10 +15,7 @@ class TasksController extends Controller
 
     public function index()
     {
-        //Все задачи от самых новых до самых старых с тэгами
-        //$tasks = Task::where('owner_id', auth()->id())->with('tags')->latest()->get();
-
-        $tasks =\Cache::tags(['tasks'])->remember('uses_tasks|'. auth()->id(), 3600, function() {
+        $tasks =\Cache::tags(['tasks'])->remember('users_tasks|'. auth()->id(), 3600, function() {
             return auth()->user()->tasks()->with('tags')->latest()->get();
         });
 

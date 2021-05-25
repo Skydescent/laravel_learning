@@ -101,4 +101,31 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
 
+    'cache_service' => [
+        'map' => [
+            \App\Post::class => [
+                'tag' => 'posts',
+                'isPersonal' => true,
+                'relations' => [
+                    'comments' => \App\Comment::class,
+                    'tags' => \App\Tag::class,
+                    'owner' => \App\User::class,
+                    'history' => \App\PostHistory::class
+                ]
+            ],
+            \App\News::class => [
+                'tag' => 'news',
+                'isPersonal' => false
+            ],
+            \App\Tag::class => [
+                'tag' => 'tags',
+                'isPersonal' => true
+            ]
+        ],
+        'allPrefix' => 'all',
+        'personalKeyPrefix' => 'user',
+        'ttl' => 3600
+    ]
 ];
+
+//TODO: add relations configs to rest of models Classes

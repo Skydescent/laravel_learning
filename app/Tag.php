@@ -5,14 +5,13 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Scopes\CacheScope;
 
 class Tag extends \App\Model
 {
     use HasFactory;
 
     public $guarded = [];
-
-
 
     public function tasks()
     {
