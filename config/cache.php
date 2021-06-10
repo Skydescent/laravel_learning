@@ -123,7 +123,14 @@ return [
             ],
             \App\Tag::class => [
                 'tag' => 'tags',
-                'isPersonal' => true
+                'isPersonal' => true,
+                'relations' => [
+                    'tasks' => \App\Task::class,
+                    'posts' => \App\Post::class,
+                    'news' => \App\News::class,
+                    'users' => \App\User::class
+                ],
+
             ],
             \App\Comment::class => [
                 'tag' => 'comments',

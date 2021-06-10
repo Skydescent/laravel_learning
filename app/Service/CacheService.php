@@ -61,14 +61,16 @@ class CacheService
     public function cacheCollection(
         Collection|\Illuminate\Database\Eloquent\Collection $collection ,
         User $user = null,
-        $postfixes = []
+        array $postfixes = [],
+        array $tags = []
     )
     {
         $queryData = function () use ($collection) {
             return CacheEloquentWrapper::wrapCollection($collection, $this);
         };
 
-        return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
+        return $this->cache($queryData, $user, $postfixes, array_merge([$this->getTagName() . '_collect
+        ion'], $tags));
     }
 
 

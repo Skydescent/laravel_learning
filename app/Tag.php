@@ -33,8 +33,6 @@ class Tag extends \App\Model
         return $this->morphedByMany(User::class, 'taggable');
     }
 
-    //переопределяем метод, для того, чтобы ключём для маршрута стало
-    //поле name из БД
     public function getRouteKeyName()
     {
         return 'name';

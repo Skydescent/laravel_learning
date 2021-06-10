@@ -7,14 +7,12 @@ return [
             'relation' => 'posts',
             'showView' => 'posts.show',
             'item' => 'post',
-
         ],
         'App\News' => [
             'title' => 'Новости',
             'relation' => 'news',
             'showView' => 'news.show',
             'item' => 'news',
-
         ],
     ],
 ];

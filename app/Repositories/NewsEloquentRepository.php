@@ -13,6 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class NewsEloquentRepository extends EloquentRepository
 {
+    use HasTagsCloud;
 
     /**
      *

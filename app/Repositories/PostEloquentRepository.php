@@ -11,6 +11,8 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class PostEloquentRepository extends  EloquentRepository
 {
+    use HasTagsCloud;
+
     protected static function setModel()
     {
         self::$model = Post::class;

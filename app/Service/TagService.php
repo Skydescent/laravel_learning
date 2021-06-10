@@ -3,7 +3,10 @@
 
 namespace App\Service;
 
-class TagService
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Http\Request;
+
+class TagService implements RepositoryServiceable
 {
     public function getFilterCallback()
     {
@@ -26,4 +29,31 @@ class TagService
         return $query;
     }
 
+    /**
+     * @param ValidatesWhenResolved|Request $request
+     * @return mixed
+     */
+    public function store(ValidatesWhenResolved|Request $request)
+    {
+        // TODO: Implement store() method.
+    }
+
+    /**
+     * @param ValidatesWhenResolved|Request $request
+     * @param $model
+     * @return mixed
+     */
+    public function update(ValidatesWhenResolved|Request $request, $model)
+    {
+        // TODO: Implement update() method.
+    }
+
+    /**
+     * @param $model
+     * @return mixed
+     */
+    public function destroy($model)
+    {
+        // TODO: Implement destroy() method.
+    }
 }
