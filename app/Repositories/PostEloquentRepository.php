@@ -3,48 +3,45 @@
 
 namespace App\Repositories;
 
-use App\Cache\CacheEloquentWrapper;
-use App\Service\CacheService;
 use App\Post;
+use App\Service\CacheService;
+use App\Service\PostsService;
 use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 
-class PostEloquentRepository implements EloquentRepositoryInterface
+class PostEloquentRepository extends  EloquentRepository
 {
-
-    protected CacheService $cacheService;
-
-    protected $identifier;
-
-    const MODEL = Post::class;
-
-    public function __construct()
+    protected static function setModel()
     {
-        $this->cacheService = new CacheService(self::MODEL);
+        self::$model = Post::class;
     }
 
-    public function adminAll($postfixes = [])
+    protected function setModelService()
     {
-
+        $this->modelService = new PostsService();
     }
 
-    public function publicAll(User|null $user = null, array $postfixes = [])
+    protected function setCacheService()
     {
-        $queryData = function () {
-            $collection = (self::MODEL)::latest()
-                ->with('tags')
-                ->where('published', 1)
-                ->orWhere('owner_id', '=', auth()->id())
-                ->simplePaginate(10);
-            return CacheEloquentWrapper::wrapPaginator($collection, $this->cacheService);
-        };
-        return $this->cacheService->cache($queryData, $user, $postfixes);
+        $this->cacheService = CacheService::getInstance(static::$model);
     }
 
-    public function find(array $identifier, User|null $user = null)
+    public function adminIndex(Authenticatable|User|null $user, array $postfixes = [])
     {
-        $queryData = function () use($identifier) {
-            return CacheEloquentWrapper::wrapItem((self::MODEL)::firstWhere($identifier), $identifier, $this->cacheService);
-        };
-        return $this->cacheService->cache($queryData, $user, $identifier);
+       $paginator = (self::$model)::latest()
+           ->with('owner')
+           ->paginate(20);
+
+       return $this->cacheService->cachePaginator($paginator, $user, $postfixes);
+    }
+
+    public function publicIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed
+    {
+        $paginator = (self::$model)::latest()
+            ->with('tags')
+            ->where('published', 1)
+            ->orWhere('owner_id', '=', auth()->id())
+            ->simplePaginate(10);
+        return $this->cacheService->cachePaginator($paginator, $user, $postfixes);
     }
 }

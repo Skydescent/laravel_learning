@@ -7,7 +7,7 @@
     <h3 class="mb-2 font-italic">
         {{ $post->title }}
     </h3>
-    @can('update', $post)
+    @can('update', $post->model)
         <h5>
             <a href="{{ route('posts.edit', ['post' => $post]) }}" class="badge badge-primary">Изменить</a>
         </h5>

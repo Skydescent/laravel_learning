@@ -5,8 +5,10 @@ namespace App\Service;
 
 
 use App\News;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Http\Request;
 
-class NewsService
+class NewsService implements RepositoryServiceable
 {
     /**
      * @var
@@ -48,5 +50,33 @@ class NewsService
         $this->news->syncTags($tags);
 
         return $this;
+    }
+
+    /**
+     * @param ValidatesWhenResolved $request
+     * @return mixed
+     */
+    public function store(ValidatesWhenResolved|Request $request)
+    {
+        // TODO: Implement store() method.
+    }
+
+    /**
+     * @param ValidatesWhenResolved $request
+     * @param $model
+     * @return mixed
+     */
+    public function update(ValidatesWhenResolved|Request $request, $model)
+    {
+        // TODO: Implement update() method.
+    }
+
+    /**
+     * @param $model
+     * @return mixed
+     */
+    public function destroy($model)
+    {
+        // TODO: Implement destroy() method.
     }
 }

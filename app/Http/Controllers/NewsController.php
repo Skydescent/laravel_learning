@@ -12,9 +12,10 @@ class NewsController extends Controller
     /**
      * @return Application|Factory|View
      */
-    public function index()
+    public function index(): View|Factory|Application
     {
-        $news = News::latest()->where('published', 1)->simplePaginate(10);
+        $currentPage = request()->get('page',1);
+        $news = $this->modelInterface->publicIndex(auth()->user(), ['page' => $currentPage]);
         return view('news.index', compact( 'news'));
     }
 
@@ -22,8 +23,9 @@ class NewsController extends Controller
      * @param News $news
      * @return Application|Factory|View
      */
-    public function show(News $news)
+    public function show(News $news): View|Factory|Application
     {
+        $news = $this->modelInterface->find($news, auth()->user());
         return view('news.show', compact('news'));
     }
 }

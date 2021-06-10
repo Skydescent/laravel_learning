@@ -4,18 +4,29 @@
 namespace App\Service;
 
 
+use App\Cache\CacheEloquentWrapper;
 use App\User;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class CacheService
 {
+    private static $instances = [];
+
     protected string $modelClass;
 
     public array $configs;
 
-    public function __construct(string $modelClass)
+    protected function __construct(string $modelClass)
     {
         $this->modelClass = $modelClass;
         $this->initialize();
+    }
+
+    protected function __clone()
+    {
+
     }
 
     protected function initialize()
@@ -28,12 +39,58 @@ class CacheService
         }
     }
 
-    public function cache(callable $queryData , User $user = null, $postfixes = [])
+    public static function getInstance(string $modelClass): CacheService
     {
-        $tag = $this->getTagName();
+        if (!isset(self::$instances[$modelClass])) {
+            self::$instances[$modelClass] = new static($modelClass);
+        }
+
+        return self::$instances[$modelClass];
+    }
+
+    public function cacheItem($data, $cacheKey, ?User $user = null)
+    {
+        $queryData = function () use ($cacheKey, $data) {
+            return CacheEloquentWrapper::wrapItem($data, $cacheKey, $this);
+        };
+
+        return $this->cache($queryData, $user, $cacheKey);
+    }
+
+
+    public function cacheCollection(
+        Collection|\Illuminate\Database\Eloquent\Collection $collection ,
+        User $user = null,
+        $postfixes = []
+    )
+    {
+        $queryData = function () use ($collection) {
+            return CacheEloquentWrapper::wrapCollection($collection, $this);
+        };
+
+        return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
+    }
+
+
+    public function cachePaginator(
+        \Illuminate\Pagination\Paginator|\Illuminate\Pagination\LengthAwarePaginator $paginator,
+        User $user = null,
+        $postfixes = []
+    )
+    {
+        $queryData = function () use ($paginator) {
+            return CacheEloquentWrapper::wrapPaginator($paginator, $this);
+        };
+
+        return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
+    }
+
+    public function cache(callable $queryData , User $user = null, $postfixes = [], array|null $tags = null)
+    {
+        $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
 
-        return \Cache::tags([$tag])
+        return \Cache::tags($tags)
             ->remember(
                 $key,
                 $this->configs['ttl'],
@@ -47,7 +104,7 @@ class CacheService
     }
 
 
-    public function getKeyName(User|null $user, $postfixes)
+    public function getKeyName(User|null $user, $postfixes): string
     {
         $prefix = $this->configs['allPrefix'] . '_';
         $postfix = '';
@@ -64,4 +121,63 @@ class CacheService
 
         return $prefix . $this->getTagName() . $postfix;
     }
+
+    public function flushModelCache(UrlRoutable $modelInstance, User|null $user = null)
+    {
+        $identifier = $this->getModelIdentifier($modelInstance);
+        $this->forgetModel($identifier, $user);
+        $this->forgetModelRelations($identifier, $user);
+        $this->flushCollections();
+    }
+
+    public function forgetModel(array $identifier, User|null $user = null)
+    {
+        $keyName = $this->getKeyName($user, $identifier);
+        $tag = $this->getTagName();
+        Log::info('CacheService::forgetModel_$keyName:' . $keyName . '_Tag: ' . $tag);
+
+        \Cache::tags([$tag])->forget($keyName);
+    }
+
+    public function forgetModelRelations(array $identifier = null, User|null $user = null)
+    {
+        foreach ($this->getRelationsNames() as $relationName) {
+            $this->forgetModelRelation($identifier, [$relationName], $user);
+        }
+    }
+
+    public function forgetMorphedModelRelation(UrlRoutable $model, array $relationName, User|null $user = null)
+    {
+        $morphedCacheService = static::getInstance(get_class($model));
+        $identifier = $morphedCacheService->getModelIdentifier($model);
+        $morphedCacheService->forgetModelRelation($identifier, $relationName, $user);
+    }
+
+    public function forgetModelRelation(array $identifier, array $relationName, User|null $user = null)
+    {
+        $postfixes = array_merge($relationName, $identifier);
+        $keyName = $this->getKeyName($user, $postfixes);
+        $tags = [$this->getTagName()];
+
+        \Cache::tags($tags)->forget($keyName);
+    }
+
+    public function flushCollections()
+    {
+        \Cache::tags([$this->getTagName() . '_collection'])->flush();
+
+    }
+
+    public function getRelationsNames(): array
+    {
+        return array_keys($this->configs['relations']);
+    }
+
+    public function getModelIdentifier(UrlRoutable $modelInstance) : array
+    {
+        $routeKeyName = $modelInstance->getRouteKeyName();
+        $instanceKeyName = $modelInstance->$routeKeyName;
+        return [$routeKeyName => $instanceKeyName];
+    }
+
 }

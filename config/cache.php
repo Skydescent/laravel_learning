@@ -111,20 +111,32 @@ return [
                     'tags' => \App\Tag::class,
                     'owner' => \App\User::class,
                     'history' => \App\PostHistory::class
-                ]
+                ],
             ],
             \App\News::class => [
                 'tag' => 'news',
-                'isPersonal' => false
+                'isPersonal' => false,
+                'relations' => [
+                    'comments' => \App\Comment::class,
+                    'tags' => \App\Tag::class,
+                ],
             ],
             \App\Tag::class => [
                 'tag' => 'tags',
                 'isPersonal' => true
+            ],
+            \App\Comment::class => [
+                'tag' => 'comments',
+                'isPersonal' => false,
+                'relations' => [
+                    'author' => \App\User::class
+                ]
             ]
         ],
         'allPrefix' => 'all',
         'personalKeyPrefix' => 'user',
-        'ttl' => 3600
+        'ttl' => 300,
+        'nameOfAllCacheKeysKey' => 'all_cache_keys',
     ]
 ];
 

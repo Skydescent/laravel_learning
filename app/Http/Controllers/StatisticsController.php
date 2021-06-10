@@ -11,6 +11,7 @@ class StatisticsController extends Controller
 {
     public function index()
     {
+        // TODO: в репозитории возможность передачи кастомных настроек напраямую в КэшСервис
         $statistics = [
             'postsCount' => Post::count(),
             'newsCount' => News::count(),

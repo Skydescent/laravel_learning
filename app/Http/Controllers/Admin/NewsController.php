@@ -12,13 +12,6 @@ use Illuminate\View\View;
 
 class NewsController extends Controller
 {
-    private $newsService;
-
-    public function __construct(NewsService $newsService)
-    {
-        $this->newsService = $newsService;
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -26,7 +19,8 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news = News::latest()->paginate(20);
+        $currentPage = request()->get('page',1);
+        $news = $this->modelInterface->adminIndex(auth()->user(), ['page' => $currentPage]);
 
         return view('admin.news.index', compact( 'news'));
     }
@@ -51,9 +45,7 @@ class NewsController extends Controller
      */
     public function store(NewsStoreAndUpdateRequest $request) : RedirectResponse
     {
-        $this->newsService
-            ->setNews(new News())
-            ->storeOrUpdate($request->validated());
+        $this->modelInterface->store($request);
         return redirect()->route('admin.news.index');
     }
 
@@ -65,6 +57,7 @@ class NewsController extends Controller
      */
     public function edit(News $news) : View
     {
+        $news = $this->modelInterface->find($news, auth()->user());
         return view('admin.news.edit', compact('news'));
     }
 
@@ -78,9 +71,7 @@ class NewsController extends Controller
      */
     public function update(NewsStoreAndUpdateRequest $request, News $news)
     {
-        $this->newsService
-            ->setNews($news)
-            ->storeOrUpdate($request->validated());
+        $this->modelInterface->update($request, $news, auth()->user());
         return redirect()->route('admin.news.index');
     }
 
@@ -93,7 +84,7 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
-        $news->delete();
+        $this->modelInterface->destroy($news, auth()->user());
         return redirect()->route('admin.news.index');
     }
 }

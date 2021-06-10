@@ -4,9 +4,15 @@
 namespace App\Cache;
 
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Log;
+use JsonSerializable;
 
-class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable, \ArrayAccess
+
+class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable, \ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {
 
     protected array $modelCacheKey;
@@ -15,7 +21,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     protected  \App\Service\CacheService $cacheService;
 
-    protected static $modelClass;
+    protected static string $modelClass;
 
     public static function wrapItem($item, array $modelCacheKey, \App\Service\CacheService $cacheService)
     {
@@ -44,7 +50,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
     }
 
     public static function wrapPaginator(
-        \Illuminate\Pagination\Paginator $paginator,
+        \Illuminate\Pagination\Paginator|\Illuminate\Pagination\LengthAwarePaginator $paginator,
         \App\Service\CacheService $cacheService,
         string $modelIdentifier = null
     )
@@ -55,9 +61,9 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     public function __get(string $name)
     {
-        if (in_array($name, array_keys($this->cacheService->configs['relations']))) {
-            $queryData = function () use ($name) {
+        if (in_array($name, $this->cacheService->getRelationsNames())) {
 
+            $queryData = function () use ($name) {
                 if (get_class($instance = $this->model->$name) === \Illuminate\Database\Eloquent\Collection::class) {
                     return static::wrapCollection($instance, $this->cacheService);
                 } elseif (is_subclass_of($instance, \Illuminate\Database\Eloquent\Model::class)) {
@@ -65,10 +71,19 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
                     return static::wrapItem($instance,[$modelIdentifier => $instance->$modelIdentifier], $this->cacheService);
                 }
             };
-            return $this->cacheService->cache($queryData,null, array_merge($this->modelCacheKey, ['relation' => $name]));
+            return $this->cacheService->cache($queryData,null, array_merge($this->modelCacheKey, ['relation' => $name]), [$name . '_collection']);
+        }
+
+        if($name === 'model') {
+            return $this->getModel();
         }
 
         return $this->model->$name;
+    }
+
+    public function getModel()
+    {
+        return $this->model;
     }
 
     public function __call(string $name, array $arguments)
@@ -78,7 +93,30 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     public function __toString()
     {
-        return $this->model;
+        return json_encode($this->model);
+    }
+
+    public function toArray()
+    {
+        return $this->model->toArray();
+    }
+
+    public function toJson($options = 0)
+    {
+        // TODO: Remove if not need
+        $json = json_encode($this->jsonSerialize(), $options);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw JsonEncodingException::forModel($this, json_last_error_msg());
+        }
+
+        return $json;
+    }
+
+    public function jsonSerialize ()
+    {
+        // TODO: Remove if not need
+        return $this->model->toArray();
     }
 
     /**
@@ -132,7 +170,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
      */
     public function offsetExists($offset)
     {
-        // TODO: Implement offsetExists() method.
+       return $this->model->offsetExists($offset);
     }
 
     /**
@@ -141,7 +179,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
      */
     public function offsetGet($offset)
     {
-        // TODO: Implement offsetGet() method.
+        return $this->model->offsetGet($offset);
     }
 
     /**
@@ -150,7 +188,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
      */
     public function offsetSet($offset, $value)
     {
-        // TODO: Implement offsetSet() method.
+        return $this->model->offsetSet($offset, $value);
     }
 
     /**
@@ -158,7 +196,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
      */
     public function offsetUnset($offset)
     {
-        // TODO: Implement offsetUnset() method.
+        return $this->model->offsetSet($offset);
     }
 
 }

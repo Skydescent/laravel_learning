@@ -6,32 +6,29 @@ use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
 use App\Repositories\EloquentRepositoryInterface;
 use App\Service\CacheService;
-use App\Service\PostsService;
+use Illuminate\Database\Eloquent\Model;
 
 
 class PostsController extends Controller
 {
-    private $postService;
-
-    public function __construct(EloquentRepositoryInterface $postInterface)
+    public function __construct(EloquentRepositoryInterface $modelInterface)
     {
+        parent::__construct($modelInterface);
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
-        //$this->middleware('can:view,post')->only(['show']);
-        $this->postInterface = $postInterface;
     }
 
     public function index()
     {
-
         $currentPage = request()->get('page',1);
-        $posts = $this->postInterface->publicAll(auth()->user(), ['page' => $currentPage] );
+        $posts = $this->modelInterface->publicIndex(auth()->user(), ['page' => $currentPage]);
             return view('posts.index', compact( 'posts'));
     }
 
-    public function show($slug)
+    public function show(Post $post)
     {
-        $post = $this->postInterface->find(['slug' => $slug]);
+        $post = $this->modelInterface->find($post, auth()->user());
+
         return view('posts.show', compact('post'));
     }
 
@@ -42,10 +39,7 @@ class PostsController extends Controller
 
     public function store(PostStoreAndUpdateRequest $request)
     {
-        $this->postService
-            ->setPost(new Post)
-            ->storeOrUpdate($request->validated())
-            ->notifyAdmin('добавлена статья', 'posts.show');
+        $this->modelInterface->store($request);
 
         flash('Статья успешно добавлена');
 
@@ -54,16 +48,15 @@ class PostsController extends Controller
 
     public function edit(Post $post)
     {
+        $post = $this->modelInterface->find($post, auth()->user());
+
         $isAdmin = false;
         return view('posts.edit', compact('post', 'isAdmin'));
     }
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $this->postService
-            ->setPost($post)
-            ->storeOrUpdate($request->validated())
-            ->notifyAdmin('обновлена статья', 'posts.show');
+        $this->modelInterface->update($request, $post, auth()->user());
 
         flash('Статья успешно обновлена');
 
@@ -72,10 +65,8 @@ class PostsController extends Controller
 
     public function destroy(Post $post)
     {
-        $this->postService
-            ->setPost($post)
-            ->destroy()
-            ->notifyAdmin('удалена статья');
+
+        $this->modelInterface->destory($post, auth()->user());
         flash('Статья удалена', 'warning');
         return redirect()->route('posts.index');
     }

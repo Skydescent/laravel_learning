@@ -3,11 +3,14 @@
 namespace App\Service;
 
 use App\Events\PostCreated;
+use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Http\Request;
 
-class PostsService
+class PostsService implements RepositoryServiceable
 {
     /**
      * @var
@@ -56,9 +59,11 @@ class PostsService
     /**
      * @throws \Exception
      */
-    public function destroy()
+    public function destroyPost()
     {
             $this->post->delete();
+
+            return $this;
     }
 
     /**
@@ -75,5 +80,31 @@ class PostsService
             $route
         ));
         return $this;
+    }
+
+    public function storePost(ValidatesWhenResolved $request, $message, Post $post = null)
+    {
+        $post = $post ?? new Post();
+
+        $this->setPost($post)
+            ->storeOrUpdate($request->validated())
+            ->notifyAdmin($message, 'posts.show');
+    }
+
+    public function store(ValidatesWhenResolved|Request $request)
+    {
+        $this->storePost($request, 'добавлена статья', null);
+    }
+
+    public function update(ValidatesWhenResolved|Request $request, $post)
+    {
+        $this->storePost($request, 'обновлена статья', $post);
+    }
+
+    public function destroy($post)
+    {
+        $this->setPost($post)
+            ->destroyPost()
+            ->notifyAdmin('статья удалена');
     }
 }

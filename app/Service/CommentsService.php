@@ -5,10 +5,12 @@ namespace App\Service;
 
 
 use App\Commentable;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Http\Request;
 
-class CommentsService
+class CommentsService implements RepositoryServiceable
 {
-    public function store(Commentable $model, $request)
+    public function store(ValidatesWhenResolved|Request $request, Commentable $model = null)
     {
         $attributes = $request->validate([
             'body' => 'required',
@@ -17,4 +19,25 @@ class CommentsService
 
         $model->comments()->create($attributes);
     }
+
+    /**
+     * @param ValidatesWhenResolved $request
+     * @param $model
+     * @return mixed
+     */
+    public function update(ValidatesWhenResolved|Request $request, $model)
+    {
+        // TODO: Implement update() method.
+    }
+
+    /**
+     * @param $model
+     * @return mixed
+     */
+    public function destroy($model)
+    {
+        // TODO: Implement destroy() method.
+    }
+
+
 }
