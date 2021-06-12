@@ -26,7 +26,7 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
     /**
      * @var EloquentRepositoryInterface
      */
-    private static EloquentRepositoryInterface $instance;
+    protected static EloquentRepositoryInterface $instance;
 
     /**
      * @var string

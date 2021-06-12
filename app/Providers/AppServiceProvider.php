@@ -35,13 +35,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('layout.sidebar', function($view) {
-            $currentModelRepository = \App\Repositories\PostEloquentRepository::getInstance();
-
-            //TODO: Решить как достать нужный класс репозитория из contextual Binding
-            $action = \app('request')->route()->getAction();
-            dump($action['controller']);
+            $action = (
+                \app('request')
+                ->route()
+                ->getAction()
+            )['controller'];
+            $currentModelRepository = (new \App\Service\RepositoryService)->getRepository($action);
             $view->with('tagsCloud', $currentModelRepository->tagsCloud(auth()->user()));
-
         });
 
 

@@ -1,5 +1,22 @@
 <?php
 
+use App\Comment;
+use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\PostsController as AdminPostsController;
+use App\Http\Controllers\NewsCommentsController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\PostCommentsController;
+use App\Http\Controllers\PostsController;
+use App\News;
+use App\Post;
+use App\PostHistory;
+use App\Repositories\CommentEloquentRepository;
+use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\NewsEloquentRepository;
+use App\Repositories\PostEloquentRepository;
+use App\Tag;
+use App\Task;
+use App\User;
 use Illuminate\Support\Str;
 
 return [
@@ -103,40 +120,40 @@ return [
 
     'cache_service' => [
         'map' => [
-            \App\Post::class => [
+            Post::class => [
                 'tag' => 'posts',
                 'isPersonal' => true,
                 'relations' => [
-                    'comments' => \App\Comment::class,
-                    'tags' => \App\Tag::class,
-                    'owner' => \App\User::class,
-                    'history' => \App\PostHistory::class
+                    'comments' => Comment::class,
+                    'tags' => Tag::class,
+                    'owner' => User::class,
+                    'history' => PostHistory::class
                 ],
             ],
-            \App\News::class => [
+            News::class => [
                 'tag' => 'news',
                 'isPersonal' => false,
                 'relations' => [
-                    'comments' => \App\Comment::class,
-                    'tags' => \App\Tag::class,
+                    'comments' => Comment::class,
+                    'tags' => Tag::class,
                 ],
             ],
-            \App\Tag::class => [
+            Tag::class => [
                 'tag' => 'tags',
                 'isPersonal' => true,
                 'relations' => [
-                    'tasks' => \App\Task::class,
-                    'posts' => \App\Post::class,
-                    'news' => \App\News::class,
-                    'users' => \App\User::class
+                    'tasks' => Task::class,
+                    'posts' => Post::class,
+                    'news' => News::class,
+                    'users' => User::class
                 ],
 
             ],
-            \App\Comment::class => [
+            Comment::class => [
                 'tag' => 'comments',
                 'isPersonal' => false,
                 'relations' => [
-                    'author' => \App\User::class
+                    'author' => User::class
                 ]
             ]
         ],
@@ -144,7 +161,29 @@ return [
         'personalKeyPrefix' => 'user',
         'ttl' => 300,
         'nameOfAllCacheKeysKey' => 'all_cache_keys',
+    ],
+    'cache_repositories' => [
+        'interface_name' => EloquentRepositoryInterface::class,
+        'controller_repository_map' => [
+            [
+                'controllers' => [PostsController::class, AdminPostsController::class],
+                'repository_closure' => function () {
+                    return PostEloquentRepository::getInstance();
+                }
+            ],
+            [
+                'controllers' => [NewsController::class, AdminNewsController::class],
+                'repository_closure' => function () {
+                    return NewsEloquentRepository::getInstance();
+                }
+            ],
+            [
+                'controllers' => [NewsCommentsController::class, PostCommentsController::class],
+                'repository_closure' => function () {
+                    return CommentEloquentRepository::getInstance();
+                }
+            ],
+        ]
     ]
 ];
 
-//TODO: add relations configs to rest of models Classes
