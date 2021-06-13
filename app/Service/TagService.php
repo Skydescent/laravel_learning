@@ -17,7 +17,7 @@ class TagService implements RepositoryServiceable
         };
     }
 
-    private function getModelQueryFilter($models, $query, $queryFilterName = 'queryFilter')
+    public function getModelQueryFilter($models, $query, $queryFilterName = 'queryFilter')
     {
         foreach ($models as $model => $options){
             if(method_exists( new $model(), $queryFilterName)) {

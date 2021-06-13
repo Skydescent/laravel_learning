@@ -88,13 +88,13 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
     }
 
     /**
-     * @param UrlRoutable $model
+     * @param UrlRoutable|array $item
      * @param Authenticatable|User|null $user
      * @return mixed
      */
-    public function find(UrlRoutable $model, Authenticatable|User|null $user = null): mixed
+    public function find(UrlRoutable|array $item, Authenticatable|User|null $user = null): mixed
     {
-        $identifier = $this->cacheService->getModelIdentifier($model);
+        $identifier = gettype($item) === 'array' ? $item : $this->cacheService->getModelIdentifier($item);
         $data = (self::$model)::firstWhere($identifier);
         return  $this->cacheService->cacheItem($data, $identifier, $user);
     }

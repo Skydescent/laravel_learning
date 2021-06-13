@@ -25,6 +25,8 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     public static function wrapItem($item, array $modelCacheKey, \App\Service\CacheService $cacheService)
     {
+        if (is_null($item)) return null;
+
         $instance = new static();
         $instance->model = $item;
         static::$modelClass = get_class($item);

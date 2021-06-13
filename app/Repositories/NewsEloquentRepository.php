@@ -11,9 +11,9 @@ use App\Service\NewsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class NewsEloquentRepository extends EloquentRepository
+class NewsEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface
 {
-    use HasTagsCloud;
+    use HasTags;
 
     /**
      *

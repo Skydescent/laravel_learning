@@ -17,13 +17,13 @@ class PostsController extends Controller
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $this->modelInterface->update($request, $post, auth()->user());
+        $this->modelInterface->update($request, $post);
         return redirect()->route('admin.posts.index');
     }
 
     public function edit(Post $post)
     {
-        $post = $this->modelInterface->find($post, auth()->user());
+        $post = $this->modelInterface->find($post);
         $isAdmin = true;
         return view('posts.edit', compact('post', 'isAdmin'));
     }

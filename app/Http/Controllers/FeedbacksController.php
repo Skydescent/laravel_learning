@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Feedback;
+use App\Repositories\EloquentRepositoryInterface;
 use Illuminate\Http\Request;
 
 class FeedbacksController extends Controller

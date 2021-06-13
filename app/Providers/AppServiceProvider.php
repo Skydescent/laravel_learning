@@ -35,13 +35,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('layout.sidebar', function($view) {
-            $action = (
-                \app('request')
-                ->route()
-                ->getAction()
-            )['controller'];
-            $currentModelRepository = (new \App\Service\RepositoryService)->getRepository($action);
-            $view->with('tagsCloud', $currentModelRepository->tagsCloud(auth()->user()));
+            $taggableRepository = (new \App\Service\RepositoryService)->getTaggableRepository();
+            $view->with('tagsCloud', $taggableRepository->tagsCloud(auth()->user()));
         });
 
 

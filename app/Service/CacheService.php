@@ -8,7 +8,6 @@ use App\Cache\CacheEloquentWrapper;
 use App\User;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class CacheService
 {
@@ -69,8 +68,7 @@ class CacheService
             return CacheEloquentWrapper::wrapCollection($collection, $this);
         };
 
-        return $this->cache($queryData, $user, $postfixes, array_merge([$this->getTagName() . '_collect
-        ion'], $tags));
+        return $this->cache($queryData, $user, $postfixes, array_merge([$this->getTagName() . '_collection'], $tags));
     }
 
 
@@ -136,7 +134,6 @@ class CacheService
     {
         $keyName = $this->getKeyName($user, $identifier);
         $tag = $this->getTagName();
-        Log::info('CacheService::forgetModel_$keyName:' . $keyName . '_Tag: ' . $tag);
 
         \Cache::tags([$tag])->forget($keyName);
     }
@@ -144,7 +141,7 @@ class CacheService
     public function forgetModelRelations(array $identifier = null, User|null $user = null)
     {
         foreach ($this->getRelationsNames() as $relationName) {
-            $this->forgetModelRelation($identifier, [$relationName], $user);
+            $this->forgetModelRelation($identifier, ['relation' => $relationName], $user, [$relationName . '_collection']);
         }
     }
 
@@ -155,11 +152,12 @@ class CacheService
         $morphedCacheService->forgetModelRelation($identifier, $relationName, $user);
     }
 
-    public function forgetModelRelation(array $identifier, array $relationName, User|null $user = null)
+    public function forgetModelRelation(array $identifier, array $relationName, User|null $user = null, array $tags = [])
     {
-        $postfixes = array_merge($relationName, $identifier);
+        $postfixes = array_merge( $identifier, $relationName);
         $keyName = $this->getKeyName($user, $postfixes);
-        $tags = [$this->getTagName()];
+
+        $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
 
         \Cache::tags($tags)->forget($keyName);
     }

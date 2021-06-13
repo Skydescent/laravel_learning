@@ -3,12 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\News;
+use App\Repositories\EloquentRepositoryInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 
 class NewsController extends Controller
 {
+
+    protected EloquentRepositoryInterface $modelInterface;
+
+    public function __construct(EloquentRepositoryInterface $modelInterface)
+    {
+        $this->modelInterface = $modelInterface;
+    }
+
     /**
      * @return Application|Factory|View
      */

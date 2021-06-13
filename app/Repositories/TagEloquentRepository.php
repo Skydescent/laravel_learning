@@ -3,11 +3,12 @@
 namespace App\Repositories;
 
 use App\Service\CacheService;
-use App\User;
-use Illuminate\Contracts\Auth\Authenticatable;
 
-class TagEloquentRepository extends EloquentRepository
+class TagEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface
 {
+    use HasTags;
+
+    //TODO: Remove class?
 
     /**
      * @inheritDoc

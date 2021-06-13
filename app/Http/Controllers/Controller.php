@@ -12,10 +12,4 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected EloquentRepositoryInterface $modelInterface;
-
-    public function __construct(EloquentRepositoryInterface $modelInterface)
-    {
-        $this->modelInterface = $modelInterface;
-    }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\RepositoryTaggableInterface;
 
 class RepositoryService
 {
@@ -18,9 +18,20 @@ class RepositoryService
         return explode('@',$action)[0];
     }
 
-    public function getRepository(string $action): EloquentRepositoryInterface
+    protected function getAction ()
+    {
+        return (
+        \app('request')
+            ->route()
+            ->getAction()
+        )['controller'];
+    }
+
+    public function getTaggableRepository(string|null $action = null): RepositoryTaggableInterface
     {
         static::getConfigs();
+        $action = $action ?? $this->getAction();
+
         $controller = $this->getControllerFromAction($action);
         $map = static::$configs['controller_repository_map'];
         foreach ($map as $item) {
@@ -28,6 +39,6 @@ class RepositoryService
                 return $item['repository_closure']();
             }
         }
-
+        return  \App\Repositories\TagEloquentRepository::getInstance();
     }
 }

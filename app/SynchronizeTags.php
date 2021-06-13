@@ -21,12 +21,8 @@ trait SynchronizeTags
             $tagsToAttach = $tags;
         }
 
-        foreach ($tagsToAttach as $tag) {
-            $tag = Tag::firstOrCreate(['name' => $tag]);
-            $syncIds[] = $tag->id;
-        }
-
-        $this->tags()->sync($syncIds);
+        $taggableRepository = (new \App\Service\RepositoryService())->getTaggableRepository();
+        $taggableRepository->attachTags($tagsToAttach, $this, $syncIds, auth()->user());
 
     }
 

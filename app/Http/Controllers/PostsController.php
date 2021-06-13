@@ -5,17 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
 use App\Repositories\EloquentRepositoryInterface;
-use App\Service\CacheService;
-use Illuminate\Database\Eloquent\Model;
 
 
 class PostsController extends Controller
 {
+    protected EloquentRepositoryInterface $modelInterface;
+
     public function __construct(EloquentRepositoryInterface $modelInterface)
     {
-        parent::__construct($modelInterface);
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
+        $this->modelInterface = $modelInterface;
     }
 
     public function index()
@@ -56,7 +56,7 @@ class PostsController extends Controller
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $this->modelInterface->update($request, $post, auth()->user());
+        $this->modelInterface->update($request, $post);
 
         flash('Статья успешно обновлена');
 
@@ -66,7 +66,7 @@ class PostsController extends Controller
     public function destroy(Post $post)
     {
 
-        $this->modelInterface->destory($post, auth()->user());
+        $this->modelInterface->destory($post);
         flash('Статья удалена', 'warning');
         return redirect()->route('posts.index');
     }
