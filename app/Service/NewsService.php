@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 class NewsService implements RepositoryServiceable
 {
+    //TODO: FIRST - extends EloquentService
     /**
      * @var
      */

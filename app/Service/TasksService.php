@@ -3,8 +3,6 @@
 namespace App\Service;
 
 use App\Task;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 
 class TasksService extends EloquentService
 {

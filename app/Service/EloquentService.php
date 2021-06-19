@@ -5,10 +5,13 @@ namespace App\Service;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 abstract class EloquentService implements RepositoryServiceable
 {
     public array $flashMessages = [];
+
+    public array $afterEventMethods = [];
 
     protected Model $model;
 
@@ -21,6 +24,18 @@ abstract class EloquentService implements RepositoryServiceable
     public function __construct()
     {
         static::setModelClass();
+    }
+
+    public function __call($method,$arguments) {
+        Log::info('before if in EloquentService@__call(), method: ' . $method);
+        if(in_array($method, self::ALLOWED_EVENTS)) {
+            Log::info('in EloquentService@__call(), method: ' . $method);
+            if (count($this->flashMessages)!== 0 && key_exists($method, $this->flashMessages)) {
+                $this->flashEventMessage($method);
+            }
+            $this->callMethodsAfterEvent($method);
+        }
+        if (method_exists($this, $method)) return call_user_func_array([$this,$method],$arguments);
     }
 
     public function setModel(Model|null $model = null): EloquentService
@@ -59,14 +74,14 @@ abstract class EloquentService implements RepositoryServiceable
     {
         $this
             ->storeOrUpdate($request)
-            ->flashEventMessage('store');
+            ->callMethodsAfterEvent('store');
     }
 
     public function  update(FormRequest|Request $request, Model $model)
     {
         $this
             ->storeOrUpdate($request, $model)
-            ->flashEventMessage('update');
+            ->callMethodsAfterEvent('update');
     }
 
     public function destroy(Model $model)
@@ -74,7 +89,7 @@ abstract class EloquentService implements RepositoryServiceable
         $this
             ->setModel($model)
             ->destroyModel()
-            ->flashEventMessage('destroy');
+            ->callMethodsAfterEvent('destroy');
     }
 
     protected function destroyModel()
@@ -94,6 +109,20 @@ abstract class EloquentService implements RepositoryServiceable
                 ['message' => $this->flashMessages[$eventName], 'type' => 'success'];
 
             \flash($msg, $type);
+        }
+    }
+
+    protected function callMethodsAfterEvent(string $currentEvent)
+    {
+        if (count($this->flashMessages)!== 0 && key_exists($currentEvent, $this->flashMessages)) {
+            $this->flashEventMessage($currentEvent);
+        }
+        if (count($this->afterEventMethods) !== 0) {
+            foreach ($this->afterEventMethods as $method => $events) {
+
+                $key = array_values(array_intersect(['all', $currentEvent], array_keys($events)))[0];
+                call_user_func_array([$this,$method],$events[$key]);
+            }
         }
     }
 }

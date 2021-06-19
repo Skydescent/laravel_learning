@@ -11,57 +11,44 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-class PostsService implements RepositoryServiceable
+class PostsService extends EloquentService
 {
-    /**
-     * @var
-     */
-    private $post;
+
+    public array $flashMessages = [
+        'update' => 'Статья успешно обновлена!',
+        'store' => 'Статья успешно создана!',
+        'destroy' => [
+            'message' => 'Задача удалена!',
+            'type' => 'warning'
+        ],
+    ];
+
+    public array $afterEventMethods = [
+        'NotifyAdmin' => [
+            'store' =>['добавлена статья', 'posts.show'],
+            'update'=>['обновлена статья', 'posts.show'],
+            'destroy'=>['статья удалена']
+        ]
+    ];
 
     /**
-     * Set service Post model.
-     * @param Post $post
+     *
      */
-    public function setPost(Post $post)
+    protected static function setModelClass()
     {
-        $this->post = $post;
-        return $this;
+       static::$modelClass = \App\Post::class;
     }
 
     /**
-     * @return \App\Post
+     * @param null $request
+     * @return array
      */
-    public function getPost(): Post
+    protected function prepareAttributes($request = null): array
     {
-        return $this->post;
-    }
-
-    /**
-     * @param $attributes
-     */
-    public function storeOrUpdate($attributes)
-    {
+        $attributes = $request->validated();
         $attributes['published'] = $attributes['published'] ?? 0;
-        $attributes['owner_id'] = $this->post->owner ? $this->post->owner->id :auth()->id();
-
-        $tags = $attributes['tags'] ?? null;
-        unset($attributes['tags']);
-
-        $post = Post::updateOrCreate(['id' => $this->post->id], $attributes);
-        $this->post = $post;
-        $this->post->syncTags($tags);
-
-        return $this;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function destroyPost()
-    {
-            $this->post->delete();
-
-            return $this;
+        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :auth()->id();
+        return $attributes;
     }
 
     /**
@@ -70,39 +57,13 @@ class PostsService implements RepositoryServiceable
      */
     public function notifyAdmin($message, $routeName = null)
     {
-        $route = $routeName ? route($routeName, ['post' => $this->post]) : null;
+        $route = $routeName ? route($routeName, ['post' => $this->model]) : null;
         $recipient = new AdminRecipient();
         $recipient->notify(new PostStatusChanged(
             $message,
-            $this->post->title,
+            $this->model->title,
             $route
         ));
         return $this;
-    }
-
-    public function storePost(FormRequest $request, $message, Post $post = null)
-    {
-        $post = $post ?? new Post();
-
-        $this->setPost($post)
-            ->storeOrUpdate($request->validated())
-            ->notifyAdmin($message, 'posts.show');
-    }
-
-    public function store(FormRequest|Request $request)
-    {
-        $this->storePost($request, 'добавлена статья', null);
-    }
-
-    public function update(FormRequest|Request $request, $post)
-    {
-        $this->storePost($request, 'обновлена статья', $post);
-    }
-
-    public function destroy($post)
-    {
-        $this->setPost($post)
-            ->destroyPost()
-            ->notifyAdmin('статья удалена');
     }
 }
