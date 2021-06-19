@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskStoreAndUpdateRequest;
+use App\Repositories\EloquentRepositoryInterface;
 use App\Tag;
 use App\Task;
 
 class TasksController extends Controller
 {
-    public function __construct()
+    protected EloquentRepositoryInterface $modelInterface;
+
+    public function __construct(EloquentRepositoryInterface $modelInterface)
     {
         $this->middleware('auth');
         $this->middleware('can:update,task')->except(['index', 'store', 'create']);
+        $this->modelInterface = $modelInterface;
     }
 
     public function index()
     {
-        $tasks =\Cache::tags(['tasks'])->remember('users_tasks|'. auth()->id(), 3600, function() {
-            return auth()->user()->tasks()->with('tags')->latest()->get();
-        });
-
+        $tasks = $this->modelInterface->publicIndex(auth()->user());
         return view('tasks.index', compact( 'tasks'));
     }
 
     public function show(Task $task)
     {
-        // laravel сопоставил $task с моделью Task и выбрал её по id
+        $task = $this->modelInterface->find($task, auth()->user());
         return view('tasks.show', compact('task'));
     }
 
@@ -33,83 +35,27 @@ class TasksController extends Controller
         return view('tasks.create');
     }
 
-    public function store()
+    public function store(TaskStoreAndUpdateRequest $request)
     {
-        $attributes = request()->validate( [
-            'title' => 'required',
-            'body' => 'required'
-        ]);
-
-        $attributes['owner_id'] = auth()->id();
-
-        $task = Task::create($attributes);
-
-        //session()->flash('message', 'Задача успешно создана');
-        flash('Задача успешно создана');
-
-
-        // Редирект на список задач
+        $this->modelInterface->store($request);
         return redirect('/tasks');
     }
 
     public function edit(Task $task)
     {
-        //abort_if($task->ownder_id !== auth()->id(), 403);
-        //$this->authorize('update', $task);
-
+        $task = $this->modelInterface->find($task, auth()->user());
         return view('tasks.edit', compact('task'));
     }
 
-    public function update(Task $task)
+    public function update(TaskStoreAndUpdateRequest $request,Task $task)
     {
-        $attributes = request()->validate( [
-            'title' => 'required',
-            'body' => 'required'
-        ]);
-
-        //$task->update(request(['title', 'body']));
-        $task->update($attributes);
-
-        //Получаем текущую коллекцию тэгов и ключами делаем поля name
-        /** @var Collection $taskTags */
-        $taskTags = $task->tags->keyBy('name');
-
-        //Получаем из request строку с тэгами, преоразуем в массив, затем в коллекцию,
-        // а затем в коллекции ключами делаем значения элементов коллекции
-        $tags = collect(explode(',', request('tags')))->keyBy(function ($item) { return $item; });
-
-        //Находим пересечение ключей тэгов из модели и из request, приводим к массиву с id
-        $syncIds = $taskTags->intersectByKeys($tags)->pluck('id')->toArray();
-
-        $tagsToAttach = $tags->diffKeys($taskTags);
-
-        foreach ($tagsToAttach as $tag) {
-            $tag = Tag::firstOrCreate(['name' => $tag]);
-            $syncIds[] = $tag->id;
-        }
-//        $tagsToDetach = $taskTags->diffKeys($tags);
-//
-//        foreach ($tagsToAttach as $tag) {
-//            //Статичный метод либо вернёт этот тэг, либо создаст новый
-//            $tag = Tag::firstOrCreate(['name' => $tag]);
-//            $task->tags()->attach($tag);
-//        }
-//
-//        foreach ($tagsToDetach as $tag) {
-//            $task->tags()->detach($tag);
-//        }
-
-        //Синхронизируем id тэгов в задаче с id из request
-        $task->tags()->sync($syncIds);
-        flash('Задача успешно обновлена');
-
+        $this->modelInterface->update($request,$task);
         return redirect('/tasks');
     }
 
     public function destroy(Task $task)
     {
-        $task->delete();
-        flash('Задача удалена', 'warning');
+        $this->modelInterface->destroy($task);
         return redirect('/tasks');
     }
 

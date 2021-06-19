@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use function Symfony\Component\String\s;
 
-class Post extends \App\Model implements Commentable
+class Post extends \App\Model implements Commentable, Taggable
 {
     use SynchronizeTags;
 
@@ -18,6 +19,9 @@ class Post extends \App\Model implements Commentable
     {
         static::updated(function (\App\Post $post) {
             broadcast(new \App\Events\PostUpdated($post, auth()->user()));
+        });
+        static::created(function (\App\Post $post) {
+            event(new \App\Events\PostCreated($post));
         });
     }
 

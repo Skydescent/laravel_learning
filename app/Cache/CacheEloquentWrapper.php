@@ -73,7 +73,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
                     return static::wrapItem($instance,[$modelIdentifier => $instance->$modelIdentifier], $this->cacheService);
                 }
             };
-            return $this->cacheService->cache($queryData,null, array_merge($this->modelCacheKey, ['relation' => $name]), [$name . '_collection']);
+            return $this->cacheService->cache($queryData,auth()->user(), array_merge($this->modelCacheKey, ['relation' => $name]), [$name . '_collection']);
         }
 
         if($name === 'model') {

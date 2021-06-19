@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class News extends \App\Model implements Commentable
+class News extends \App\Model implements Commentable, Taggable
 {
     use SynchronizeTags;
 

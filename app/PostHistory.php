@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PostHistory extends Model
 {
-    use HasFactory;
 
     /**
      * @var array

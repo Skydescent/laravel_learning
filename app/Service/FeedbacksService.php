@@ -4,14 +4,15 @@ namespace App\Service;
 
 use App\Feedback;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
 class FeedbacksService implements RepositoryServiceable
 {
 
-    public function store(ValidatesWhenResolved|Request $request)
+    public function store(FormRequest|Request $request)
     {
-        $attributes = request()->validate([
+        $attributes = $request->validate([
             'email' => 'required|email',
             'body' => 'required'
         ]);
@@ -19,7 +20,7 @@ class FeedbacksService implements RepositoryServiceable
         Feedback::create($attributes);
     }
 
-    public function update(ValidatesWhenResolved|Request $request, $model)
+    public function update(FormRequest|Request $request, $model)
     {
         // TODO: Implement update() method.
     }

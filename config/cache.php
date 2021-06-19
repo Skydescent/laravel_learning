@@ -9,6 +9,7 @@ use App\Http\Controllers\NewsCommentsController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\TasksController;
 use App\News;
 use App\Post;
 use App\PostHistory;
@@ -17,6 +18,8 @@ use App\Repositories\EloquentRepositoryInterface;
 use App\Repositories\FeedbackEloquentRepository;
 use App\Repositories\NewsEloquentRepository;
 use App\Repositories\PostEloquentRepository;
+use App\Repositories\TaskEloquentRepository;
+use App\Step;
 use App\Tag;
 use App\Task;
 use App\User;
@@ -163,10 +166,21 @@ return [
                 'tag' => 'feedbacks',
                 'isPersonal' => false,
             ],
+            Task::class => [
+                'tag' => 'tasks',
+                'isPersonal' => true,
+                'relations' => [
+                    'steps' => Step::class,
+                    'tags' => Tag::class,
+                    'owner' => User::class,
+                ],
+
+            ],
         ],
         'allPrefix' => 'all',
         'personalKeyPrefix' => 'user',
         'ttl' => 300,
+        //TODO: remove, when removed CacheEvents
         'nameOfAllCacheKeysKey' => 'all_cache_keys',
     ],
     'cache_repositories' => [
@@ -194,6 +208,12 @@ return [
                 'controllers' => [FeedbacksController::class],
                 'repository_closure' => function () {
                     return FeedbackEloquentRepository::getInstance();
+                }
+            ],
+            [
+                'controllers' => [TasksController::class],
+                'repository_closure' => function () {
+                    return TaskEloquentRepository::getInstance();
                 }
             ],
         ]

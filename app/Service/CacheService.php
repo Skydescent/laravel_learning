@@ -6,8 +6,10 @@ namespace App\Service;
 
 use App\Cache\CacheEloquentWrapper;
 use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class CacheService
 {
@@ -85,10 +87,17 @@ class CacheService
         return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
     }
 
-    public function cache(callable $queryData , User $user = null, $postfixes = [], array|null $tags = null)
+    public function cache(callable $queryData , Authenticatable|User $user = null, $postfixes = [], array|null $tags = null)
     {
         $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
+        //TODO: Remove log and using log class
+//        Log::info(
+//            '/Cache::tags(' .
+//            implode(',', $tags) .
+//            ')->remember(' .
+//            'key: ' . $key . ',' .
+//            'ttl: ' . $this->configs['ttl']);
 
         return \Cache::tags($tags)
             ->remember(

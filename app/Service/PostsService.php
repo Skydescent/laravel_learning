@@ -8,6 +8,7 @@ use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
 class PostsService implements RepositoryServiceable
@@ -18,7 +19,7 @@ class PostsService implements RepositoryServiceable
     private $post;
 
     /**
-     * PostsService constructor.
+     * Set service Post model.
      * @param Post $post
      */
     public function setPost(Post $post)
@@ -47,9 +48,6 @@ class PostsService implements RepositoryServiceable
         unset($attributes['tags']);
 
         $post = Post::updateOrCreate(['id' => $this->post->id], $attributes);
-        if (!$this->post->id) {
-            event(new PostCreated($post));
-        }
         $this->post = $post;
         $this->post->syncTags($tags);
 
@@ -82,7 +80,7 @@ class PostsService implements RepositoryServiceable
         return $this;
     }
 
-    public function storePost(ValidatesWhenResolved $request, $message, Post $post = null)
+    public function storePost(FormRequest $request, $message, Post $post = null)
     {
         $post = $post ?? new Post();
 
@@ -91,12 +89,12 @@ class PostsService implements RepositoryServiceable
             ->notifyAdmin($message, 'posts.show');
     }
 
-    public function store(ValidatesWhenResolved|Request $request)
+    public function store(FormRequest|Request $request)
     {
         $this->storePost($request, 'добавлена статья', null);
     }
 
-    public function update(ValidatesWhenResolved|Request $request, $post)
+    public function update(FormRequest|Request $request, $post)
     {
         $this->storePost($request, 'обновлена статья', $post);
     }

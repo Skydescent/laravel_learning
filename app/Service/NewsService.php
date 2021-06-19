@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\News;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
 class NewsService implements RepositoryServiceable
@@ -53,20 +54,18 @@ class NewsService implements RepositoryServiceable
     }
 
     /**
-     * @param ValidatesWhenResolved $request
-     * @return mixed
+     * @param FormRequest|Request $request
      */
-    public function store(ValidatesWhenResolved|Request $request)
+    public function store(FormRequest|Request $request)
     {
         // TODO: Implement store() method.
     }
 
     /**
-     * @param ValidatesWhenResolved $request
+     * @param FormRequest|Request $request
      * @param $model
-     * @return mixed
      */
-    public function update(ValidatesWhenResolved|Request $request, $model)
+    public function update(FormRequest|Request $request, $model)
     {
         // TODO: Implement update() method.
     }

@@ -3,7 +3,7 @@
 
 namespace App\Service;
 
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
 class TagService implements RepositoryServiceable
@@ -30,27 +30,24 @@ class TagService implements RepositoryServiceable
     }
 
     /**
-     * @param ValidatesWhenResolved|Request $request
-     * @return mixed
+     * @param FormRequest|Request $request
      */
-    public function store(ValidatesWhenResolved|Request $request)
+    public function store(FormRequest|Request $request)
     {
         // TODO: Implement store() method.
     }
 
     /**
-     * @param ValidatesWhenResolved|Request $request
+     * @param FormRequest|Request $request
      * @param $model
-     * @return mixed
      */
-    public function update(ValidatesWhenResolved|Request $request, $model)
+    public function update(FormRequest|Request $request, $model)
     {
         // TODO: Implement update() method.
     }
 
     /**
      * @param $model
-     * @return mixed
      */
     public function destroy($model)
     {

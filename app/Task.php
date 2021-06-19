@@ -6,8 +6,10 @@ use App\Events\TaskCreated;
 use App\Events\TaskUpdated;
 use Illuminate\Database\Eloquent\Collection;
 
-class Task extends Model
+class Task extends Model implements Taggable
 {
+    use SynchronizeTags;
+
     //Защита от массового заполнения
     //public $fillable = ['title', 'body'];
     public $guarded = [];
