@@ -1,8 +1,10 @@
 <?php
 
 use App\Comment;
+use App\Feedback;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PostsController as AdminPostsController;
+use App\Http\Controllers\FeedbacksController;
 use App\Http\Controllers\NewsCommentsController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PostCommentsController;
@@ -12,6 +14,7 @@ use App\Post;
 use App\PostHistory;
 use App\Repositories\CommentEloquentRepository;
 use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\FeedbackEloquentRepository;
 use App\Repositories\NewsEloquentRepository;
 use App\Repositories\PostEloquentRepository;
 use App\Tag;
@@ -155,7 +158,11 @@ return [
                 'relations' => [
                     'author' => User::class
                 ]
-            ]
+            ],
+            Feedback::class => [
+                'tag' => 'feedbacks',
+                'isPersonal' => false,
+            ],
         ],
         'allPrefix' => 'all',
         'personalKeyPrefix' => 'user',
@@ -181,6 +188,12 @@ return [
                 'controllers' => [NewsCommentsController::class, PostCommentsController::class],
                 'repository_closure' => function () {
                     return CommentEloquentRepository::getInstance();
+                }
+            ],
+            [
+                'controllers' => [FeedbacksController::class],
+                'repository_closure' => function () {
+                    return FeedbackEloquentRepository::getInstance();
                 }
             ],
         ]

@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class FeedbacksController extends Controller
 {
+    protected EloquentRepositoryInterface $modelInterface;
+
+    public function __construct(EloquentRepositoryInterface $modelInterface)
+    {
+        $this->modelInterface = $modelInterface;
+    }
+
     public function index()
     {
-        $feedbacks = Feedback::latest()->get();
+        $feedbacks = $this->modelInterface->adminIndex(auth()->user());
         return view('admin.feedbacks.index', compact( 'feedbacks'));
     }
 
@@ -19,16 +26,10 @@ class FeedbacksController extends Controller
         return view('feedbacks.create');
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $attributes = request()->validate([
-            'email' => 'required|email',
-            'body' => 'required'
-        ]);
-
-        Feedback::create($attributes);
+        $this->modelInterface->store($request);
 
         return redirect('/');
-
     }
 }

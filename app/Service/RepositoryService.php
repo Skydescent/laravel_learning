@@ -36,9 +36,14 @@ class RepositoryService
         $map = static::$configs['controller_repository_map'];
         foreach ($map as $item) {
             if(in_array($controller,$item['controllers'])) {
-                return $item['repository_closure']();
+                $repository = $item['repository_closure'];
             }
         }
+
+        if (isset($repository) && in_array(RepositoryTaggableInterface::class, class_implements($repository()))) {
+            return $repository();
+        };
+
         return  \App\Repositories\TagEloquentRepository::getInstance();
     }
 }

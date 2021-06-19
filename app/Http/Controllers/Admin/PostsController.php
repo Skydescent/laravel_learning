@@ -5,9 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
+use App\Repositories\EloquentRepositoryInterface;
 
 class PostsController extends Controller
 {
+    protected EloquentRepositoryInterface $modelInterface;
+
+    public function __construct(EloquentRepositoryInterface $modelInterface)
+    {
+        $this->modelInterface = $modelInterface;
+    }
+
     public function index()
     {
         $currentPage = request()->get('page',1);

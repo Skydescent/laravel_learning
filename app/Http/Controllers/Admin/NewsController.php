@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NewsStoreAndUpdateRequest;
 use App\News;
+use App\Repositories\EloquentRepositoryInterface;
 use App\Service\NewsService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +13,13 @@ use Illuminate\View\View;
 
 class NewsController extends Controller
 {
+    protected EloquentRepositoryInterface $modelInterface;
+
+    public function __construct(EloquentRepositoryInterface $modelInterface)
+    {
+        $this->modelInterface = $modelInterface;
+    }
+
     /**
      * Display a listing of the resource.
      *

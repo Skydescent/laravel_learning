@@ -170,7 +170,7 @@ class CacheService
 
     public function getRelationsNames(): array
     {
-        return array_keys($this->configs['relations']);
+        return isset($this->configs['relations']) ? array_keys($this->configs['relations']) : [];
     }
 
     public function getModelIdentifier(UrlRoutable $modelInstance) : array

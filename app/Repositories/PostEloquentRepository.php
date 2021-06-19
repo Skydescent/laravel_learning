@@ -15,7 +15,7 @@ class PostEloquentRepository extends  EloquentRepository implements RepositoryTa
 
     protected static function setModel()
     {
-        self::$model = Post::class;
+        static::$model = Post::class;
     }
 
     protected function setModelService()
@@ -30,7 +30,7 @@ class PostEloquentRepository extends  EloquentRepository implements RepositoryTa
 
     public function adminIndex(Authenticatable|User|null $user, array $postfixes = [])
     {
-       $paginator = (self::$model)::latest()
+       $paginator = (static::$model)::latest()
            ->with('owner')
            ->paginate(20);
 

@@ -8,6 +8,10 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 trait HasTags
 {
+    //TODO: В контроллерах, где тэги просто отображаются списком, нужно их отделить
+    // и не добавлять трейт ко всем контроллерам только для отображения облака тэгов, подумать как сделать это отдельно
+    // возможно также как и для статистики??
+
     protected function getTagsCacheService(): CacheService
     {
         return \App\Service\CacheService::getInstance(\App\Tag::class);
