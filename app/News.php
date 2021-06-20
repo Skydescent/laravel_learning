@@ -38,6 +38,12 @@ class News extends \App\Model implements Commentable, Taggable
         });
     }
 
+    public function setTitleAttribute($value)
+    {
+        $this->attributes['title'] = $value;
+        $this->attributes['slug'] = \Str::slug(\Str::substr($value, 0, 8), '-');
+    }
+
     public function setSlugAttribute($value) {
 
         if (static::whereSlug($slug = \Str::of($value)->slug('_'))->exists()) {
