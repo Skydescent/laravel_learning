@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Comment;
 use App\Commentable;
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\Service\CommentsService;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
@@ -24,7 +24,7 @@ class CommentEloquentRepository extends EloquentRepository
      */
     protected function setCacheService()
     {
-        $this->cacheService = CacheService::getInstance(static::$model);
+        $this->cacheService = EloquentCacheService::getInstance(static::$model);
     }
 
     /**

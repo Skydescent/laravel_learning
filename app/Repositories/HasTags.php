@@ -2,19 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 trait HasTags
 {
-    //TODO: В контроллерах, где тэги просто отображаются списком, нужно их отделить
-    // и не добавлять трейт ко всем контроллерам только для отображения облака тэгов, подумать как сделать это отдельно
-    // возможно также как и для статистики??
 
-    protected function getTagsCacheService(): CacheService
+    protected function getTagsCacheService(): EloquentCacheService
     {
-        return \App\Service\CacheService::getInstance(\App\Tag::class);
+        return \App\Service\EloquentCacheService::getInstance(\App\Tag::class);
     }
 
     public function tagsCloud(Authenticatable|User|null $user, array $postfixes = [])

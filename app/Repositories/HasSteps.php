@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\Service\HasStepsServiceable;
 use App\Service\StepsService;
 use App\Step;
@@ -12,13 +12,13 @@ use Illuminate\Http\Request;
 
 trait HasSteps
 {
-    protected CacheService $stepsCacheService;
+    protected EloquentCacheService $stepsCacheService;
 
     protected HasStepsServiceable $stepsService;
 
     protected function initializeStepServices()
     {
-        $this->stepsCacheService = CacheService::getInstance(Step::class);
+        $this->stepsCacheService = EloquentCacheService::getInstance(Step::class);
         $this->stepsService = new StepsService();
     }
 

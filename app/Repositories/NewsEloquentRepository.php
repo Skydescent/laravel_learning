@@ -6,7 +6,7 @@ namespace App\Repositories;
 
 use App\Cache\CacheEloquentWrapper;
 use App\News;
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\Service\NewsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -28,7 +28,7 @@ class NewsEloquentRepository extends EloquentRepository implements TaggableInter
      */
     protected function setCacheService()
     {
-        $this->cacheService = CacheService::getInstance(static::$model);
+        $this->cacheService = EloquentCacheService::getInstance(static::$model);
     }
 
     /**

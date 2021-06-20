@@ -19,11 +19,11 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     protected $model;
 
-    protected  \App\Service\CacheService $cacheService;
+    protected  \App\Service\EloquentCacheService $cacheService;
 
     protected static string $modelClass;
 
-    public static function wrapItem($item, array $modelCacheKey, \App\Service\CacheService $cacheService)
+    public static function wrapItem($item, array $modelCacheKey, \App\Service\EloquentCacheService $cacheService)
     {
         if (is_null($item)) return null;
 
@@ -38,7 +38,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     public static function wrapCollection(
         \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Collection $collection,
-        \App\Service\CacheService $cacheService, string $modelIdentifier =  null
+        \App\Service\EloquentCacheService                                       $cacheService, string $modelIdentifier =  null
     )
     {
         if($collection->first()) {
@@ -53,8 +53,8 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     public static function wrapPaginator(
         \Illuminate\Pagination\Paginator|\Illuminate\Pagination\LengthAwarePaginator $paginator,
-        \App\Service\CacheService $cacheService,
-        string $modelIdentifier = null
+        \App\Service\EloquentCacheService                                            $cacheService,
+        string                                                                       $modelIdentifier = null
     )
     {
         $modelsCollection = static::wrapCollection($paginator->getCollection(), $cacheService, $modelIdentifier);

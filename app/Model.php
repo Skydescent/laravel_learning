@@ -4,7 +4,7 @@
 namespace App;
 
 
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

@@ -1,27 +1,23 @@
 <?php
 
-
 namespace App\Service;
 
-
-use App\Cache\CacheEloquentWrapper;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
-class CacheService
+abstract class CacheService
 {
-    private static $instances = [];
+    protected static array $instances = [];
 
-    protected string $modelClass;
+    protected static string $configsMap;
+
+    protected string $configKey;
 
     public array $configs;
 
-    protected function __construct(string $modelClass)
+    protected function __construct(string $configKey)
     {
-        $this->modelClass = $modelClass;
+        $this->configKey = $configKey;
         $this->initialize();
     }
 
@@ -30,61 +26,26 @@ class CacheService
 
     }
 
+    abstract protected static function setConfigsMap();
+
     protected function initialize()
     {
         $allConfigs = config('cache.cache_service');
-        $this->configs = array_diff_key($allConfigs, ['map' => '']);
+        $this->configs = array_diff_key($allConfigs, [static::$configsMap => '']);
 
-        if (array_key_exists($this->modelClass,$allConfigs['map'])) {
-            $this->configs = array_merge($this->configs, $allConfigs['map'][$this->modelClass]);
+        if (array_key_exists($this->configKey,$allConfigs[static::$configsMap])) {
+            $this->configs = array_merge($this->configs, $allConfigs[static::$configsMap][$this->configKey]);
         }
     }
 
-    public static function getInstance(string $modelClass): CacheService
+    public static function getInstance(string $configKey)
     {
-        if (!isset(self::$instances[$modelClass])) {
-            self::$instances[$modelClass] = new static($modelClass);
+        static::setConfigsMap();
+        if (!isset(self::$instances[$configKey])) {
+            self::$instances[$configKey] = new static($configKey);
         }
 
-        return self::$instances[$modelClass];
-    }
-
-    public function cacheItem($data, $cacheKey, ?User $user = null)
-    {
-        $queryData = function () use ($cacheKey, $data) {
-            return CacheEloquentWrapper::wrapItem($data, $cacheKey, $this);
-        };
-
-        return $this->cache($queryData, $user, $cacheKey);
-    }
-
-
-    public function cacheCollection(
-        Collection|\Illuminate\Database\Eloquent\Collection $collection ,
-        User $user = null,
-        array $postfixes = [],
-        array $tags = []
-    )
-    {
-        $queryData = function () use ($collection) {
-            return CacheEloquentWrapper::wrapCollection($collection, $this);
-        };
-
-        return $this->cache($queryData, $user, $postfixes, array_merge([$this->getTagName() . '_collection'], $tags));
-    }
-
-
-    public function cachePaginator(
-        \Illuminate\Pagination\Paginator|\Illuminate\Pagination\LengthAwarePaginator $paginator,
-        User $user = null,
-        $postfixes = []
-    )
-    {
-        $queryData = function () use ($paginator) {
-            return CacheEloquentWrapper::wrapPaginator($paginator, $this);
-        };
-
-        return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
+        return self::$instances[$configKey];
     }
 
     public function cache(callable $queryData , Authenticatable|User $user = null, $postfixes = [], array|null $tags = null)
@@ -111,87 +72,9 @@ class CacheService
 
     public function getTagName()
     {
-        return  $this->configs['tag'] ??  $this->modelClass;
+        return  $this->configs['tag'] ??  $this->configKey;
     }
 
-
-    public function getKeyName(User|null $user, $postfixes): string
-    {
-        $prefix = $this->configs['allPrefix'] . '_';
-        $postfix = '';
-        if ($user && $this->configs['isPersonal']) {
-            $prefix = '';
-            $postfix = '|' . $this->configs['personalKeyPrefix'] . '=' .  $user->id;
-        }
-
-        if (!empty($postfixes)) {
-            foreach ($postfixes as $key => $value) {
-                $postfix .= '|' . $key . '=' . $value;
-            }
-        }
-
-        return $prefix . $this->getTagName() . $postfix;
-    }
-
-    public function flushModelCache(UrlRoutable $modelInstance, User|null $user = null)
-    {
-        $identifier = $this->getModelIdentifier($modelInstance);
-        $this->forgetModel($identifier, $user);
-        $this->forgetModelRelations($identifier, $user);
-        $this->flushCollections();
-    }
-
-    public function forgetModel(array $identifier, User|null $user = null)
-    {
-        $keyName = $this->getKeyName($user, $identifier);
-        $tag = $this->getTagName();
-
-        //Log::info('forgetModel: \Cache::tags(' . $tag . ')->forget(' . $keyName . ')');
-        \Cache::tags([$tag])->forget($keyName);
-    }
-
-    public function forgetModelRelations(array $identifier = null, User|null $user = null)
-    {
-        foreach ($this->getRelationsNames() as $relationName) {
-            $this->forgetModelRelation($identifier, ['relation' => $relationName], $user, [$relationName . '_collection']);
-        }
-    }
-
-    public function forgetMorphedModelRelation(UrlRoutable $model, array $relationName, User|null $user = null)
-    {
-        $morphedCacheService = static::getInstance(get_class($model));
-        $identifier = $morphedCacheService->getModelIdentifier($model);
-        $tags = [$relationName['relation'] . '_collection'];
-        $morphedCacheService->forgetModelRelation($identifier, $relationName, $user, $tags);
-    }
-
-    public function forgetModelRelation(array $identifier, array $relationName, User|null $user = null, array $tags = [])
-    {
-        $postfixes = array_merge( $identifier, $relationName);
-        $keyName = $this->getKeyName($user, $postfixes);
-
-        $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
-
-        //Log::info('forgetModelRelation: \Cache::tags(' . implode(',',$tags) . ')->forget(' . $keyName . ')');
-        \Cache::tags($tags)->forget($keyName);
-    }
-
-    public function flushCollections()
-    {
-        \Cache::tags([$this->getTagName() . '_collection'])->flush();
-
-    }
-
-    public function getRelationsNames(): array
-    {
-        return isset($this->configs['relations']) ? array_keys($this->configs['relations']) : [];
-    }
-
-    public function getModelIdentifier(UrlRoutable $modelInstance) : array
-    {
-        $routeKeyName = $modelInstance->getRouteKeyName();
-        $instanceKeyName = $modelInstance->$routeKeyName;
-        return [$routeKeyName => $instanceKeyName];
-    }
+    abstract protected function getKeyName(Authenticatable|User $user = null, $postfixes = []): string;
 
 }

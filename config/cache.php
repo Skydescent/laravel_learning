@@ -190,6 +190,18 @@ return [
                 ]
             ],
         ],
+        'simple_services' => [
+            \App\Repositories\StatistcsRepository::class => [
+                'tag' => 'statistics',
+                'cached_models_collections' => [
+                    User::class,
+                    Post::class,
+                    News::class,
+                    Comment::class,
+                    PostHistory::class
+                ],
+            ]
+        ],
         'allPrefix' => 'all',
         'personalKeyPrefix' => 'user',
         'ttl' => 300,

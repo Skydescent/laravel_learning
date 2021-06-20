@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\Service\TasksService;
 use App\Task;
 use App\User;
@@ -25,7 +25,7 @@ class TaskEloquentRepository extends EloquentRepository implements TaggableInter
      */
     protected function setCacheService()
     {
-        $this->cacheService = CacheService::getInstance(static::$model);
+        $this->cacheService = EloquentCacheService::getInstance(static::$model);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Feedback;
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
@@ -25,7 +25,7 @@ class FeedbackEloquentRepository extends EloquentRepository implements TaggableI
      */
     protected function setCacheService()
     {
-        $this->cacheService = CacheService::getInstance(static::$model);
+        $this->cacheService = EloquentCacheService::getInstance(static::$model);
     }
 
     /**

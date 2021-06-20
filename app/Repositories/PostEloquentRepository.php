@@ -4,7 +4,7 @@
 namespace App\Repositories;
 
 use App\Post;
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\Service\PostsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -25,7 +25,7 @@ class PostEloquentRepository extends  EloquentRepository implements TaggableInte
 
     protected function setCacheService()
     {
-        $this->cacheService = CacheService::getInstance(static::$model);
+        $this->cacheService = EloquentCacheService::getInstance(static::$model);
     }
 
     public function adminIndex(Authenticatable|User|null $user, array $postfixes = [])

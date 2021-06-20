@@ -4,7 +4,7 @@
 namespace App\Repositories;
 
 
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 use App\Service\RepositoryServiceable;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -18,9 +18,9 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
     protected RepositoryServiceable $modelService;
 
     /**
-     * @var CacheService
+     * @var EloquentCacheService
      */
-    protected CacheService $cacheService;
+    protected EloquentCacheService $cacheService;
 
     /**
      * @var EloquentRepositoryInterface

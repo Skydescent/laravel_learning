@@ -2,13 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Service\CacheService;
+use App\Service\EloquentCacheService;
 
 class TagEloquentRepository extends EloquentRepository implements TaggableInterface
 {
     use HasTags;
-
-    //TODO: Remove class?
 
     /**
      * @inheritDoc
@@ -23,7 +21,7 @@ class TagEloquentRepository extends EloquentRepository implements TaggableInterf
      */
     protected function setCacheService()
     {
-        $this->cacheService = CacheService::getInstance(static::$model);
+        $this->cacheService = EloquentCacheService::getInstance(static::$model);
     }
 
     /**
