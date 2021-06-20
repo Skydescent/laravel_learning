@@ -49,13 +49,13 @@ class TasksController extends Controller
 
     public function update(TaskStoreAndUpdateRequest $request,Task $task)
     {
-        $this->modelInterface->update($request,$task);
+        $this->modelInterface->update($request,$task, auth()->user());
         return redirect('/tasks');
     }
 
     public function destroy(Task $task)
     {
-        $this->modelInterface->destroy($task);
+        $this->modelInterface->destroy($task, auth()->user());
         return redirect('/tasks');
     }
 

@@ -8,9 +8,9 @@ use App\Task;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class TaskEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface
+class TaskEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface, RepositoryStepableInterface
 {
-    use HasTags;
+    use HasTags, HasSteps;
 
     /**
      * @inheritDoc

@@ -41,8 +41,6 @@ class PostsController extends Controller
     {
         $this->modelInterface->store($request);
 
-        flash('Статья успешно добавлена');
-
         return redirect()->route('posts.index');
     }
 
@@ -58,8 +56,6 @@ class PostsController extends Controller
     {
         $this->modelInterface->update($request, $post);
 
-        flash('Статья успешно обновлена');
-
         return redirect()->route('posts.index');
     }
 
@@ -67,7 +63,7 @@ class PostsController extends Controller
     {
 
         $this->modelInterface->destory($post);
-        flash('Статья удалена', 'warning');
+
         return redirect()->route('posts.index');
     }
 }

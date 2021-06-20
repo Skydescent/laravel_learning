@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Step;
+use App\Repositories\RepositoryStepableInterface;
 use App\Task;
-use Illuminate\Http\Request;
 
 class TaskStepsController extends Controller
 {
+    protected RepositoryStepableInterface $modelInterface;
+
+    public function __construct(RepositoryStepableInterface $modelInterface)
+    {
+        $this->modelInterface = $modelInterface;
+    }
+
     public function store(Task $task)
     {
-        $task->addStep( \request()->validate([
-            'description' => 'required|min:5'
-        ]));
+        $this->modelInterface->addStep(\request(), $task);
 
         return back();
     }

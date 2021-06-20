@@ -92,12 +92,14 @@ class CacheService
         $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
         //TODO: Remove log and using log class
-//        Log::info(
-//            '/Cache::tags(' .
-//            implode(',', $tags) .
-//            ')->remember(' .
-//            'key: ' . $key . ',' .
-//            'ttl: ' . $this->configs['ttl']);
+        //if (in_array('steps_collection', $tags)) {
+//            Log::info(
+//                'cache: \Cache::tags(' .
+//                implode(',', $tags) .
+//                ')->remember(' .
+//                'key: ' . $key . ',' .
+//                'ttl: ' . $this->configs['ttl']);
+        //}
 
         return \Cache::tags($tags)
             ->remember(
@@ -144,6 +146,7 @@ class CacheService
         $keyName = $this->getKeyName($user, $identifier);
         $tag = $this->getTagName();
 
+        //Log::info('forgetModel: \Cache::tags(' . $tag . ')->forget(' . $keyName . ')');
         \Cache::tags([$tag])->forget($keyName);
     }
 
@@ -158,7 +161,8 @@ class CacheService
     {
         $morphedCacheService = static::getInstance(get_class($model));
         $identifier = $morphedCacheService->getModelIdentifier($model);
-        $morphedCacheService->forgetModelRelation($identifier, $relationName, $user);
+        $tags = [$relationName['relation'] . '_collection'];
+        $morphedCacheService->forgetModelRelation($identifier, $relationName, $user, $tags);
     }
 
     public function forgetModelRelation(array $identifier, array $relationName, User|null $user = null, array $tags = [])
@@ -168,6 +172,7 @@ class CacheService
 
         $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
 
+        //Log::info('forgetModelRelation: \Cache::tags(' . implode(',',$tags) . ')->forget(' . $keyName . ')');
         \Cache::tags($tags)->forget($keyName);
     }
 

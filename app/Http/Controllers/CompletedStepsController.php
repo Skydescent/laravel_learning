@@ -3,28 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\TaskStepCompleted;
+use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\RepositoryStepableInterface;
 use App\Step;
 use Illuminate\Http\Request;
 
 class CompletedStepsController extends Controller
 {
-    public function __construct()
+    protected RepositoryStepableInterface $modelInterface;
+
+    public function __construct(RepositoryStepableInterface $modelInterface)
     {
         $this->middleware('auth');
-        //$this->middleware('can:update,step'); //StepPolicy
+        $this->modelInterface = $modelInterface;
     }
 
     public function store(Step $step)
     {
-        $step->complete();
-        $step->task->owner->notify(new TaskStepCompleted());
+        $this->modelInterface->completeStep($step, $step->task);
 
         return back();
     }
 
     public function destroy(Step $step)
     {
-        $step->incomplete();
+        $this->modelInterface->incompleteStep($step, $step->task);
         return back();
     }
 }

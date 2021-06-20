@@ -33,7 +33,8 @@ class RepositoryService
         $action = $action ?? $this->getAction();
 
         $controller = $this->getControllerFromAction($action);
-        $map = static::$configs['controller_repository_map'];
+
+        $map = static::$configs[RepositoryTaggableInterface::class];
         foreach ($map as $item) {
             if(in_array($controller,$item['controllers'])) {
                 $repository = $item['repository_closure'];

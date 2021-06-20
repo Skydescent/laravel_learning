@@ -28,12 +28,14 @@ class RepositoryServiceProvider extends ServiceProvider
 
     protected function whenControllersNeedsGiveRepository()
     {
-        $repoInterface = config('cache.cache_repositories.interface_name');
-        $controllerRepoMap = config('cache.cache_repositories.controller_repository_map');
-        foreach ($controllerRepoMap as $item) {
-            $this->app->when($item['controllers'])
-                ->needs($repoInterface)
-                ->give($item['repository_closure']);
+        $repoLists = config('cache.cache_repositories');
+
+        foreach ($repoLists as $interface => $reposForControllers) {
+            foreach ($reposForControllers as $item) {
+                $this->app->when($item['controllers'])
+                    ->needs($interface)
+                    ->give($item['repository_closure']);
+            }
         }
     }
 }

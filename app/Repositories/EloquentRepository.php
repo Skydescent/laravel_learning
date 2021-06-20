@@ -4,7 +4,6 @@
 namespace App\Repositories;
 
 
-use App\Cache\CacheEloquentWrapper;
 use App\Service\CacheService;
 use App\Service\RepositoryServiceable;
 use App\User;

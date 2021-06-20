@@ -6,40 +6,23 @@ use App\Events\TaskCreated;
 use App\Events\TaskUpdated;
 use Illuminate\Database\Eloquent\Collection;
 
-class Task extends Model implements Taggable
+class Task extends Model implements Taggable, Stepable
 {
     use SynchronizeTags;
 
-    //Защита от массового заполнения
-    //public $fillable = ['title', 'body'];
     public $guarded = [];
-
-    protected static function boot()
-    {
-        parent::boot();
-        static::created(function() {
-           \Cache::tags(['tasks'])->flush();
-        });
-        static::updated(function() {
-            \Cache::tags(['tasks'])->flush();
-        });
-        static::deleted(function() {
-            \Cache::tags(['tasks'])->flush();
-        });
-    }
 
     protected $dispatchesEvents = [
         'created' => TaskCreated::class,
         'updated' => TaskUpdated::class,
     ];
 
-    // чтобы переопределить поле по которому Laravel будет сопоставлять с переменной из пути(может быть и не id)
     public function getRouteKeyName()
     {
         return 'id';
     }
 
-    public function scopeIncompleted($query) // Task::incomplete(false);
+    public function scopeIncompleted($query)
     {
         return $query->where('completed', 0);
     }
@@ -54,7 +37,7 @@ class Task extends Model implements Taggable
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    public function addStep($attributes)
+    public function addStep(array $attributes)
     {
         return $this->steps()->create($attributes);
     }
