@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Service\CacheService;
 
-class TagEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface
+class TagEloquentRepository extends EloquentRepository implements TaggableInterface
 {
     use HasTags;
 

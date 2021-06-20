@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Notifications\TaskStepCompleted;
 use App\Repositories\EloquentRepositoryInterface;
-use App\Repositories\RepositoryStepableInterface;
+use App\Repositories\StepableInterface;
 use App\Step;
 use Illuminate\Http\Request;
 
 class CompletedStepsController extends Controller
 {
-    protected RepositoryStepableInterface $modelInterface;
+    protected StepableInterface $modelInterface;
 
-    public function __construct(RepositoryStepableInterface $modelInterface)
+    public function __construct(StepableInterface $modelInterface)
     {
         $this->middleware('auth');
         $this->modelInterface = $modelInterface;

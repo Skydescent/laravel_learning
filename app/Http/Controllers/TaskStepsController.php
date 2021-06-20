@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\RepositoryStepableInterface;
+use App\Repositories\StepableInterface;
 use App\Task;
 
 class TaskStepsController extends Controller
 {
-    protected RepositoryStepableInterface $modelInterface;
+    protected StepableInterface $modelInterface;
 
-    public function __construct(RepositoryStepableInterface $modelInterface)
+    public function __construct(StepableInterface $modelInterface)
     {
         $this->modelInterface = $modelInterface;
     }

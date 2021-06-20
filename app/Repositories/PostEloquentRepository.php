@@ -9,9 +9,9 @@ use App\Service\PostsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class PostEloquentRepository extends  EloquentRepository implements RepositoryTaggableInterface
+class PostEloquentRepository extends  EloquentRepository implements TaggableInterface, CommentableInerface
 {
-    use HasTags;
+    use HasTags, HasComments;
 
     protected static function setModel()
     {

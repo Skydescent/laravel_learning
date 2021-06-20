@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Notifications\TaskStepCompleted;
+use App\Repositories\StepableInterface;
 use App\Step;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;

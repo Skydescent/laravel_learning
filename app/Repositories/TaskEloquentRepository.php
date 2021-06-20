@@ -8,7 +8,7 @@ use App\Task;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class TaskEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface, RepositoryStepableInterface
+class TaskEloquentRepository extends EloquentRepository implements TaggableInterface, StepableInterface
 {
     use HasTags, HasSteps;
 

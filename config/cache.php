@@ -15,13 +15,14 @@ use App\Http\Controllers\TaskStepsController;
 use App\News;
 use App\Post;
 use App\PostHistory;
+use App\Repositories\CommentableInerface;
 use App\Repositories\CommentEloquentRepository;
 use App\Repositories\EloquentRepositoryInterface;
 use App\Repositories\FeedbackEloquentRepository;
 use App\Repositories\NewsEloquentRepository;
 use App\Repositories\PostEloquentRepository;
-use App\Repositories\RepositoryStepableInterface;
-use App\Repositories\RepositoryTaggableInterface;
+use App\Repositories\StepableInterface;
+use App\Repositories\TaggableInterface;
 use App\Repositories\StepEloquentRepository;
 use App\Repositories\TaskEloquentRepository;
 use App\Step;
@@ -228,7 +229,7 @@ return [
                 }
             ],
         ],
-        RepositoryStepableInterface::class => [
+        StepableInterface::class => [
             [
                 'controllers' => [TasksController::class, TaskStepsController::class, CompletedStepsController::class],
                 'repository_closure' => function () {
@@ -236,7 +237,7 @@ return [
                 }
             ],
         ],
-        RepositoryTaggableInterface::class => [
+        TaggableInterface::class => [
             [
                 'controllers' => [FeedbacksController::class],
                 'repository_closure' => function () {
@@ -261,6 +262,20 @@ return [
                     return TaskEloquentRepository::getInstance();
                 }
             ]
+        ],
+        CommentableInerface::class => [
+            [
+                'controllers' => [PostCommentsController::class],
+                'repository_closure' => function () {
+                    return PostEloquentRepository::getInstance();
+                }
+            ],
+            [
+                'controllers' => [NewsCommentsController::class],
+                'repository_closure' => function () {
+                    return NewsEloquentRepository::getInstance();
+                }
+            ],
         ],
     ]
 ];

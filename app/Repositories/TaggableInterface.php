@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-interface RepositoryTaggableInterface
+interface TaggableInterface
 {
     public function tagsCloud(Authenticatable|User|null $user, array $postfixes = []);
 

@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Repositories\RepositoryTaggableInterface;
+use App\Repositories\TaggableInterface;
 
 class RepositoryService
 {
@@ -27,21 +27,21 @@ class RepositoryService
         )['controller'];
     }
 
-    public function getTaggableRepository(string|null $action = null): RepositoryTaggableInterface
+    public function getTaggableRepository(string|null $action = null): TaggableInterface
     {
         static::getConfigs();
         $action = $action ?? $this->getAction();
 
         $controller = $this->getControllerFromAction($action);
 
-        $map = static::$configs[RepositoryTaggableInterface::class];
+        $map = static::$configs[TaggableInterface::class];
         foreach ($map as $item) {
             if(in_array($controller,$item['controllers'])) {
                 $repository = $item['repository_closure'];
             }
         }
 
-        if (isset($repository) && in_array(RepositoryTaggableInterface::class, class_implements($repository()))) {
+        if (isset($repository) && in_array(TaggableInterface::class, class_implements($repository()))) {
             return $repository();
         };
 

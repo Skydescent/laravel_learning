@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Post;
-use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\CommentableInerface;
 
 class PostCommentsController extends Controller
 {
-    protected EloquentRepositoryInterface $modelInterface;
+    protected CommentableInerface $modelInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelInterface)
+    public function __construct(CommentableInerface $modelInterface)
     {
         $this->modelInterface = $modelInterface;
     }
 
     public function store(Post $post)
     {
-        $this->modelInterface->store(\request(), $post);
+        $this->modelInterface->storeComment(\request(), $post);
         return back();
     }
 }

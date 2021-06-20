@@ -7,7 +7,7 @@ use App\Service\CacheService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class FeedbackEloquentRepository extends EloquentRepository implements RepositoryTaggableInterface
+class FeedbackEloquentRepository extends EloquentRepository implements TaggableInterface
 {
 
     use HasTags;
