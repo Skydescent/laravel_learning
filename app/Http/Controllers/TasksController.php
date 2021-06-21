@@ -9,24 +9,24 @@ use App\Task;
 
 class TasksController extends Controller
 {
-    protected EloquentRepositoryInterface $modelInterface;
+    protected EloquentRepositoryInterface $modelRepositoryInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelInterface)
+    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
     {
         $this->middleware('auth');
         $this->middleware('can:update,task')->except(['index', 'store', 'create']);
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     public function index()
     {
-        $tasks = $this->modelInterface->publicIndex(auth()->user());
+        $tasks = $this->modelRepositoryInterface->publicIndex(auth()->user());
         return view('tasks.index', compact( 'tasks'));
     }
 
     public function show(Task $task)
     {
-        $task = $this->modelInterface->find($task, auth()->user());
+        $task = $this->modelRepositoryInterface->find($task, auth()->user());
         return view('tasks.show', compact('task'));
     }
 
@@ -37,25 +37,25 @@ class TasksController extends Controller
 
     public function store(TaskStoreAndUpdateRequest $request)
     {
-        $this->modelInterface->store($request);
+        $this->modelRepositoryInterface->store($request);
         return redirect('/tasks');
     }
 
     public function edit(Task $task)
     {
-        $task = $this->modelInterface->find($task, auth()->user());
+        $task = $this->modelRepositoryInterface->find($task, auth()->user());
         return view('tasks.edit', compact('task'));
     }
 
     public function update(TaskStoreAndUpdateRequest $request,Task $task)
     {
-        $this->modelInterface->update($request,$task, auth()->user());
+        $this->modelRepositoryInterface->update($request,$task, auth()->user());
         return redirect('/tasks');
     }
 
     public function destroy(Task $task)
     {
-        $this->modelInterface->destroy($task, auth()->user());
+        $this->modelRepositoryInterface->destroy($task, auth()->user());
         return redirect('/tasks');
     }
 

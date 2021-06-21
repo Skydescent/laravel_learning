@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Feedback;
 use App\Service\EloquentCacheService;
+use App\Service\FeedbacksService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
@@ -33,7 +34,7 @@ class FeedbackEloquentRepository extends EloquentRepository implements TaggableI
      */
     protected function setModelService()
     {
-        $this->modelService = new \App\Service\FeedbacksService();
+        $this->modelService = new FeedbacksService();
     }
 
     public function adminIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed

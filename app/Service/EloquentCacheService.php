@@ -3,13 +3,14 @@
 
 namespace App\Service;
 
-
 use App\Cache\CacheEloquentWrapper;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class EloquentCacheService extends CacheService
 {
@@ -36,24 +37,30 @@ class EloquentCacheService extends CacheService
 
 
     public function cacheCollection(
-        Collection|\Illuminate\Database\Eloquent\Collection $collection ,
-        User $user = null,
-        array $postfixes = [],
-        array $tags = []
+        Collection|EloquentCollection $collection ,
+        User                          $user = null,
+        array                         $postfixes = [],
+        array                         $tags = []
     )
     {
         $queryData = function () use ($collection) {
             return CacheEloquentWrapper::wrapCollection($collection, $this);
         };
 
-        return $this->cache($queryData, $user, $postfixes, array_merge([$this->getTagName() . '_collection'], $tags));
+        return $this->cache(
+            $queryData,
+            $user,
+            $postfixes,
+            array_merge([$this->getTagName() . '_collection'],
+                $tags)
+        );
     }
 
 
     public function cachePaginator(
-        \Illuminate\Pagination\Paginator|\Illuminate\Pagination\LengthAwarePaginator $paginator,
-        User $user = null,
-        $postfixes = []
+        Paginator|LengthAwarePaginator $paginator,
+        User                           $user = null,
+                                       $postfixes = []
     )
     {
         $queryData = function () use ($paginator) {
@@ -63,19 +70,15 @@ class EloquentCacheService extends CacheService
         return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
     }
 
-    public function cache(callable $queryData , Authenticatable|User $user = null, $postfixes = [], array|null $tags = null)
+    public function cache(
+        callable             $queryData ,
+        Authenticatable|User $user = null,
+                             $postfixes = [],
+        array|null           $tags = null
+    )
     {
         $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
-        //TODO: Remove log and using log class
-        //if (in_array('steps_collection', $tags)) {
-//            Log::info(
-//                'cache: \Cache::tags(' .
-//                implode(',', $tags) .
-//                ')->remember(' .
-//                'key: ' . $key . ',' .
-//                'ttl: ' . $this->configs['ttl']);
-        //}
 
         return \Cache::tags($tags)
             ->remember(
@@ -117,18 +120,26 @@ class EloquentCacheService extends CacheService
         $keyName = $this->getKeyName($user, $identifier);
         $tag = $this->getTagName();
 
-        //Log::info('forgetModel: \Cache::tags(' . $tag . ')->forget(' . $keyName . ')');
         \Cache::tags([$tag])->forget($keyName);
     }
 
     public function forgetModelRelations(array $identifier = null, User|null $user = null)
     {
         foreach ($this->getRelationsNames() as $relationName) {
-            $this->forgetModelRelation($identifier, ['relation' => $relationName], $user, [$relationName . '_collection']);
+            $this->forgetModelRelation(
+                $identifier,
+                ['relation' => $relationName],
+                $user,
+                [$relationName . '_collection']
+            );
         }
     }
 
-    public function forgetMorphedModelRelation(UrlRoutable $model, array $relationName, User|null $user = null)
+    public function forgetMorphedModelRelation(
+        UrlRoutable               $model,
+        array                     $relationName,
+        Authenticatable|User|null $user = null
+    )
     {
         $morphedCacheService = static::getInstance(get_class($model));
         $identifier = $morphedCacheService->getModelIdentifier($model);
@@ -136,14 +147,18 @@ class EloquentCacheService extends CacheService
         $morphedCacheService->forgetModelRelation($identifier, $relationName, $user, $tags);
     }
 
-    public function forgetModelRelation(array $identifier, array $relationName, User|null $user = null, array $tags = [])
+    public function forgetModelRelation(
+        array                     $identifier,
+        array                     $relationName,
+        Authenticatable|User|null $user = null,
+        array                     $tags = []
+    )
     {
         $postfixes = array_merge( $identifier, $relationName);
         $keyName = $this->getKeyName($user, $postfixes);
 
         $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
 
-        //Log::info('forgetModelRelation: \Cache::tags(' . implode(',',$tags) . ')->forget(' . $keyName . ')');
         \Cache::tags($tags)->forget($keyName);
     }
 

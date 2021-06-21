@@ -9,25 +9,25 @@ use App\Repositories\EloquentRepositoryInterface;
 
 class PostsController extends Controller
 {
-    protected EloquentRepositoryInterface $modelInterface;
+    protected EloquentRepositoryInterface $modelRepositoryInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelInterface)
+    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
     {
         $this->middleware('auth')->only(['create','update']);
         $this->middleware('can:update,post')->only(['edit', 'update', 'destroy']);
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     public function index()
     {
         $currentPage = request()->get('page',1);
-        $posts = $this->modelInterface->publicIndex(auth()->user(), ['page' => $currentPage]);
+        $posts = $this->modelRepositoryInterface->publicIndex(auth()->user(), ['page' => $currentPage]);
             return view('posts.index', compact( 'posts'));
     }
 
     public function show(Post $post)
     {
-        $post = $this->modelInterface->find($post, auth()->user());
+        $post = $this->modelRepositoryInterface->find($post, auth()->user());
 
         return view('posts.show', compact('post'));
     }
@@ -39,14 +39,14 @@ class PostsController extends Controller
 
     public function store(PostStoreAndUpdateRequest $request)
     {
-        $this->modelInterface->store($request);
+        $this->modelRepositoryInterface->store($request);
 
         return redirect()->route('posts.index');
     }
 
     public function edit(Post $post)
     {
-        $post = $this->modelInterface->find($post, auth()->user());
+        $post = $this->modelRepositoryInterface->find($post, auth()->user());
 
         $isAdmin = false;
         return view('posts.edit', compact('post', 'isAdmin'));
@@ -54,7 +54,7 @@ class PostsController extends Controller
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $this->modelInterface->update($request, $post);
+        $this->modelRepositoryInterface->update($request, $post);
 
         return redirect()->route('posts.index');
     }
@@ -62,7 +62,7 @@ class PostsController extends Controller
     public function destroy(Post $post)
     {
 
-        $this->modelInterface->destory($post);
+        $this->modelRepositoryInterface->destory($post);
 
         return redirect()->route('posts.index');
     }

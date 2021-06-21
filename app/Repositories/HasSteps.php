@@ -29,14 +29,14 @@ trait HasSteps
         $this->forgetStepCache($model);
     }
 
-    public function completeStep(Step $step, Stepable $model)
+    public function completeStep(Step $step, Stepable $model = null)
     {
         $this->initializeStepServices();
         $this->stepsService->completeStep($step);
         $this->forgetStepCache($model);
     }
 
-    public function incompleteStep(Step $step, $model)
+    public function incompleteStep(Step $step, $model = null)
     {
         $this->initializeStepServices();
         $this->stepsService->incompleteStep($step);

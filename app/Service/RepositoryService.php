@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Repositories\TagEloquentRepository;
 use App\Repositories\TaggableInterface;
 
 class RepositoryService
@@ -41,10 +42,16 @@ class RepositoryService
             }
         }
 
-        if (isset($repository) && in_array(TaggableInterface::class, class_implements($repository()))) {
+        if (
+            isset($repository) &&
+            in_array(
+                TaggableInterface::class,
+                class_implements($repository())
+            )
+        ) {
             return $repository();
         };
 
-        return  \App\Repositories\TagEloquentRepository::getInstance();
+        return  TagEloquentRepository::getInstance();
     }
 }

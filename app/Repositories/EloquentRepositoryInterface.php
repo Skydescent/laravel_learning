@@ -3,7 +3,6 @@
 
 namespace App\Repositories;
 
-
 use App\User;
 
 interface EloquentRepositoryInterface

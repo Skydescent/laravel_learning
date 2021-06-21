@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Feedback;
 use App\Repositories\EloquentRepositoryInterface;
 use Illuminate\Http\Request;
 
 class FeedbacksController extends Controller
 {
-    protected EloquentRepositoryInterface $modelInterface;
+    protected EloquentRepositoryInterface $modelRepositoryInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelInterface)
+    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
     {
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     public function index()
     {
-        $feedbacks = $this->modelInterface->adminIndex(auth()->user());
+        $feedbacks = $this->modelRepositoryInterface->adminIndex(auth()->user());
         return view('admin.feedbacks.index', compact( 'feedbacks'));
     }
 
@@ -28,7 +27,7 @@ class FeedbacksController extends Controller
 
     public function store(Request $request)
     {
-        $this->modelInterface->store($request);
+        $this->modelRepositoryInterface->store($request);
 
         return redirect('/');
     }

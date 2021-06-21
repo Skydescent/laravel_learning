@@ -41,6 +41,9 @@ abstract class CacheService
     public static function getInstance(string $configKey)
     {
         static::setConfigsMap();
+
+        if (!\config('cache.cache_service.' . static::$configsMap . '.' . $configKey)) return null;
+
         if (!isset(self::$instances[$configKey])) {
             self::$instances[$configKey] = new static($configKey);
         }
@@ -52,15 +55,6 @@ abstract class CacheService
     {
         $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
-        //TODO: Remove log and using log class
-        //if (in_array('steps_collection', $tags)) {
-//            Log::info(
-//                'cache: \Cache::tags(' .
-//                implode(',', $tags) .
-//                ')->remember(' .
-//                'key: ' . $key . ',' .
-//                'ttl: ' . $this->configs['ttl']);
-        //}
 
         return \Cache::tags($tags)
             ->remember(

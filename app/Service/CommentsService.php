@@ -3,14 +3,12 @@
 
 namespace App\Service;
 
-
 use App\Commentable;
-use App\Repositories\CommentableInerface;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use App\Repositories\CommentableInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-class CommentsService implements CommentableInerface
+class CommentsService implements CommentableInterface
 {
     public function storeComment(FormRequest|Request $request, Commentable $model = null)
     {

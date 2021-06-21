@@ -4,7 +4,7 @@ namespace App\Providers;
 
 
 use App\Channels\PushAllChannel;
-use App\Service\TagService;
+use App\Service\RepositoryService;
 use App\View\Components\Alert;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('layout.sidebar', function($view) {
-            $taggableRepository = (new \App\Service\RepositoryService)->getTaggableRepository();
+            $taggableRepository = (new RepositoryService)->getTaggableRepository();
             $view->with('tagsCloud', $taggableRepository->tagsCloud(auth()->user()));
         });
 

@@ -18,15 +18,29 @@ class SimpleCacheService extends CacheService
        return '|' . $this->getTagName() . '|';
     }
 
-    protected function getCachedModelsCollectionsTags()
+    protected function getCachedModelsCollectionsTags():array
     {
+        $tags = [];
         if (
             isset($this->configs['cached_models_collections']) &&
-            \config('cache.cache_service.map')
+            isset($this->configs['map'])
         ) {
-            //TODO: найти пересечение массивов, пройти по нему и получить теги моделей
-            // далее преобразовать из в тэг_collection и выдать массив данных тегов
+            $map = $this->configs['map'];
+            $cachedModelsInMap = array_intersect(
+                $this->configs['cached_models_collections'],
+                array_keys($map)
+            );
+            foreach ($cachedModelsInMap as $modelName) {
+                $tags[] = $map[$modelName]['tag'] . '_collection';
+            }
         }
 
+        return $tags;
+    }
+
+    public function cacheQueryData(callable $queryData)
+    {
+        $tags = $this->getCachedModelsCollectionsTags();
+        return $this->cache($queryData, null, [], $tags);
     }
 }

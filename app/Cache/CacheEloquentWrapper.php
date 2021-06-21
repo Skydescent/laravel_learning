@@ -3,27 +3,30 @@
 
 namespace App\Cache;
 
-
+use App\Service\EloquentCacheService;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
 use JsonSerializable;
 
-
-class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable, \ArrayAccess, Arrayable, Jsonable, JsonSerializable
+class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {
 
     protected array $modelCacheKey;
 
     protected $model;
 
-    protected  \App\Service\EloquentCacheService $cacheService;
+    protected  EloquentCacheService $cacheService;
 
     protected static string $modelClass;
 
-    public static function wrapItem($item, array $modelCacheKey, \App\Service\EloquentCacheService $cacheService)
+    public static function wrapItem($item, array $modelCacheKey, EloquentCacheService $cacheService)
     {
         if (is_null($item)) return null;
 
@@ -37,8 +40,8 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
     }
 
     public static function wrapCollection(
-        \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Collection $collection,
-        \App\Service\EloquentCacheService                                       $cacheService, string $modelIdentifier =  null
+        Collection|EloquentCollection $collection,
+        EloquentCacheService          $cacheService, string $modelIdentifier =  null
     )
     {
         if($collection->first()) {
@@ -52,9 +55,9 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
     }
 
     public static function wrapPaginator(
-        \Illuminate\Pagination\Paginator|\Illuminate\Pagination\LengthAwarePaginator $paginator,
-        \App\Service\EloquentCacheService                                            $cacheService,
-        string                                                                       $modelIdentifier = null
+        Paginator|LengthAwarePaginator $paginator,
+        EloquentCacheService           $cacheService,
+        string                         $modelIdentifier = null
     )
     {
         $modelsCollection = static::wrapCollection($paginator->getCollection(), $cacheService, $modelIdentifier);
@@ -66,9 +69,9 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
         if (in_array($name, $this->cacheService->getRelationsNames())) {
 
             $queryData = function () use ($name) {
-                if (get_class($instance = $this->model->$name) === \Illuminate\Database\Eloquent\Collection::class) {
+                if (get_class($instance = $this->model->$name) === EloquentCollection::class) {
                     return static::wrapCollection($instance, $this->cacheService);
-                } elseif (is_subclass_of($instance, \Illuminate\Database\Eloquent\Model::class)) {
+                } elseif (is_subclass_of($instance, Model::class)) {
                     $modelIdentifier = $instance->getRouteKeyName();
                     return static::wrapItem($instance,[$modelIdentifier => $instance->$modelIdentifier], $this->cacheService);
                 }
@@ -98,14 +101,13 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
         return json_encode($this->model);
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return $this->model->toArray();
     }
 
     public function toJson($options = 0)
     {
-        // TODO: Remove if not need
         $json = json_encode($this->jsonSerialize(), $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
@@ -117,7 +119,6 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
 
     public function jsonSerialize ()
     {
-        // TODO: Remove if not need
         return $this->model->toArray();
     }
 
@@ -146,7 +147,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
      *
      * @param mixed $value
      * @param string|null $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
     {
@@ -159,7 +160,7 @@ class CacheEloquentWrapper implements \Illuminate\Contracts\Routing\UrlRoutable,
      * @param string $childType
      * @param mixed $value
      * @param string|null $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function resolveChildRouteBinding($childType, $value, $field)
     {

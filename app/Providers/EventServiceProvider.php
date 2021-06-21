@@ -32,13 +32,6 @@ class EventServiceProvider extends ServiceProvider
         PostCreated::class => [
           SendPostCreatedNotification::class,
         ],
-        KeyForgotten::class => [
-            LogKeyForgotten::class,
-        ],
-
-        KeyWritten::class => [
-            LogKeyWritten::class,
-        ],
     ];
 
     /**

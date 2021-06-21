@@ -12,7 +12,7 @@ trait HasComments
 {
     protected EloquentCacheService $commentsCacheService;
 
-    protected CommentableInerface $commentsService;
+    protected CommentableInterface $commentsService;
 
     protected function initializeStepServices()
     {

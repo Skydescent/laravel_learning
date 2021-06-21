@@ -34,7 +34,7 @@ class TagService implements RepositoryServiceable
      */
     public function store(FormRequest|Request $request)
     {
-        // TODO: Implement store() method.
+
     }
 
     /**
@@ -43,7 +43,7 @@ class TagService implements RepositoryServiceable
      */
     public function update(FormRequest|Request $request, $model)
     {
-        // TODO: Implement update() method.
+
     }
 
     /**
@@ -51,6 +51,6 @@ class TagService implements RepositoryServiceable
      */
     public function destroy($model)
     {
-        // TODO: Implement destroy() method.
+
     }
 }

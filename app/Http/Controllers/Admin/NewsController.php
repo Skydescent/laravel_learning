@@ -12,11 +12,11 @@ use Illuminate\View\View;
 
 class NewsController extends Controller
 {
-    protected EloquentRepositoryInterface $modelInterface;
+    protected EloquentRepositoryInterface $modelRepositoryInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelInterface)
+    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
     {
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     /**
@@ -27,7 +27,7 @@ class NewsController extends Controller
     public function index()
     {
         $currentPage = request()->get('page',1);
-        $news = $this->modelInterface->adminIndex(auth()->user(), ['page' => $currentPage]);
+        $news = $this->modelRepositoryInterface->adminIndex(auth()->user(), ['page' => $currentPage]);
 
         return view('admin.news.index', compact( 'news'));
     }
@@ -52,7 +52,7 @@ class NewsController extends Controller
      */
     public function store(NewsStoreAndUpdateRequest $request) : RedirectResponse
     {
-        $this->modelInterface->store($request);
+        $this->modelRepositoryInterface->store($request);
         return redirect()->route('admin.news.index');
     }
 
@@ -64,7 +64,7 @@ class NewsController extends Controller
      */
     public function edit(News $news) : View
     {
-        $news = $this->modelInterface->find($news, auth()->user());
+        $news = $this->modelRepositoryInterface->find($news, auth()->user());
         return view('admin.news.edit', compact('news'));
     }
 
@@ -78,7 +78,7 @@ class NewsController extends Controller
      */
     public function update(NewsStoreAndUpdateRequest $request, News $news)
     {
-        $this->modelInterface->update($request, $news, auth()->user());
+        $this->modelRepositoryInterface->update($request, $news, auth()->user());
         return redirect()->route('admin.news.index');
     }
 
@@ -91,7 +91,7 @@ class NewsController extends Controller
      */
     public function destroy(News $news)
     {
-        $this->modelInterface->destroy($news, auth()->user());
+        $this->modelRepositoryInterface->destroy($news, auth()->user());
         return redirect()->route('admin.news.index');
     }
 }

@@ -2,14 +2,9 @@
 
 namespace App\Service;
 
-use App\Events\PostCreated;
-use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 
 class PostsService extends EloquentService
 {
@@ -24,7 +19,7 @@ class PostsService extends EloquentService
     ];
 
     public array $afterEventMethods = [
-        'NotifyAdmin' => [
+        'notifyAdmin' => [
             'store' =>['добавлена статья', 'posts.show'],
             'update'=>['обновлена статья', 'posts.show'],
             'destroy'=>['статья удалена']
@@ -36,7 +31,7 @@ class PostsService extends EloquentService
      */
     protected static function setModelClass()
     {
-       static::$modelClass = \App\Post::class;
+       static::$modelClass = Post::class;
     }
 
     /**
@@ -52,10 +47,10 @@ class PostsService extends EloquentService
     }
 
     /**
-     * @param $message
-     * @param null $routeName
+     * @param string $message
+     * @param string|null $routeName
      */
-    public function notifyAdmin($message, $routeName = null)
+    public function notifyAdmin(string $message, string|null $routeName = null): static
     {
         $route = $routeName ? route($routeName, ['post' => $this->model]) : null;
         $recipient = new AdminRecipient();

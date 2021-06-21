@@ -7,16 +7,16 @@ use App\Task;
 
 class TaskStepsController extends Controller
 {
-    protected StepableInterface $modelInterface;
+    protected StepableInterface $modelRepositoryInterface;
 
-    public function __construct(StepableInterface $modelInterface)
+    public function __construct(StepableInterface $modelRepositoryInterface)
     {
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     public function store(Task $task)
     {
-        $this->modelInterface->addStep(\request(), $task);
+        $this->modelRepositoryInterface->addStep(\request(), $task);
 
         return back();
     }

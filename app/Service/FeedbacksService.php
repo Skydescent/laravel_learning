@@ -21,11 +21,11 @@ class FeedbacksService implements RepositoryServiceable
 
     public function update(FormRequest|Request $request, $model)
     {
-        // TODO: Implement update() method.
+
     }
 
     public function destroy($model)
     {
-        // TODO: Implement destroy() method.
+
     }
 }

@@ -9,36 +9,36 @@ use App\Repositories\EloquentRepositoryInterface;
 
 class PostsController extends Controller
 {
-    protected EloquentRepositoryInterface $modelInterface;
+    protected EloquentRepositoryInterface $modelRepositoryInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelInterface)
+    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
     {
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     public function index()
     {
         $currentPage = request()->get('page',1);
-        $posts = $this->modelInterface->adminIndex(auth()->user(), ['page' => $currentPage] );
+        $posts = $this->modelRepositoryInterface->adminIndex(auth()->user(), ['page' => $currentPage] );
         return view('admin.posts.index', compact( 'posts'));
     }
 
     public function update(PostStoreAndUpdateRequest $request, Post $post)
     {
-        $this->modelInterface->update($request, $post);
+        $this->modelRepositoryInterface->update($request, $post);
         return redirect()->route('admin.posts.index');
     }
 
     public function edit(Post $post)
     {
-        $post = $this->modelInterface->find($post);
+        $post = $this->modelRepositoryInterface->find($post);
         $isAdmin = true;
         return view('posts.edit', compact('post', 'isAdmin'));
     }
 
     public function destroy(Post $post)
     {
-        $this->modelInterface->destory($post, auth()->user());
+        $this->modelRepositoryInterface->destroy($post, auth()->user());
         flash('Статья удалена', 'warning');
         return redirect()->route('admin.posts.index');
     }

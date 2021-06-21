@@ -3,21 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\News;
-use App\Repositories\CommentableInerface;
-use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\CommentableInterface;
 
 class NewsCommentsController extends Controller
 {
-    protected CommentableInerface $modelInterface;
+    protected CommentableInterface $modelRepositoryInterface;
 
-    public function __construct(CommentableInerface $modelInterface)
+    public function __construct(CommentableInterface $modelRepositoryInterface)
     {
-        $this->modelInterface = $modelInterface;
+        $this->modelRepositoryInterface = $modelRepositoryInterface;
     }
 
     public function store(News $news)
     {
-        $this->modelInterface->storeComment(\request(), $news);
+        $this->modelRepositoryInterface->storeComment(\request(), $news);
         return back();
     }
 }

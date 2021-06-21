@@ -10,17 +10,20 @@ use App\Http\Controllers\NewsCommentsController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TaskStepsController;
 use App\News;
 use App\Post;
 use App\PostHistory;
-use App\Repositories\CommentableInerface;
+use App\Repositories\CommentableInterface;
 use App\Repositories\CommentEloquentRepository;
 use App\Repositories\EloquentRepositoryInterface;
 use App\Repositories\FeedbackEloquentRepository;
 use App\Repositories\NewsEloquentRepository;
 use App\Repositories\PostEloquentRepository;
+use App\Repositories\SimpleRepositoryInterface;
+use App\Repositories\StatisticsRepository;
 use App\Repositories\StepableInterface;
 use App\Repositories\TaggableInterface;
 use App\Repositories\StepEloquentRepository;
@@ -191,7 +194,7 @@ return [
             ],
         ],
         'simple_services' => [
-            \App\Repositories\StatistcsRepository::class => [
+            StatisticsRepository::class => [
                 'tag' => 'statistics',
                 'cached_models_collections' => [
                     User::class,
@@ -220,12 +223,6 @@ return [
                 'controllers' => [NewsController::class, AdminNewsController::class],
                 'repository_closure' => function () {
                     return NewsEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [NewsCommentsController::class, PostCommentsController::class],
-                'repository_closure' => function () {
-                    return CommentEloquentRepository::getInstance();
                 }
             ],
             [
@@ -275,7 +272,7 @@ return [
                 }
             ]
         ],
-        CommentableInerface::class => [
+        CommentableInterface::class => [
             [
                 'controllers' => [PostCommentsController::class],
                 'repository_closure' => function () {
@@ -288,6 +285,14 @@ return [
                     return NewsEloquentRepository::getInstance();
                 }
             ],
+        ],
+        SimpleRepositoryInterface::class =>[
+            [
+                'controllers' => [StatisticsController::class],
+                'repository_closure' => function () {
+                    return StatisticsRepository::getInstance();
+                }
+            ]
         ],
     ]
 ];

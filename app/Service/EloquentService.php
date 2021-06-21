@@ -5,7 +5,6 @@ namespace App\Service;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 abstract class EloquentService implements RepositoryServiceable
 {
@@ -26,17 +25,6 @@ abstract class EloquentService implements RepositoryServiceable
         static::setModelClass();
     }
 
-    public function __call($method,$arguments) {
-        Log::info('before if in EloquentService@__call(), method: ' . $method);
-        if(in_array($method, self::ALLOWED_EVENTS)) {
-            Log::info('in EloquentService@__call(), method: ' . $method);
-            if (count($this->flashMessages)!== 0 && key_exists($method, $this->flashMessages)) {
-                $this->flashEventMessage($method);
-            }
-            $this->callMethodsAfterEvent($method);
-        }
-        if (method_exists($this, $method)) return call_user_func_array([$this,$method],$arguments);
-    }
 
     public function setModel(Model|null $model = null): EloquentService
     {
