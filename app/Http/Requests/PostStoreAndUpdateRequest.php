@@ -3,9 +3,27 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class PostStoreAndUpdateRequest extends FormRequest
 {
+    private \App\Service\RepositoryServiceable $postsService;
+
+    public function __construct(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null,
+        \App\Service\RepositoryServiceable|null $postsService = null
+    )
+    {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+        $this->postsService = $postsService;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -17,9 +35,10 @@ class PostStoreAndUpdateRequest extends FormRequest
             return ['published'=>''];
         }
         $slugRule = 'required|regex:/^[a-z0-9-_]+$/i|unique:posts';
-
+        Log::info('PostRequest@rules, post' . $this->route('post') . ' ' . $this->slug . ' ' . $this->id);
         if ($this->route()->hasParameter('post')) {
-            $slugRule .= ',slug,' . $this->route('post')->id;
+            $post = $this->postsService->find($this->slug, auth()->user());
+            $slugRule .= ',slug,' . $post->id;
         }
 
         return [

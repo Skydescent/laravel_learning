@@ -5,17 +5,18 @@ namespace App\Repositories;
 
 
 use App\Service\EloquentCacheService;
-use App\Service\RepositoryServiceable;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use PhpParser\Node\Expr\AssignOp\Mod;
 
 abstract  class EloquentRepository implements EloquentRepositoryInterface
 {
-    /**
-     * @var RepositoryServiceable
-     */
-    protected RepositoryServiceable $modelService;
+    //TODO: Remove static::$modelClass(pass it from Service when needed)
+
+    protected static string $modelClass;
 
     /**
      * @var EloquentCacheService
@@ -26,39 +27,16 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
      * @var EloquentRepositoryInterface
      */
     protected static EloquentRepositoryInterface $instance;
+    
+    protected function __construct(){}
 
-    /**
-     * @var string
-     */
-    protected static string $model;
+    abstract protected function prepareAttributes();
 
-    /**
-     *
-     */
-    protected function __construct()
+    protected function setCacheService($cacheService)
     {
-        $this->setCacheService();
-        $this->setModelService();
+        $this->cacheService = $cacheService;
     }
-
-    /**
-     *
-     */
-    abstract protected static function setModel();
-
-    /**
-     *
-     */
-    abstract protected function setCacheService();
-
-    /**
-     *
-     */
-    abstract protected function setModelService();
-
-    /**
-     *
-     */
+    
     protected function __clone()
     {
 
@@ -76,40 +54,35 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
     /**
      * @return EloquentRepositoryInterface
      */
-    public static function getInstance(): EloquentRepositoryInterface
+    public static function getInstance(string $modelClass): EloquentRepositoryInterface
     {
-        static::setModel();
+        static::setModelClass($modelClass);
         if (!isset(self::$instance)) {
             self::$instance = new static();
         }
 
+        self::$instance->setCacheService(EloquentCacheService::getInstance($modelClass));
         return self::$instance;
     }
 
-    /**
-     * @param UrlRoutable|array $item
-     * @param Authenticatable|User|null $user
-     * @return mixed
-     */
-    public function find(UrlRoutable|array $item, Authenticatable|User|null $user = null): mixed
+    protected static function setModelClass($modelClass)
     {
-        $identifier = gettype($item) === 'array' ? $item : $this->cacheService->getModelIdentifier($item);
-        $data = (self::$model)::firstWhere($identifier);
-        return  $this->cacheService->cacheItem($data, $identifier, $user);
+        static::$modelClass = $modelClass;
+    }
+
+    public function index(callable $getIndex, string $modelKeyName, Authenticatable|User|null $user = null, array $postfixes = [])
+    {
+        return $this->cacheService->cacheIndex($getIndex,$user,$postfixes, $modelKeyName);
     }
 
     /**
+     * @param string|array $identifier
      * @param Authenticatable|User|null $user
-     * @param array $postfixes
      * @return mixed
      */
-    public function publicIndex(Authenticatable|User|null $user = null, array $postfixes = []): mixed
+    public function find(callable $getModel, array $identifier, Authenticatable|User|null $user = null): mixed
     {
-        return $this->cacheService->cacheCollection(
-            (self::$model)::all(),
-            $user,
-            $postfixes
-        );
+        return  $this->cacheService->cacheModel($getModel, $identifier, $user);
     }
 
     /**
@@ -117,28 +90,58 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
      */
     public function store($request)
     {
-        $this->modelService->store($request);
+        $model = $this->storeOrUpdate($request);
         $this->cacheService->flushCollections();
+
+        return $model;
     }
 
     /**
      * @param $request
-     * @param $model
+     * @param array $identifier
      * @param Authenticatable|User|null $user
      */
-    public function update($request, $model, Authenticatable|User|null $user = null)
+    public function update(FormRequest|Request $request, array $identifier, Authenticatable|User|null $user = null)
     {
-        $this->modelService->update($request, $model);
-        $this->cacheService->flushModelCache($model, $user);
+        $model = $this->storeOrUpdate($request, $identifier);
+        $this->cacheService->flushModelCache($identifier, $user);
+
+        return $model;
     }
 
     /**
      * @param $model
      * @param Authenticatable|User|null $user
      */
-    public function destroy($model, Authenticatable|User|null $user = null)
+    public function destroy(array $identifier, Authenticatable|User|null $user = null)
     {
-        $this->modelService->destroy($model);
-        $this->cacheService->flushModelCache($model, $user);
+        $model = (static::$modelClass)::firstWhere($identifier);
+        $model->delete();
+        $this->cacheService->flushModelCache($identifier, $user);
+
+        return $model;
+    }
+
+    protected function storeOrUpdate(FormRequest|Request $request,array $identifier = null)
+    {
+        $attributes = $this->prepareAttributes($request);
+
+        $tags = $attributes['tags'] ?? null;
+        unset($attributes['tags']);
+
+        if ($identifier) {
+           $model = (static::$modelClass)::updateOrCreate($identifier, $attributes);
+        } else {
+           $model = (static::$modelClass)::updateOrCreate($attributes);
+        }
+
+
+
+        //TODO: Return tags sync
+//        if ($this->getModel() instanceof \App\Taggable) {
+//            $this->model->syncTags($tags);
+//        }
+
+        return $model;
     }
 }

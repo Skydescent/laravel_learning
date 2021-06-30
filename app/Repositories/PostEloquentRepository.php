@@ -5,45 +5,23 @@ namespace App\Repositories;
 
 use App\Post;
 use App\Service\EloquentCacheService;
-use App\Service\PostsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class PostEloquentRepository extends  EloquentRepository implements TaggableInterface, CommentableInterface
+class PostEloquentRepository extends  EloquentRepository //implements TaggableInterface, CommentableInterface
 {
-    use HasTags, HasComments;
+    //TODO: Now how use traits?
+    //use HasTags, HasComments;
 
-    protected static function setModel()
+    /**
+     * @param null $request
+     * @return array
+     */
+    protected function prepareAttributes($request = null): array
     {
-        static::$model = Post::class;
-    }
-
-    protected function setModelService()
-    {
-        $this->modelService = new PostsService();
-    }
-
-    protected function setCacheService()
-    {
-        $this->cacheService = EloquentCacheService::getInstance(static::$model);
-    }
-
-    public function adminIndex(Authenticatable|User|null $user, array $postfixes = [])
-    {
-       $paginator = (static::$model)::latest()
-           ->with('owner')
-           ->paginate(20);
-
-       return $this->cacheService->cachePaginator($paginator, $user, $postfixes);
-    }
-
-    public function publicIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed
-    {
-        $paginator = (self::$model)::latest()
-            ->with('tags')
-            ->where('published', 1)
-            ->orWhere('owner_id', '=', auth()->id())
-            ->simplePaginate(10);
-        return $this->cacheService->cachePaginator($paginator, $user, $postfixes);
+        $attributes = $request->validated();
+        $attributes['published'] = $attributes['published'] ?? 0;
+        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :auth()->id();
+        return $attributes;
     }
 }

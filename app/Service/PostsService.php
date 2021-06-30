@@ -5,6 +5,9 @@ namespace App\Service;
 use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
+use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Log;
 
 class PostsService extends EloquentService
 {
@@ -26,39 +29,45 @@ class PostsService extends EloquentService
         ]
     ];
 
-    /**
-     *
-     */
     protected static function setModelClass()
     {
        static::$modelClass = Post::class;
     }
 
-    /**
-     * @param null $request
-     * @return array
-     */
-    protected function prepareAttributes($request = null): array
+    protected static function setRepository()
     {
-        $attributes = $request->validated();
-        $attributes['published'] = $attributes['published'] ?? 0;
-        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :auth()->id();
-        return $attributes;
+        static::$repository = \App\Repositories\PostEloquentRepository::getInstance(static::$modelClass);
     }
 
     /**
      * @param string $message
      * @param string|null $routeName
+     * @return PostsService
      */
     public function notifyAdmin(string $message, string|null $routeName = null): static
     {
-        $route = $routeName ? route($routeName, ['post' => $this->model]) : null;
+
+        Log::info('PostsService@notifyAdmin ' . $this->currentModel->title);
+        $route = $routeName ? route($routeName, ['post' => $this->currentModel]) : null;
         $recipient = new AdminRecipient();
         $recipient->notify(new PostStatusChanged(
             $message,
-            $this->model->title,
+            $this->currentModel->title,
             $route
         ));
         return $this;
+    }
+
+    public function publicIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed
+    {
+        $getIndex = function () {
+            return (self::$modelClass)::latest()
+                ->with('tags')
+                ->where('published', 1)
+                ->orWhere('owner_id', '=', auth()->id())
+                ->simplePaginate(10);
+        };
+
+        return (static::$repository)->index($getIndex, $this->getModelKeyName(), $user,$postfixes);
     }
 }

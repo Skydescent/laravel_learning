@@ -23,7 +23,7 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->whenControllersNeedsGiveRepository();
+        //$this->whenControllersNeedsGiveRepository();
     }
 
     protected function whenControllersNeedsGiveRepository()

@@ -7,10 +7,10 @@ use App\Cache\CacheEloquentWrapper;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Contracts\Pagination\Paginator as PaginatorInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorInterface;
+use Illuminate\Support\Enumerable;
+use Illuminate\Support\Facades\Log;
 
 class EloquentCacheService extends CacheService
 {
@@ -26,68 +26,29 @@ class EloquentCacheService extends CacheService
 
     }
 
-    public function cacheItem($data, $cacheKey, ?User $user = null)
+    public function cacheModel(callable $getModel, array $identifier, ?User $user = null): ?CacheEloquentWrapper
     {
-        $queryData = function () use ($cacheKey, $data) {
-            return CacheEloquentWrapper::wrapItem($data, $cacheKey, $this);
-        };
+        $cache = $this->cache($getModel, $user, $identifier);
 
-        return $this->cache($queryData, $user, $cacheKey);
+        return CacheEloquentWrapper::wrapModel($cache,$identifier, $this);
     }
 
-
-    public function cacheCollection(
-        Collection|EloquentCollection $collection ,
-        User                          $user = null,
-        array                         $postfixes = [],
-        array                         $tags = []
-    )
+    public function cacheIndex($getIndex, $user, $postfixies, $modelKeyName)
     {
-        $queryData = function () use ($collection) {
-            return CacheEloquentWrapper::wrapCollection($collection, $this);
-        };
+        $cache = $this->cache($getIndex, $user, $postfixies, [$this->getTagName() . '_collection']);
 
-        return $this->cache(
-            $queryData,
-            $user,
-            $postfixes,
-            array_merge([$this->getTagName() . '_collection'],
-                $tags)
-        );
+        $indexInterfaces = class_implements($cache);
+        $paginatorInterfaces = [PaginatorInterface::class, LengthAwarePaginatorInterface::class];
+        $collectionInterfaces = [Enumerable::class];
+
+        if(count(array_intersect($paginatorInterfaces, $indexInterfaces)) !== 0) {
+            return CacheEloquentWrapper::wrapPaginator($cache,$this,$modelKeyName);
+        }
+
+        if (count(array_intersect($collectionInterfaces, $indexInterfaces)) !== 0) {
+            return CacheEloquentWrapper::wrapCollection($cache,$this,$modelKeyName);
+        }
     }
-
-
-    public function cachePaginator(
-        Paginator|LengthAwarePaginator $paginator,
-        User                           $user = null,
-                                       $postfixes = []
-    )
-    {
-        $queryData = function () use ($paginator) {
-            return CacheEloquentWrapper::wrapPaginator($paginator, $this);
-        };
-
-        return $this->cache($queryData, $user, $postfixes, [$this->getTagName() . '_collection']);
-    }
-
-    public function cache(
-        callable             $queryData ,
-        Authenticatable|User $user = null,
-                             $postfixes = [],
-        array|null           $tags = null
-    )
-    {
-        $tags = $tags ??  [$this->getTagName()];
-        $key = $this->getKeyName($user, $postfixes);
-
-        return \Cache::tags($tags)
-            ->remember(
-                $key,
-                $this->configs['ttl'],
-                $queryData
-            );
-    }
-
 
     public function getKeyName(Authenticatable|User $user = null, $postfixes = [] ): string
     {
@@ -107,9 +68,8 @@ class EloquentCacheService extends CacheService
         return $prefix . $this->getTagName() . $postfix;
     }
 
-    public function flushModelCache(UrlRoutable $modelInstance, User|null $user = null)
+    public function flushModelCache(array $identifier, User|null $user = null)
     {
-        $identifier = $this->getModelIdentifier($modelInstance);
         $this->forgetModel($identifier, $user);
         $this->forgetModelRelations($identifier, $user);
         $this->flushCollections();
@@ -164,6 +124,7 @@ class EloquentCacheService extends CacheService
 
     public function flushCollections()
     {
+        Log::info('EloquentCacheService@flushCollections: \Cache::tags([' . $this->getTagName() . '_collection])->flush()');
         \Cache::tags([$this->getTagName() . '_collection'])->flush();
 
     }
@@ -173,10 +134,19 @@ class EloquentCacheService extends CacheService
         return isset($this->configs['relations']) ? array_keys($this->configs['relations']) : [];
     }
 
-    public function getModelIdentifier(UrlRoutable $modelInstance) : array
+    public function getModelIdentifier(UrlRoutable|null $model =  null,string $identifier = null) : array
     {
-        $routeKeyName = $modelInstance->getRouteKeyName();
-        $instanceKeyName = $modelInstance->$routeKeyName;
+        if (
+            (!$model && !class_exists($this->configKey)) ||
+            (!$model && !in_array(UrlRoutable::class,class_implements($this->configKey)))
+        ) return [];
+
+        if (!$model){
+            return [(new $this->configKey())->getRouteKeyName() => $identifier];
+        }
+
+        $routeKeyName = $model->getRouteKeyName();
+        $instanceKeyName = $model->$routeKeyName;
         return [$routeKeyName => $instanceKeyName];
     }
 

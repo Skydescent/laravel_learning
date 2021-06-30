@@ -18,22 +18,23 @@ use JsonSerializable;
 class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {
 
-    protected array $modelCacheKey;
+    protected array $identifier;
 
     protected $model;
 
     protected  EloquentCacheService $cacheService;
 
-    protected static string $modelClass;
+    //protected static string $modelClass;
 
-    public static function wrapItem($item, array $modelCacheKey, EloquentCacheService $cacheService)
+    public static function wrapModel($model, array $identifier, EloquentCacheService $cacheService)
     {
-        if (is_null($item)) return null;
+        if (is_null($model)) return null;
 
+        //Если такой ключ уже есть, то не добавляем ключ в кэш, если нет, то добавляем
         $instance = new static();
-        $instance->model = $item;
-        static::$modelClass = get_class($item);
-        $instance->modelCacheKey = $modelCacheKey;
+        $instance->model = $model;
+        //static::$modelClass = get_class($model);
+        $instance->identifier = $identifier;
         $instance->cacheService = $cacheService;
 
         return $instance;
@@ -41,14 +42,14 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
 
     public static function wrapCollection(
         Collection|EloquentCollection $collection,
-        EloquentCacheService          $cacheService, string $modelIdentifier =  null
-    )
+        EloquentCacheService          $cacheService,
+        string                        $keyName
+    ): EloquentCollection|Collection
     {
         if($collection->first()) {
-            $modelIdentifier = $modelIdentifier ?? $collection->first()->getRouteKeyName();
             return $collection
-                ->map(function ($model) use ($modelIdentifier, $cacheService) {
-                    return static::wrapItem($model, [$modelIdentifier => $model->$modelIdentifier], $cacheService);
+                ->map(function ($model) use ($cacheService, $keyName) {
+                    return static::wrapModel($model, [$keyName => $model->$keyName], $cacheService);
                 });
         }
        return collect();
@@ -57,10 +58,10 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
     public static function wrapPaginator(
         Paginator|LengthAwarePaginator $paginator,
         EloquentCacheService           $cacheService,
-        string                         $modelIdentifier = null
+        string                         $keyName
     )
     {
-        $modelsCollection = static::wrapCollection($paginator->getCollection(), $cacheService, $modelIdentifier);
+        $modelsCollection = static::wrapCollection($paginator->getCollection(), $cacheService, $keyName);
         return $paginator->setCollection($modelsCollection);
     }
 
@@ -68,15 +69,11 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
     {
         if (in_array($name, $this->cacheService->getRelationsNames())) {
 
-            $queryData = function () use ($name) {
-                if (get_class($instance = $this->model->$name) === EloquentCollection::class) {
-                    return static::wrapCollection($instance, $this->cacheService);
-                } elseif (is_subclass_of($instance, Model::class)) {
-                    $modelIdentifier = $instance->getRouteKeyName();
-                    return static::wrapItem($instance,[$modelIdentifier => $instance->$modelIdentifier], $this->cacheService);
-                }
+            $getRelation = function () use ($name) {
+                return $this->model->$name;
             };
-            return $this->cacheService->cache($queryData,auth()->user(), array_merge($this->modelCacheKey, ['relation' => $name]), [$name . '_collection']);
+
+            return $this->cacheService->cache($getRelation,auth()->user(), array_merge($this->identifier, ['relation' => $name]), [$name . '_collection']);
         }
 
         if($name === 'model') {

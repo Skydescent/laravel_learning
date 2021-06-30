@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Log;
 
 abstract class CacheService
 {
@@ -30,6 +31,7 @@ abstract class CacheService
 
     protected function initialize()
     {
+        //TODO: Remove simple_services config from EloquentCacheServices
         $allConfigs = config('cache.cache_service');
         $this->configs = array_diff_key($allConfigs, [static::$configsMap => '']);
 
@@ -51,11 +53,17 @@ abstract class CacheService
         return self::$instances[$configKey];
     }
 
-    public function cache(callable $queryData , Authenticatable|User $user = null, $postfixes = [], array|null $tags = null)
+    public function cache(
+        callable             $queryData ,
+        Authenticatable|User $user = null,
+        array                $postfixes = [],
+        array|null           $tags = null
+    )
     {
         $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
 
+        //Log::info('CacheService@cache: \Cache::tags(' . implode(',',$tags) . ')->remember(' . $key . ')');
         return \Cache::tags($tags)
             ->remember(
                 $key,

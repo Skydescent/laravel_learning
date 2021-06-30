@@ -34,9 +34,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //TODO: May be replace to RepositoryServiceProvider, or config map
+        $this->app->when(\App\Http\Requests\PostStoreAndUpdateRequest::class)
+            ->needs(\App\Service\RepositoryServiceable::class)
+            ->give(\App\Service\PostsService::class);
+
         view()->composer('layout.sidebar', function($view) {
-            $taggableRepository = (new RepositoryService)->getTaggableRepository();
-            $view->with('tagsCloud', $taggableRepository->tagsCloud(auth()->user()));
+            //$taggableRepository = (new RepositoryService)->getTaggableRepository();
+            //$taggableRepository->tagsCloud(auth()->user())
+            $view->with('tagsCloud', collect());
         });
 
 

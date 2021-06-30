@@ -2,6 +2,10 @@
 
 namespace App\Service;
 
+use App\Repositories\EloquentRepositoryInterface;
+use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
@@ -12,79 +16,51 @@ abstract class EloquentService implements RepositoryServiceable
 
     public array $afterEventMethods = [];
 
-    protected Model $model;
+    protected Model $currentModel;
 
     protected static string $modelClass;
 
+    protected static EloquentRepositoryInterface $repository;
+
     protected abstract static function setModelClass();
 
-    protected abstract function prepareAttributes($request = null): array;
+    protected abstract static function setRepository();
 
     public function __construct()
     {
         static::setModelClass();
+        static::setRepository();
     }
 
 
-    public function setModel(Model|null $model = null): EloquentService
+    public function find(string $identifier, Authenticatable|null $user = null)
     {
-        $this->model = $model ?? new static::$modelClass();
+        $identifier = $this->getModelIdentifier($identifier);
+        $getModel = function () use ($identifier) {
+            return (static::$modelClass)::firstWhere($identifier);
+        };
 
-        return $this;
-    }
-
-    public function getModel(): Model
-    {
-        return $this->model;
-    }
-
-    protected function storeOrUpdate(FormRequest|Request $request, Model|null $model = null): EloquentService
-    {
-        $attributes = $this->prepareAttributes($request);
-
-        $this->setModel($model);
-
-        $tags = $attributes['tags'] ?? null;
-        unset($attributes['tags']);
-
-        $model = (static::$modelClass)::updateOrCreate(['id' => $this->model->id], $attributes);
-
-        $this->setModel($model);
-
-        if ($this->getModel() instanceof \App\Taggable) {
-            $this->model->syncTags($tags);
-        }
-
-        return $this;
+        return static::$repository->find($getModel, $identifier, $user);
     }
 
     public function store(FormRequest|Request $request)
     {
-        $this
-            ->storeOrUpdate($request)
-            ->callMethodsAfterEvent('store');
+        $this->currentModel = static::$repository->store($request);
+        $this->callMethodsAfterEvent('store');
     }
 
-    public function  update(FormRequest|Request $request, Model $model)
+    public function  update(FormRequest|Request $request,string $identifier, Authenticatable|User|null $user = null)
     {
-        $this
-            ->storeOrUpdate($request, $model)
-            ->callMethodsAfterEvent('update');
+        $this->currentModel = static::$repository->update($request, $this->getModelIdentifier($identifier), $user);
+        $this->callMethodsAfterEvent('update');
     }
 
-    public function destroy(Model $model)
+    public function destroy(string $identifier, Authenticatable|User|null $user = null)
     {
-        $this
-            ->setModel($model)
-            ->destroyModel()
-            ->callMethodsAfterEvent('destroy');
+        $this->currentModel = static::$repository->destroy($this->getModelIdentifier($identifier), $user);
+        $this->callMethodsAfterEvent('destroy');
     }
 
-    protected function destroyModel()
-    {
-        $this->model->delete();
-        return $this;
-    }
 
     protected function flashEventMessage(string $eventName)
     {
@@ -112,5 +88,15 @@ abstract class EloquentService implements RepositoryServiceable
                 call_user_func_array([$this,$method],$events[$key]);
             }
         }
+    }
+
+    protected function getModelIdentifier(string $identifier) : array
+    {
+        return [$this->getModelKeyName() => $identifier];
+    }
+
+    protected function getModelKeyName() : string
+    {
+        return (new(static::$modelClass))->getRouteKeyName();
     }
 }
