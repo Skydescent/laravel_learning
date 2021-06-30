@@ -24,7 +24,7 @@ class PostsController extends Controller
 
     public function show($slug)
     {
-        $post = $this->postsService->find($slug, auth()->user());
+        $post = $this->postsService->find($slug, cachedUser(\request())->model);
         return view('posts.show', compact('post'));
     }
 
@@ -42,7 +42,7 @@ class PostsController extends Controller
 
     public function edit($slug)
     {
-        $post = $this->postsService->find($slug, auth()->user());
+        $post = $this->postsService->find($slug, cachedUser(\request())->model);
         $this->authorize('update', $post->model);
 
         $isAdmin = false;
@@ -51,8 +51,8 @@ class PostsController extends Controller
 
     public function update(PostStoreAndUpdateRequest $request, $slug)
     {
-        $post = $this->postsService->find($slug, auth()->user());
-        $this->authorize('update', $request->post->model);
+        $post = $this->postsService->find($slug, cachedUser(\request())->model);
+        $this->authorize('update', $post->model);
         $this->postsService->update($request, $slug);
 
         return redirect()->route('posts.index');
@@ -60,10 +60,11 @@ class PostsController extends Controller
 
     public function destroy($slug)
     {
-        $post = $this->postsService->find($slug, auth()->user());
+        $user = cachedUser(\request())->model;
+        $post = $this->postsService->find($slug, $user);
         $this->authorize('update', $post->model);
 
-        $this->postsService->destroy($slug, auth()->user());
+        $this->postsService->destroy($slug, $user);
 
         return redirect()->route('posts.index');
     }

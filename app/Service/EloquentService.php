@@ -9,6 +9,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 abstract class EloquentService implements RepositoryServiceable
 {
@@ -18,46 +19,47 @@ abstract class EloquentService implements RepositoryServiceable
 
     protected Model $currentModel;
 
-    protected static string $modelClass;
+    protected string $modelClass;
 
-    protected static EloquentRepositoryInterface $repository;
+    protected EloquentRepositoryInterface $repository;
 
-    protected abstract static function setModelClass();
+    protected abstract function setModelClass();
 
-    protected abstract static function setRepository();
+    protected abstract function setRepository();
 
     public function __construct()
     {
-        static::setModelClass();
-        static::setRepository();
+        $this->setModelClass();
+        $this->setRepository();
     }
 
 
     public function find(string $identifier, Authenticatable|null $user = null)
     {
+        Log::info('EloquentService@find: ' . $identifier . ' user: ' . $user);
         $identifier = $this->getModelIdentifier($identifier);
         $getModel = function () use ($identifier) {
-            return (static::$modelClass)::firstWhere($identifier);
+            return ($this->modelClass)::firstWhere($identifier);
         };
 
-        return static::$repository->find($getModel, $identifier, $user);
+        return $this->repository->find($getModel, $identifier, $user);
     }
 
     public function store(FormRequest|Request $request)
     {
-        $this->currentModel = static::$repository->store($request);
+        $this->currentModel = $this->repository->store($request);
         $this->callMethodsAfterEvent('store');
     }
 
     public function  update(FormRequest|Request $request,string $identifier, Authenticatable|User|null $user = null)
     {
-        $this->currentModel = static::$repository->update($request, $this->getModelIdentifier($identifier), $user);
+        $this->currentModel = $this->repository->update($request, $this->getModelIdentifier($identifier), $user);
         $this->callMethodsAfterEvent('update');
     }
 
     public function destroy(string $identifier, Authenticatable|User|null $user = null)
     {
-        $this->currentModel = static::$repository->destroy($this->getModelIdentifier($identifier), $user);
+        $this->currentModel = $this->repository->destroy($this->getModelIdentifier($identifier), $user);
         $this->callMethodsAfterEvent('destroy');
     }
 
@@ -97,6 +99,6 @@ abstract class EloquentService implements RepositoryServiceable
 
     protected function getModelKeyName() : string
     {
-        return (new(static::$modelClass))->getRouteKeyName();
+        return (new($this->modelClass))->getRouteKeyName();
     }
 }

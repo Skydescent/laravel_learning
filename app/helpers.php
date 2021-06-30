@@ -32,4 +32,25 @@ if (!function_exists('push_all')) {
     }
 }
 
+if (!function_exists('cachedUser')) {
+    /**
+     * @param $request
+     *
+     */
+    function cachedUser($request)
+    {
+        $sessionKeys = $request->session()->all();
+        $userId = null;
+        foreach ($sessionKeys as $key => $value) {
+            if (str_starts_with($key, 'login_web_')) {
+                $userId = $value;
+            }
+        }
+        $userService = new \App\Service\UsersService();
+        Log::info('cachedUser: ' . $userId);
+        return $userService->find($userId);
+    }
+}
+
+
 

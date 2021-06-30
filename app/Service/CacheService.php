@@ -18,6 +18,7 @@ abstract class CacheService
 
     protected function __construct(string $configKey)
     {
+        Log::info('CacheService@__construct ' . $configKey);
         $this->configKey = $configKey;
         $this->initialize();
     }
@@ -31,6 +32,7 @@ abstract class CacheService
 
     protected function initialize()
     {
+
         //TODO: Remove simple_services config from EloquentCacheServices
         $allConfigs = config('cache.cache_service');
         $this->configs = array_diff_key($allConfigs, [static::$configsMap => '']);
@@ -38,6 +40,7 @@ abstract class CacheService
         if (array_key_exists($this->configKey,$allConfigs[static::$configsMap])) {
             $this->configs = array_merge($this->configs, $allConfigs[static::$configsMap][$this->configKey]);
         }
+        Log::info('CacheService@setConfigMap: ' . $this->configs['tag']);
     }
 
     public static function getInstance(string $configKey)
@@ -63,7 +66,7 @@ abstract class CacheService
         $tags = $tags ??  [$this->getTagName()];
         $key = $this->getKeyName($user, $postfixes);
 
-        //Log::info('CacheService@cache: \Cache::tags(' . implode(',',$tags) . ')->remember(' . $key . ')');
+        Log::info('CacheService@cache: \Cache::tags(' . implode(',',$tags) . ')->remember(' . $key . ')');
         return \Cache::tags($tags)
             ->remember(
                 $key,
@@ -74,6 +77,7 @@ abstract class CacheService
 
     public function getTagName()
     {
+        Log::info('CacheService@getTagName: ' . $this->configs['tag'] ??  $this->configKey);
         return  $this->configs['tag'] ??  $this->configKey;
     }
 

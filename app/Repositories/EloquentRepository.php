@@ -14,9 +14,9 @@ use PhpParser\Node\Expr\AssignOp\Mod;
 
 abstract  class EloquentRepository implements EloquentRepositoryInterface
 {
-    //TODO: Remove static::$modelClass(pass it from Service when needed)
+    //TODO: Remove $this->modelClass(pass it from Service when needed)
 
-    protected static string $modelClass;
+    protected string $modelClass;
 
     /**
      * @var EloquentCacheService
@@ -24,11 +24,14 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
     protected EloquentCacheService $cacheService;
 
     /**
-     * @var EloquentRepositoryInterface
+     * @var array
      */
-    protected static EloquentRepositoryInterface $instance;
+    protected static array $instances = [];
     
-    protected function __construct(){}
+    protected function __construct($modelClass)
+    {
+        $this->modelClass = $modelClass;
+    }
 
     abstract protected function prepareAttributes();
 
@@ -56,18 +59,11 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
      */
     public static function getInstance(string $modelClass): EloquentRepositoryInterface
     {
-        static::setModelClass($modelClass);
-        if (!isset(self::$instance)) {
-            self::$instance = new static();
+        if (!isset(static::$instances[$modelClass])) {
+            static::$instances[$modelClass] = new static($modelClass);
         }
-
-        self::$instance->setCacheService(EloquentCacheService::getInstance($modelClass));
-        return self::$instance;
-    }
-
-    protected static function setModelClass($modelClass)
-    {
-        static::$modelClass = $modelClass;
+        static::$instances[$modelClass]->setCacheService(EloquentCacheService::getInstance($modelClass));
+        return static::$instances[$modelClass];
     }
 
     public function index(callable $getIndex, string $modelKeyName, Authenticatable|User|null $user = null, array $postfixes = [])
@@ -115,7 +111,7 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
      */
     public function destroy(array $identifier, Authenticatable|User|null $user = null)
     {
-        $model = (static::$modelClass)::firstWhere($identifier);
+        $model = ($this->modelClass)::firstWhere($identifier);
         $model->delete();
         $this->cacheService->flushModelCache($identifier, $user);
 
@@ -130,9 +126,9 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
         unset($attributes['tags']);
 
         if ($identifier) {
-           $model = (static::$modelClass)::updateOrCreate($identifier, $attributes);
+           $model = ($this->modelClass)::updateOrCreate($identifier, $attributes);
         } else {
-           $model = (static::$modelClass)::updateOrCreate($attributes);
+           $model = ($this->modelClass)::updateOrCreate($attributes);
         }
 
 

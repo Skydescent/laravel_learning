@@ -192,6 +192,17 @@ return [
                     'tasks' => Task::class
                 ]
             ],
+            User::class => [
+                'tag' => 'users',
+                'isPersonal' => false,
+                'relations' => [
+                    'tasks' => Task::class,
+                    'posts' => Post::class,
+                    'company' => \App\Company::class,
+                    'tags' => Tag::class,
+                    'comments' => Comment::class
+                ]
+            ],
         ],
         'simple_services' => [
             StatisticsRepository::class => [

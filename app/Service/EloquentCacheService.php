@@ -30,6 +30,8 @@ class EloquentCacheService extends CacheService
     {
         $cache = $this->cache($getModel, $user, $identifier);
 
+        Log::info('EloquentCacheService@cacheModel: ' . $cache);
+
         return CacheEloquentWrapper::wrapModel($cache,$identifier, $this);
     }
 

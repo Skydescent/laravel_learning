@@ -24,16 +24,12 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
 
     protected  EloquentCacheService $cacheService;
 
-    //protected static string $modelClass;
-
     public static function wrapModel($model, array $identifier, EloquentCacheService $cacheService)
     {
         if (is_null($model)) return null;
 
-        //Если такой ключ уже есть, то не добавляем ключ в кэш, если нет, то добавляем
         $instance = new static();
         $instance->model = $model;
-        //static::$modelClass = get_class($model);
         $instance->identifier = $identifier;
         $instance->cacheService = $cacheService;
 
