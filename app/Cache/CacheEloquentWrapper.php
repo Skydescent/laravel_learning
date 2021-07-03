@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use JsonSerializable;
 
 class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Jsonable, JsonSerializable
@@ -20,7 +21,7 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
 
     protected array $identifier;
 
-    protected $model;
+    private Model $model;
 
     protected  EloquentCacheService $cacheService;
 
@@ -69,7 +70,7 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
                 return $this->model->$name;
             };
 
-            return $this->cacheService->cache($getRelation,auth()->user(), array_merge($this->identifier, ['relation' => $name]), [$name . '_collection']);
+            return $this->cacheService->cache($getRelation, cachedUser(), array_merge($this->identifier, ['relation' => $name]));
         }
 
         if($name === 'model') {

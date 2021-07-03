@@ -30,14 +30,13 @@ class EloquentCacheService extends CacheService
     {
         $cache = $this->cache($getModel, $user, $identifier);
 
-        Log::info('EloquentCacheService@cacheModel: ' . $cache);
-
         return CacheEloquentWrapper::wrapModel($cache,$identifier, $this);
     }
 
-    public function cacheIndex($getIndex, $user, $postfixies, $modelKeyName)
+    public function cacheIndex(callable $getIndex, $user, $postfixies, $modelKeyName, $tags = [])
     {
-        $cache = $this->cache($getIndex, $user, $postfixies, [$this->getTagName() . '_collection']);
+        $tags = count($tags)!== 0 ? [$this->getTagName() . '_collection', $tags] : [$this->getTagName() . '_collection'];
+        $cache = $this->cache($getIndex, $user, $postfixies, $tags);
 
         $indexInterfaces = class_implements($cache);
         $paginatorInterfaces = [PaginatorInterface::class, LengthAwarePaginatorInterface::class];
@@ -91,8 +90,7 @@ class EloquentCacheService extends CacheService
             $this->forgetModelRelation(
                 $identifier,
                 ['relation' => $relationName],
-                $user,
-                [$relationName . '_collection']
+                $user
             );
         }
     }
@@ -105,8 +103,7 @@ class EloquentCacheService extends CacheService
     {
         $morphedCacheService = static::getInstance(get_class($model));
         $identifier = $morphedCacheService->getModelIdentifier($model);
-        $tags = [$relationName['relation'] . '_collection'];
-        $morphedCacheService->forgetModelRelation($identifier, $relationName, $user, $tags);
+        $morphedCacheService->forgetModelRelation($identifier, $relationName, $user);
     }
 
     public function forgetModelRelation(
@@ -121,14 +118,14 @@ class EloquentCacheService extends CacheService
 
         $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
 
+        Log::info('Cache::tags(' . implode(',', $tags) . ')->forget('. $keyName .')');
         \Cache::tags($tags)->forget($keyName);
     }
 
     public function flushCollections()
     {
-        Log::info('EloquentCacheService@flushCollections: \Cache::tags([' . $this->getTagName() . '_collection])->flush()');
+        Log::info('Cache::tags(' . $this->getTagName() . '_collection)->flush()');
         \Cache::tags([$this->getTagName() . '_collection'])->flush();
-
     }
 
     public function getRelationsNames(): array

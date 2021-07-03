@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 
 abstract class CacheService
 {
+    const CACHE_SERVICE_CONFIG_KEY = 'cache.cache_service';
+
     protected static array $instances = [];
 
     protected static string $configsMap;
@@ -18,7 +20,6 @@ abstract class CacheService
 
     protected function __construct(string $configKey)
     {
-        Log::info('CacheService@__construct ' . $configKey);
         $this->configKey = $configKey;
         $this->initialize();
     }
@@ -34,13 +35,12 @@ abstract class CacheService
     {
 
         //TODO: Remove simple_services config from EloquentCacheServices
-        $allConfigs = config('cache.cache_service');
+        $allConfigs = config(self::CACHE_SERVICE_CONFIG_KEY);
         $this->configs = array_diff_key($allConfigs, [static::$configsMap => '']);
 
         if (array_key_exists($this->configKey,$allConfigs[static::$configsMap])) {
             $this->configs = array_merge($this->configs, $allConfigs[static::$configsMap][$this->configKey]);
         }
-        Log::info('CacheService@setConfigMap: ' . $this->configs['tag']);
     }
 
     public static function getInstance(string $configKey)
@@ -64,6 +64,7 @@ abstract class CacheService
     )
     {
         $tags = $tags ??  [$this->getTagName()];
+        $user = !$user || !$user->id ? null : $user;
         $key = $this->getKeyName($user, $postfixes);
 
         Log::info('CacheService@cache: \Cache::tags(' . implode(',',$tags) . ')->remember(' . $key . ')');
@@ -77,10 +78,14 @@ abstract class CacheService
 
     public function getTagName()
     {
-        Log::info('CacheService@getTagName: ' . $this->configs['tag'] ??  $this->configKey);
         return  $this->configs['tag'] ??  $this->configKey;
     }
 
     abstract protected function getKeyName(Authenticatable|User $user = null, $postfixes = []): string;
+
+    public function getCurrentCacheServiceConfigMap()
+    {
+        return config(self::CACHE_SERVICE_CONFIG_KEY . '.' . static::$configsMap);
+    }
 
 }

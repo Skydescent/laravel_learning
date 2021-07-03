@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Service\TagService;
+use App\Service\TagsInterface;
 use Illuminate\Support\ServiceProvider;
 
-class RepositoryServiceProvider extends ServiceProvider
+class CacheServiceProvider extends ServiceProvider
 {
+
     /**
      * Register services.
      *
@@ -23,18 +26,18 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //$this->whenControllersNeedsGiveRepository();
+        $this->whenControllersNeedsGiveModelService();
     }
 
-    protected function whenControllersNeedsGiveRepository()
+    protected function whenControllersNeedsGiveModelService()
     {
-        $repoLists = config('cache.cache_repositories');
+        $repoLists = config('cache.model_services');
 
         foreach ($repoLists as $interface => $reposForControllers) {
             foreach ($reposForControllers as $item) {
                 $this->app->when($item['controllers'])
                     ->needs($interface)
-                    ->give($item['repository_closure']);
+                    ->give($item['service_closure']);
             }
         }
     }

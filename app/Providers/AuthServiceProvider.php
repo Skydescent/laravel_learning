@@ -30,7 +30,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Auth::viaRequest('is-admin', function () {
-            return auth()->user()->isAdmin() ? auth()->user() : null;
+            return cachedUser(\request())->isAdmin() ? cachedUser(\request()) : null;
         });
 
     }

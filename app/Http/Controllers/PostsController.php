@@ -3,28 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreAndUpdateRequest;
+use App\Service\RepositoryServiceable;
+use Illuminate\Http\Request;
 
 
 class PostsController extends Controller
 {
-    protected \App\Service\RepositoryServiceable $postsService;
+    protected RepositoryServiceable $postsService;
 
-    public function __construct()
+    //TODO: Add Tags to posts page
+
+    public function __construct(RepositoryServiceable $postsService)
     {
         $this->middleware('auth')->only(['create','update']);
-        $this->postsService = new \App\Service\PostsService();
+        $this->middleware('bind.model.from.cache:post')->only(['show', 'edit', 'update', 'destroy']);
+        $this->postsService = $postsService;
     }
 
     public function index()
     {
         $currentPage = request()->get('page',1);
-        $posts = $this->postsService->publicIndex(request()->user(), ['page' => $currentPage]);
+        $posts = $this->postsService->publicIndex(cachedUser(), ['page' => $currentPage]);
         return view('posts.index', compact( 'posts'));
     }
 
-    public function show($slug)
+    public function show(Request $request)
     {
-        $post = $this->postsService->find($slug, cachedUser(\request())->model);
+       $post = $request->attributes->get('post');
         return view('posts.show', compact('post'));
     }
 
@@ -40,31 +45,32 @@ class PostsController extends Controller
         return redirect()->route('posts.index');
     }
 
-    public function edit($slug)
+    public function edit(Request $request)
     {
-        $post = $this->postsService->find($slug, cachedUser(\request())->model);
+        $post = $request->attributes->get('post');
         $this->authorize('update', $post->model);
 
         $isAdmin = false;
+
         return view('posts.edit', compact('post', 'isAdmin'));
     }
 
     public function update(PostStoreAndUpdateRequest $request, $slug)
     {
-        $post = $this->postsService->find($slug, cachedUser(\request())->model);
+        $post = $request->attributes->get('post');
         $this->authorize('update', $post->model);
-        $this->postsService->update($request, $slug);
+
+        $this->postsService->update($request, $slug, cachedUser());
 
         return redirect()->route('posts.index');
     }
 
-    public function destroy($slug)
+    public function destroy(Request $request)
     {
-        $user = cachedUser(\request())->model;
-        $post = $this->postsService->find($slug, $user);
+        $post = $request->attributes->get('post');
         $this->authorize('update', $post->model);
 
-        $this->postsService->destroy($slug, $user);
+        $this->postsService->destroy($post->slug, cachedUser());
 
         return redirect()->route('posts.index');
     }

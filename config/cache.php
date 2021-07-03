@@ -13,6 +13,7 @@ use App\Http\Controllers\PostsController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TaskStepsController;
+use App\Http\Middleware\BindModelFromCache;
 use App\News;
 use App\Post;
 use App\PostHistory;
@@ -219,92 +220,34 @@ return [
         'allPrefix' => 'all',
         'personalKeyPrefix' => 'user',
         'ttl' => 300,
-        //TODO: remove, when removed CacheEvents
-        'nameOfAllCacheKeysKey' => 'all_cache_keys',
     ],
-    'cache_repositories' => [
-        EloquentRepositoryInterface::class => [
+    'model_services' => [
+        \App\Service\RepositoryServiceable::class => [
             [
-                'controllers' => [PostsController::class, AdminPostsController::class],
-                'repository_closure' => function () {
-                    return PostEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [NewsController::class, AdminNewsController::class],
-                'repository_closure' => function () {
-                    return NewsEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [FeedbacksController::class],
-                'repository_closure' => function () {
-                    return FeedbackEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [TasksController::class],
-                'repository_closure' => function () {
-                    return TaskEloquentRepository::getInstance();
-                }
-            ],
-        ],
-        StepableInterface::class => [
-            [
-                'controllers' => [TasksController::class, TaskStepsController::class, CompletedStepsController::class],
-                'repository_closure' => function () {
-                    return TaskEloquentRepository::getInstance();
-                }
-            ],
-        ],
-        TaggableInterface::class => [
-            [
-                'controllers' => [FeedbacksController::class],
-                'repository_closure' => function () {
-                    return FeedbackEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [NewsController::class, AdminNewsController::class],
-                'repository_closure' => function () {
-                    return NewsEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [PostsController::class, AdminPostsController::class],
-                'repository_closure' => function () {
-                    return PostEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [TasksController::class],
-                'repository_closure' => function () {
-                    return TaskEloquentRepository::getInstance();
+                'controllers' => [PostsController::class, AdminPostsController::class, BindModelFromCache::class],
+                'service_closure' => function () {
+                    return new \App\Service\PostsService();
                 }
             ]
-        ],
-        CommentableInterface::class => [
-            [
-                'controllers' => [PostCommentsController::class],
-                'repository_closure' => function () {
-                    return PostEloquentRepository::getInstance();
-                }
-            ],
-            [
-                'controllers' => [NewsCommentsController::class],
-                'repository_closure' => function () {
-                    return NewsEloquentRepository::getInstance();
-                }
-            ],
-        ],
-        SimpleRepositoryInterface::class =>[
-            [
-                'controllers' => [StatisticsController::class],
-                'repository_closure' => function () {
-                    return StatisticsRepository::getInstance();
-                }
-            ]
-        ],
+//            [
+//                'controllers' => [NewsController::class, AdminNewsController::class],
+//                'repository_closure' => function () {
+//                    return NewsEloquentRepository::getInstance();
+//                }
+//            ],
+//            [
+//                'controllers' => [FeedbacksController::class],
+//                'repository_closure' => function () {
+//                    return FeedbackEloquentRepository::getInstance();
+//                }
+//            ],
+//            [
+//                'controllers' => [TasksController::class],
+//                'repository_closure' => function () {
+//                    return TaskEloquentRepository::getInstance();
+//                }
+//            ],
+        ]
     ]
 ];
 

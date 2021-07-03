@@ -4,8 +4,16 @@
 namespace App;
 
 
+use App\Service\TagsInterface;
+
 trait SynchronizeTags
 {
+
+    protected function getTagService() : TagsInterface
+    {
+        return new \App\Service\TagService();
+    }
+
     public function syncTags($requestTags)
     {
         if (is_null($requestTags)) return;
@@ -21,8 +29,7 @@ trait SynchronizeTags
             $tagsToAttach = $tags;
         }
 
-        $taggableRepository = (new \App\Service\RepositoryService())->getTaggableRepository();
-        $taggableRepository->attachTags($tagsToAttach, $this, $syncIds, auth()->user());
+        $this->getTagService()->attachTags($tagsToAttach, $this, $syncIds, cachedUser());
 
     }
 

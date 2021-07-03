@@ -7,15 +7,11 @@ namespace App\Repositories;
 use App\Service\EloquentCacheService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
-use PhpParser\Node\Expr\AssignOp\Mod;
 
 abstract  class EloquentRepository implements EloquentRepositoryInterface
 {
-    //TODO: Remove $this->modelClass(pass it from Service when needed)
-
     protected string $modelClass;
 
     /**
@@ -131,12 +127,10 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
            $model = ($this->modelClass)::updateOrCreate($attributes);
         }
 
-
-
         //TODO: Return tags sync
-//        if ($this->getModel() instanceof \App\Taggable) {
-//            $this->model->syncTags($tags);
-//        }
+        if ($model instanceof \App\Taggable) {
+            $model->syncTags($tags);
+        }
 
         return $model;
     }

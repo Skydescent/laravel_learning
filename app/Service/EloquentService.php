@@ -36,7 +36,6 @@ abstract class EloquentService implements RepositoryServiceable
 
     public function find(string $identifier, Authenticatable|null $user = null)
     {
-        Log::info('EloquentService@find: ' . $identifier . ' user: ' . $user);
         $identifier = $this->getModelIdentifier($identifier);
         $getModel = function () use ($identifier) {
             return ($this->modelClass)::firstWhere($identifier);

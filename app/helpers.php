@@ -21,8 +21,6 @@ if (!function_exists('push_all')) {
      */
     function push_all($title = null, $text = null)
     {
-        //Если заголовок или текст = null,
-        // просто возвращаем объект Pushall
         if (is_null($title) || is_null($text)) {
             return app(\App\Service\Pushall::class);
         }
@@ -37,8 +35,12 @@ if (!function_exists('cachedUser')) {
      * @param $request
      *
      */
-    function cachedUser($request)
+    function cachedUser()
     {
+        $request = \request();
+
+        if (!$request->hasSession()) return new \App\User;
+
         $sessionKeys = $request->session()->all();
         $userId = null;
         foreach ($sessionKeys as $key => $value) {
@@ -47,8 +49,10 @@ if (!function_exists('cachedUser')) {
             }
         }
         $userService = new \App\Service\UsersService();
-        Log::info('cachedUser: ' . $userId);
-        return $userService->find($userId);
+
+        if (!$userId) return new \App\User();
+
+        return $userService->find($userId)->model;
     }
 }
 

@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 
 interface RepositoryServiceable
 {
+    public function find(string $identifier);
+
     public function store(FormRequest|Request $request);
 
     public function update(FormRequest|Request $request,string $identifier, Authenticatable|User|null $user = null);
