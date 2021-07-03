@@ -3,50 +3,50 @@
 
 namespace App\Service;
 
+use App\Repositories\TagEloquentRepository;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class TagService implements TagsInterface
+class TagService extends EloquentService implements TagsInterface
 {
 
     private array $dependsOnModels = [];
 
-    private static string $modelClass = \App\Tag::class;
-
-    private EloquentCacheService $cacheService;
-
     public function __construct()
     {
+        parent::__construct();
         $this->dependsOnModels = config('tags.public_visible_related_models');
-        $this->cacheService = \App\Service\EloquentCacheService::getInstance(static::$modelClass);
     }
 
     public function tagsCloud()
     {
         $getTagsCloud = function () {
             $filter = $this->getFilterCallback();
-            return (static::$modelClass)::tagsCloud($filter);
+            return ($this->modelClass)::tagsCloud($filter);
         };
 
-        $tags = $this->getDependsOnModelsTags();
-        $tags[] = $this->cacheService->getTagName() . '_collection';
-
-        return $this->cacheService->cache($getTagsCloud, auth()->user(), [], $tags);
+        return $this->repository->index($getTagsCloud, null, cachedUser(), $this->dependsOnModels);
     }
 
-    public function attachTags($tagsToAttach, $morphedModel, $syncIds, Authenticatable|User|null $user = null)
+    public function attachTags($tagsToAttach, $morphedModel, $syncIds, ?User $user = null)
     {
-        $this->cacheService->flushCollections();
-
+        $tagsToCreate = [];
         foreach ($tagsToAttach as $tag) {
             $identifier = ['name' => $tag];
-            $tag = \App\Tag::firstWhere($identifier);
-
+            $tag = $this->find($identifier);
             if (!$tag) {
-                $tag = \App\Tag::create($identifier);
+                $tagsToCreate[] = $identifier;
+            } else {
+                $syncIds[] = $tag->id;
             }
-            $syncIds[] = $tag->id;
         }
+        $syncIds = array_merge(
+            $syncIds,
+            $this
+                ->repository
+                ->createMany($tagsToCreate)
+                ->pluck('id')->all()
+        );
 
         $morphedModel->tags()->sync($syncIds);
     }
@@ -71,15 +71,19 @@ class TagService implements TagsInterface
         return $query;
     }
 
-    protected function getDependsOnModelsTags() : array
+    /**
+     * @return void
+     */
+    protected function setModelClass() : void
     {
-        $tags = [];
-        $map = $this->cacheService->getCurrentCacheServiceConfigMap();
-        foreach ($map as $model => $modelOptions) {
-            if(in_array($model, array_keys($this->dependsOnModels))) {
-                $tags[] = $modelOptions['tag'] . '_collection';
-            }
-        }
-        return $tags;
+        $this->modelClass = \App\Tag::class;
+    }
+
+    /**
+     * @return void
+     */
+    protected function setRepository() : void
+    {
+        $this->repository = TagEloquentRepository::getInstance($this->modelClass);
     }
 }

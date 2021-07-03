@@ -56,16 +56,26 @@ class PostsService extends EloquentService
         return $this;
     }
 
-    public function publicIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed
+    public function publicIndex(User $user, array $postfixes = []) : mixed
     {
-        $getIndex = function () {
+        $getIndex = function () use ($user) {
             return ($this->modelClass)::latest()
                 ->with('tags')
                 ->where('published', 1)
-                ->orWhere('owner_id', '=', cachedUser(\request())->id)
+                ->orWhere('owner_id', '=', $user->id)
                 ->simplePaginate(10);
         };
 
         return $this->repository->index($getIndex, $this->getModelKeyName(), $user,$postfixes);
     }
+
+    public function adminIndex(User $user, array $postfixes = [])
+    {
+        $getIndex = function () {
+            return ($this->modelClass)::latest()->with('owner')->paginate(20);
+        };
+
+        return $this->repository->index($getIndex, $this->getModelKeyName(), $user, $postfixes);
+    }
+
 }

@@ -6,40 +6,42 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
 use App\Repositories\EloquentRepositoryInterface;
+use App\Service\RepositoryServiceable;
+use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
-    protected EloquentRepositoryInterface $modelRepositoryInterface;
+    protected RepositoryServiceable $postsService;
 
-    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
+    public function __construct(RepositoryServiceable $postsService)
     {
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this->middleware('bind.model.from.cache:post');
+        $this->postsService = $postsService;
     }
 
     public function index()
     {
         $currentPage = request()->get('page',1);
-        $posts = $this->modelRepositoryInterface->adminIndex(auth()->user(), ['page' => $currentPage] );
+        $posts = $this->postsService->adminIndex(cachedUser(), ['page' => $currentPage] );
         return view('admin.posts.index', compact( 'posts'));
     }
 
-    public function update(PostStoreAndUpdateRequest $request, Post $post)
+    public function update(PostStoreAndUpdateRequest $request, $slug)
     {
-        $this->modelRepositoryInterface->update($request, $post);
+        $this->postsService->update($request, $slug, cachedUser());
         return redirect()->route('admin.posts.index');
     }
 
-    public function edit(Post $post)
+    public function edit(Request $request)
     {
-        $post = $this->modelRepositoryInterface->find($post);
+        $post = $request->attributes->get('post');
         $isAdmin = true;
         return view('posts.edit', compact('post', 'isAdmin'));
     }
 
-    public function destroy(Post $post)
+    public function destroy($slug)
     {
-        $this->modelRepositoryInterface->destroy($post, auth()->user());
-        flash('Статья удалена', 'warning');
+        $this->postsService->destroy($slug, cachedUser());
         return redirect()->route('admin.posts.index');
     }
 }

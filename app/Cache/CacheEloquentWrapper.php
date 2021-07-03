@@ -4,6 +4,7 @@
 namespace App\Cache;
 
 use App\Service\EloquentCacheService;
+use App\User;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -14,6 +15,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
 
 class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Jsonable, JsonSerializable
@@ -21,16 +23,19 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
 
     protected array $identifier;
 
+    protected ?User $user;
+
     private Model $model;
 
     protected  EloquentCacheService $cacheService;
 
-    public static function wrapModel($model, array $identifier, EloquentCacheService $cacheService)
+    public static function wrapModel($model, array $identifier, EloquentCacheService $cacheService, ?User $user): ?static
     {
         if (is_null($model)) return null;
 
         $instance = new static();
         $instance->model = $model;
+        $instance->user = $user;
         $instance->identifier = $identifier;
         $instance->cacheService = $cacheService;
 
@@ -40,13 +45,14 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
     public static function wrapCollection(
         Collection|EloquentCollection $collection,
         EloquentCacheService          $cacheService,
-        string                        $keyName
+        string                        $keyName,
+        ?User                         $user
     ): EloquentCollection|Collection
     {
         if($collection->first()) {
             return $collection
-                ->map(function ($model) use ($cacheService, $keyName) {
-                    return static::wrapModel($model, [$keyName => $model->$keyName], $cacheService);
+                ->map(function ($model) use ($cacheService, $keyName, $user) {
+                    return static::wrapModel($model, [$keyName => $model->$keyName], $cacheService, $user);
                 });
         }
        return collect();
@@ -55,10 +61,11 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
     public static function wrapPaginator(
         Paginator|LengthAwarePaginator $paginator,
         EloquentCacheService           $cacheService,
-        string                         $keyName
-    )
+        string                         $keyName,
+        ?User                          $user
+    ): Paginator|LengthAwarePaginator
     {
-        $modelsCollection = static::wrapCollection($paginator->getCollection(), $cacheService, $keyName);
+        $modelsCollection = static::wrapCollection($paginator->getCollection(), $cacheService, $keyName, $user);
         return $paginator->setCollection($modelsCollection);
     }
 
@@ -70,7 +77,7 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
                 return $this->model->$name;
             };
 
-            return $this->cacheService->cache($getRelation, cachedUser(), array_merge($this->identifier, ['relation' => $name]));
+            return $this->cacheService->cache($getRelation, $this->user, array_merge($this->identifier, ['relation' => $name]));
         }
 
         if($name === 'model') {

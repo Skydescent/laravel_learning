@@ -224,6 +224,7 @@ return [
     'model_services' => [
         \App\Service\RepositoryServiceable::class => [
             [
+                //TODO: BindModelFromCache - нужно чтобы получала тот сервис, который работает в настоящем контроллере
                 'controllers' => [PostsController::class, AdminPostsController::class, BindModelFromCache::class],
                 'service_closure' => function () {
                     return new \App\Service\PostsService();
@@ -247,6 +248,14 @@ return [
 //                    return TaskEloquentRepository::getInstance();
 //                }
 //            ],
+        ],
+        \App\Service\TagsInterface::class => [
+            [
+                'controllers' => [\App\Http\Controllers\TagsController::class],
+                'service_closure' => function () {
+                    return new \App\Service\TagService();
+                }
+            ]
         ]
     ]
 ];

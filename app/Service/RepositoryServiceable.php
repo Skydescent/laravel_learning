@@ -12,11 +12,11 @@ use Illuminate\Http\Request;
 
 interface RepositoryServiceable
 {
-    public function find(string $identifier);
+    public function find(string|array $identifier);
 
     public function store(FormRequest|Request $request);
 
-    public function update(FormRequest|Request $request,string $identifier, Authenticatable|User|null $user = null);
+    public function update(FormRequest|Request $request,string $identifier, ?User $user = null);
 
-    public function destroy(string $identifier, Authenticatable|User|null $user = null);
+    public function destroy(string $identifier, ?User $user = null);
 }

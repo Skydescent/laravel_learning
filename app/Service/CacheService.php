@@ -33,7 +33,6 @@ abstract class CacheService
 
     protected function initialize()
     {
-
         //TODO: Remove simple_services config from EloquentCacheServices
         $allConfigs = config(self::CACHE_SERVICE_CONFIG_KEY);
         $this->configs = array_diff_key($allConfigs, [static::$configsMap => '']);
@@ -68,12 +67,19 @@ abstract class CacheService
         $key = $this->getKeyName($user, $postfixes);
 
         Log::info('CacheService@cache: \Cache::tags(' . implode(',',$tags) . ')->remember(' . $key . ')');
-        return \Cache::tags($tags)
-            ->remember(
-                $key,
-                $this->configs['ttl'],
-                $queryData
-            );
+
+        $data = \Cache::get($key);
+
+        if (! is_null($data)) {
+            return $data;
+        }
+
+        if ($data = $queryData()) {
+            \Cache::tags($tags)->put($key, $data, $this->configs['ttl']);
+            return $data;
+        }
+
+        return null;
     }
 
     public function getTagName()

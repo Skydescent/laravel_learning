@@ -9,6 +9,7 @@ use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 abstract  class EloquentRepository implements EloquentRepositoryInterface
 {
@@ -62,7 +63,7 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
         return static::$instances[$modelClass];
     }
 
-    public function index(callable $getIndex, string $modelKeyName, Authenticatable|User|null $user = null, array $postfixes = [])
+    public function index(callable $getIndex, string|null $modelKeyName = null, ?User $user = null, array $postfixes = [])
     {
         return $this->cacheService->cacheIndex($getIndex,$user,$postfixes, $modelKeyName);
     }
@@ -72,7 +73,7 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
      * @param Authenticatable|User|null $user
      * @return mixed
      */
-    public function find(callable $getModel, array $identifier, Authenticatable|User|null $user = null): mixed
+    public function find(callable $getModel, array $identifier, ?User $user = null): mixed
     {
         return  $this->cacheService->cacheModel($getModel, $identifier, $user);
     }
@@ -88,12 +89,23 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
         return $model;
     }
 
+    public function createMany ($records) : Collection
+    {
+        $models = [];
+        foreach($records as $record) {
+            $models[] = ($this->modelClass)::create($record);
+        }
+        $this->cacheService->flushCollections();
+
+       return collect($models);
+    }
+
     /**
      * @param $request
      * @param array $identifier
      * @param Authenticatable|User|null $user
      */
-    public function update(FormRequest|Request $request, array $identifier, Authenticatable|User|null $user = null)
+    public function update(FormRequest|Request $request, array $identifier, ?User $user = null)
     {
         $model = $this->storeOrUpdate($request, $identifier);
         $this->cacheService->flushModelCache($identifier, $user);
@@ -105,7 +117,7 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
      * @param $model
      * @param Authenticatable|User|null $user
      */
-    public function destroy(array $identifier, Authenticatable|User|null $user = null)
+    public function destroy(array $identifier, ?User $user = null)
     {
         $model = ($this->modelClass)::firstWhere($identifier);
         $model->delete();
@@ -127,7 +139,6 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
            $model = ($this->modelClass)::updateOrCreate($attributes);
         }
 
-        //TODO: Return tags sync
         if ($model instanceof \App\Taggable) {
             $model->syncTags($tags);
         }

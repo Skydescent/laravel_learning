@@ -37,7 +37,7 @@ class FeedbackEloquentRepository extends EloquentRepository implements TaggableI
         $this->modelService = new FeedbacksService();
     }
 
-    public function adminIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed
+    public function adminIndex(?User $user = null, array $postfixes = []) : mixed
     {
         $collection = (self::$model)::latest()->get();
         return $this->cacheService->cacheCollection($collection, $user, $postfixes);

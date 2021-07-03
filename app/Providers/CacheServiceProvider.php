@@ -31,9 +31,9 @@ class CacheServiceProvider extends ServiceProvider
 
     protected function whenControllersNeedsGiveModelService()
     {
-        $repoLists = config('cache.model_services');
+        $modelsServices = config('cache.model_services');
 
-        foreach ($repoLists as $interface => $reposForControllers) {
+        foreach ($modelsServices as $interface => $reposForControllers) {
             foreach ($reposForControllers as $item) {
                 $this->app->when($item['controllers'])
                     ->needs($interface)

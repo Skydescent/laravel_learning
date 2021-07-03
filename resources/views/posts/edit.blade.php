@@ -20,7 +20,7 @@
 
         @include('layout.errors')
 
-        <form method="post" action="{{ route($methodPrefix . 'posts.update', ['post' => $post]) }}">
+        <form method="post" action="{{ route($methodPrefix . 'posts.update', ['post' => $post->model]) }}">
 
             @csrf
             @method('PATCH')

@@ -11,8 +11,6 @@ class PostsController extends Controller
 {
     protected RepositoryServiceable $postsService;
 
-    //TODO: Add Tags to posts page
-
     public function __construct(RepositoryServiceable $postsService)
     {
         $this->middleware('auth')->only(['create','update']);

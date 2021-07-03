@@ -5,9 +5,6 @@ namespace App\Repositories;
 
 class PostEloquentRepository extends  EloquentRepository //implements TagsInterface, CommentableInterface
 {
-    //TODO: how use traits?
-    //use HasTags, HasComments;
-
     /**
      * @param null $request
      * @return array

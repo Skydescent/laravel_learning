@@ -30,10 +30,14 @@ class EloquentCacheService extends CacheService
     {
         $cache = $this->cache($getModel, $user, $identifier);
 
-        return CacheEloquentWrapper::wrapModel($cache,$identifier, $this);
+        if(!$cache) {
+            return null;
+        }
+
+        return CacheEloquentWrapper::wrapModel($cache,$identifier, $this, $user);
     }
 
-    public function cacheIndex(callable $getIndex, $user, $postfixies, $modelKeyName, $tags = [])
+    public function cacheIndex(callable $getIndex, User $user, $postfixies, $modelKeyName, $tags = [])
     {
         $tags = count($tags)!== 0 ? [$this->getTagName() . '_collection', $tags] : [$this->getTagName() . '_collection'];
         $cache = $this->cache($getIndex, $user, $postfixies, $tags);
@@ -43,11 +47,11 @@ class EloquentCacheService extends CacheService
         $collectionInterfaces = [Enumerable::class];
 
         if(count(array_intersect($paginatorInterfaces, $indexInterfaces)) !== 0) {
-            return CacheEloquentWrapper::wrapPaginator($cache,$this,$modelKeyName);
+            return CacheEloquentWrapper::wrapPaginator($cache,$this,$modelKeyName, $user);
         }
 
         if (count(array_intersect($collectionInterfaces, $indexInterfaces)) !== 0) {
-            return CacheEloquentWrapper::wrapCollection($cache,$this,$modelKeyName);
+            return CacheEloquentWrapper::wrapCollection($cache,$this,$modelKeyName, $user);
         }
     }
 
@@ -69,14 +73,14 @@ class EloquentCacheService extends CacheService
         return $prefix . $this->getTagName() . $postfix;
     }
 
-    public function flushModelCache(array $identifier, User|null $user = null)
+    public function flushModelCache(array $identifier, ?User $user = null)
     {
         $this->forgetModel($identifier, $user);
         $this->forgetModelRelations($identifier, $user);
         $this->flushCollections();
     }
 
-    public function forgetModel(array $identifier, User|null $user = null)
+    public function forgetModel(array $identifier, ?User $user = null)
     {
         $keyName = $this->getKeyName($user, $identifier);
         $tag = $this->getTagName();
@@ -84,7 +88,7 @@ class EloquentCacheService extends CacheService
         \Cache::tags([$tag])->forget($keyName);
     }
 
-    public function forgetModelRelations(array $identifier = null, User|null $user = null)
+    public function forgetModelRelations(array $identifier = null, ?User $user = null)
     {
         foreach ($this->getRelationsNames() as $relationName) {
             $this->forgetModelRelation(
@@ -96,9 +100,9 @@ class EloquentCacheService extends CacheService
     }
 
     public function forgetMorphedModelRelation(
-        UrlRoutable               $model,
-        array                     $relationName,
-        Authenticatable|User|null $user = null
+        UrlRoutable $model,
+        array       $relationName,
+        ?User       $user = null
     )
     {
         $morphedCacheService = static::getInstance(get_class($model));
@@ -107,10 +111,10 @@ class EloquentCacheService extends CacheService
     }
 
     public function forgetModelRelation(
-        array                     $identifier,
-        array                     $relationName,
-        Authenticatable|User|null $user = null,
-        array                     $tags = []
+        array $identifier,
+        array $relationName,
+        ?User $user = null,
+        array $tags = []
     )
     {
         $postfixes = array_merge( $identifier, $relationName);

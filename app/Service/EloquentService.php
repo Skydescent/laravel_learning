@@ -34,9 +34,9 @@ abstract class EloquentService implements RepositoryServiceable
     }
 
 
-    public function find(string $identifier, Authenticatable|null $user = null)
+    public function find(string|array $identifier, ?User $user = null)
     {
-        $identifier = $this->getModelIdentifier($identifier);
+        $identifier = gettype($identifier) == 'array' ? $identifier : $this->getModelIdentifier($identifier);
         $getModel = function () use ($identifier) {
             return ($this->modelClass)::firstWhere($identifier);
         };
@@ -50,13 +50,13 @@ abstract class EloquentService implements RepositoryServiceable
         $this->callMethodsAfterEvent('store');
     }
 
-    public function  update(FormRequest|Request $request,string $identifier, Authenticatable|User|null $user = null)
+    public function  update(FormRequest|Request $request,string $identifier, ?User $user = null)
     {
         $this->currentModel = $this->repository->update($request, $this->getModelIdentifier($identifier), $user);
         $this->callMethodsAfterEvent('update');
     }
 
-    public function destroy(string $identifier, Authenticatable|User|null $user = null)
+    public function destroy(string $identifier, ?User $user = null)
     {
         $this->currentModel = $this->repository->destroy($this->getModelIdentifier($identifier), $user);
         $this->callMethodsAfterEvent('destroy');
