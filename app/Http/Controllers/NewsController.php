@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\News;
-use App\Repositories\EloquentRepositoryInterface;
+use App\Service\RepositoryServiceable;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
 
-    protected EloquentRepositoryInterface $modelRepositoryInterface;
+    /**
+     * @var RepositoryServiceable
+     */
+    protected RepositoryServiceable $newsService;
 
-    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
+    /**
+     * @param RepositoryServiceable $newsService
+     */
+    public function __construct(RepositoryServiceable $newsService)
     {
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this
+            ->middleware('model.from.cache:' . get_class($newsService) . ',news')
+            ->only(['show']);
+        $this->newsService = $newsService;
     }
 
     /**
@@ -24,17 +33,18 @@ class NewsController extends Controller
     public function index(): View|Factory|Application
     {
         $currentPage = request()->get('page',1);
-        $news = $this->modelRepositoryInterface->publicIndex(auth()->user(), ['page' => $currentPage]);
+        $news = $this->newsService->publicIndex(cachedUser(), ['page' => $currentPage]);
         return view('news.index', compact( 'news'));
     }
 
+
     /**
-     * @param News $news
+     * @param Request $request
      * @return Application|Factory|View
      */
-    public function show(News $news): View|Factory|Application
+    public function show(Request $request): View|Factory|Application
     {
-        $news = $this->modelRepositoryInterface->find($news, auth()->user());
+        $news = $request->attributes->get('news');
         return view('news.show', compact('news'));
     }
 }

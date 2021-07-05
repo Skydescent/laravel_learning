@@ -9,43 +9,19 @@ use App\Service\NewsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class NewsEloquentRepository extends EloquentRepository implements TaggableInterface, CommentableInterface
+class NewsEloquentRepository extends EloquentRepository //implements TaggableInterface, CommentableInterface
 {
-    use HasTags, HasComments;
+    //use HasTags, HasComments;
 
     /**
-     *
+     * @param null $request
+     * @return array
      */
-    protected static function setModel()
+    protected function prepareAttributes($request = null): array
     {
-        static::$model = News::class;
-    }
+        $attributes = $request->validated();
+        $attributes['published'] = $attributes['published'] ?? 0;
 
-    /**
-     *
-     */
-    protected function setCacheService()
-    {
-        $this->cacheService = EloquentCacheService::getInstance(static::$model);
-    }
-
-    /**
-     *
-     */
-    protected function setModelService()
-    {
-        $this->modelService = new NewsService();
-    }
-
-    public function publicIndex(Authenticatable|User|null $user = null, array $postfixes = []) : mixed
-    {
-        $paginator = (self::$model)::latest()->where('published', 1)->simplePaginate(10);
-        return $this->cacheService->cachePaginator($paginator, $user, $postfixes);
-    }
-
-    public function adminIndex(Authenticatable|User|null $user, array $postfixes = [])
-    {
-        $paginator = (self::$model)::latest()->paginate(20);
-        return $this->cacheService->cachePaginator($paginator, $user, $postfixes);
+        return $attributes;
     }
 }

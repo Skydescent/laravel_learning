@@ -1,5 +1,8 @@
 <?php
 
+use App\Service\UsersService;
+use App\User;
+
 if (!function_exists('flash')) {
     /**
      * @param $message
@@ -35,11 +38,11 @@ if (!function_exists('cachedUser')) {
      * @param $request
      *
      */
-    function cachedUser()
+    function cachedUser(): User
     {
         $request = \request();
 
-        if (!$request->hasSession()) return new \App\User;
+        if (!$request->hasSession()) return new User();
 
         $sessionKeys = $request->session()->all();
         $userId = null;
@@ -48,9 +51,9 @@ if (!function_exists('cachedUser')) {
                 $userId = $value;
             }
         }
-        $userService = new \App\Service\UsersService();
+        $userService = new UsersService();
 
-        if (!$userId) return new \App\User();
+        if (!$userId) return new User();
 
         return $userService->find($userId)->model;
     }

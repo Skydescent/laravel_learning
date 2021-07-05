@@ -10,10 +10,9 @@ class BindModelFromCache
 {
     private RepositoryServiceable $modelService;
 
-
-    public function __construct(RepositoryServiceable $modelService)
+    public function initialize(string $modelClass)
     {
-        $this->modelService = $modelService;
+        $this->modelService = new $modelClass();
     }
 
     /**
@@ -24,11 +23,14 @@ class BindModelFromCache
      * @param $model
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $model): mixed
+    public function handle(Request $request, Closure $next, $serviceClass, $requestFieldName): mixed
     {
-        if ($identifier = $request->$model) {
-            $modelInstance = $this->modelService->find($identifier, cachedUser())?:$model;
-            $request->attributes->set($model, $modelInstance);
+        $this->modelService =  new $serviceClass();
+
+        if ($identifier = $request->$requestFieldName) {
+
+            $modelInstance = $this->modelService->find($identifier, cachedUser())?:$requestFieldName;
+            $request->attributes->set($requestFieldName, $modelInstance);
         }
 
         return $next($request);

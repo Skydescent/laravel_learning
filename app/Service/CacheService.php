@@ -68,7 +68,7 @@ abstract class CacheService
 
         Log::info('CacheService@cache: \Cache::tags(' . implode(',',$tags) . ')->remember(' . $key . ')');
 
-        $data = \Cache::get($key);
+        $data = \Cache::tags($tags)->get($key);
 
         if (! is_null($data)) {
             return $data;

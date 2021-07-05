@@ -6,17 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\NewsStoreAndUpdateRequest;
 use App\News;
 use App\Repositories\EloquentRepositoryInterface;
+use App\Service\RepositoryServiceable;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class NewsController extends Controller
 {
-    protected EloquentRepositoryInterface $modelRepositoryInterface;
+    /**
+     * @var RepositoryServiceable
+     */
+    protected RepositoryServiceable $newsService;
 
-    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
+    /**
+     * @param RepositoryServiceable $newsService
+     */
+    public function __construct(RepositoryServiceable $newsService)
     {
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this
+            ->middleware('model.from.cache:' . get_class($newsService) . ',news')
+            ->only(['edit', 'update', 'destroy']);
+        $this->newsService = $newsService;
     }
 
     /**
@@ -24,10 +35,10 @@ class NewsController extends Controller
      *
      * @return View
      */
-    public function index()
+    public function index(): View
     {
         $currentPage = request()->get('page',1);
-        $news = $this->modelRepositoryInterface->adminIndex(auth()->user(), ['page' => $currentPage]);
+        $news = $this->newsService->adminIndex(cachedUser(), ['page' => $currentPage]);
 
         return view('admin.news.index', compact( 'news'));
     }
@@ -37,7 +48,7 @@ class NewsController extends Controller
      *
      * @return View
      */
-    public function create()
+    public function create(): View
     {
         $news = new News();
         return view('admin.news.create', compact('news'));
@@ -52,19 +63,19 @@ class NewsController extends Controller
      */
     public function store(NewsStoreAndUpdateRequest $request) : RedirectResponse
     {
-        $this->modelRepositoryInterface->store($request);
+        $this->newsService->store($request);
         return redirect()->route('admin.news.index');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  News  $news
+     * @param  Request $request
      * @return View
      */
-    public function edit(News $news) : View
+    public function edit(Request $request) : View
     {
-        $news = $this->modelRepositoryInterface->find($news, auth()->user());
+        $news = $request->attributes->get('news');
         return view('admin.news.edit', compact('news'));
     }
 
@@ -72,26 +83,30 @@ class NewsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  NewsStoreAndUpdateRequest  $request
-     * @param  News $news
+     * @param  string $slug
      * @return RedirectResponse
      * @throws Exception
      */
-    public function update(NewsStoreAndUpdateRequest $request, News $news)
+    public function update(NewsStoreAndUpdateRequest $request, string $slug): RedirectResponse
     {
-        $this->modelRepositoryInterface->update($request, $news, auth()->user());
+        $this->newsService->update($request, $slug, cachedUser());
         return redirect()->route('admin.news.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param News $news
+     * @param Request $request
      * @return RedirectResponse
      * @throws Exception
      */
-    public function destroy(News $news)
+    public function destroy(Request $request): RedirectResponse
     {
-        $this->modelRepositoryInterface->destroy($news, auth()->user());
+        $this->newsService->destroy(
+            $request
+                ->attributes
+                ->get('news')->slug,
+            auth()->user());
         return redirect()->route('admin.news.index');
     }
 }

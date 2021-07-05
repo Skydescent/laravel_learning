@@ -4,8 +4,6 @@ namespace App\Service;
 
 use App\Repositories\EloquentRepositoryInterface;
 use App\User;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;

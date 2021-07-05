@@ -29,6 +29,7 @@ use App\Repositories\StepableInterface;
 use App\Repositories\TaggableInterface;
 use App\Repositories\StepEloquentRepository;
 use App\Repositories\TaskEloquentRepository;
+use App\Service\RepositoryServiceable;
 use App\Step;
 use App\Tag;
 use App\Task;
@@ -222,20 +223,19 @@ return [
         'ttl' => 300,
     ],
     'model_services' => [
-        \App\Service\RepositoryServiceable::class => [
+        RepositoryServiceable::class => [
             [
-                //TODO: BindModelFromCache - нужно чтобы получала тот сервис, который работает в настоящем контроллере
-                'controllers' => [PostsController::class, AdminPostsController::class, BindModelFromCache::class],
+                'controllers' => [PostsController::class, AdminPostsController::class],
                 'service_closure' => function () {
                     return new \App\Service\PostsService();
                 }
-            ]
-//            [
-//                'controllers' => [NewsController::class, AdminNewsController::class],
-//                'repository_closure' => function () {
-//                    return NewsEloquentRepository::getInstance();
-//                }
-//            ],
+            ],
+            [
+                'controllers' => [NewsController::class, AdminNewsController::class],
+                'service_closure' => function () {
+                    return new \App\Service\NewsService();
+                }
+            ],
 //            [
 //                'controllers' => [FeedbacksController::class],
 //                'repository_closure' => function () {
