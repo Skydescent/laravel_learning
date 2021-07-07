@@ -109,13 +109,13 @@ class EloquentCacheService extends CacheService
 
         $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
 
-        //Log::info('Cache::tags(' . implode(',', $tags) . ')->forget('. $keyName .')');
+        Log::info('Cache::tags(' . implode(',', $tags) . ')->forget('. $keyName .')');
         \Cache::tags($tags)->forget($keyName);
     }
 
     public function flushCollections()
     {
-        //Log::info('Cache::tags(' . $this->getTagName() . '_collection)->flush()');
+        Log::info('Cache::tags(' . $this->getTagName() . '_collection)->flush()');
         \Cache::tags([$this->getTagName() . '_collection'])->flush();
     }
 

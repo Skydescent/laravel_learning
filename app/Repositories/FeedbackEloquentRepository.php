@@ -14,7 +14,7 @@ class FeedbackEloquentRepository extends EloquentRepository //implements Taggabl
     /**
      * @return mixed
      */
-    protected function prepareAttributes($request = null): mixed
+    protected function prepareAttributes($request = null) : array
     {
         return $request->validate([
             'email' => 'required|email',

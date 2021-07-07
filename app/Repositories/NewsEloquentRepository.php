@@ -9,7 +9,7 @@ use App\Service\NewsService;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class NewsEloquentRepository extends EloquentRepository //implements TaggableInterface, CommentableInterface
+class NewsEloquentRepository extends EloquentRepository //implements TaggableInterface, CommentsInterface
 {
     //use HasTags, HasComments;
 

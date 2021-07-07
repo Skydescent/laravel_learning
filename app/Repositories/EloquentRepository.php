@@ -31,7 +31,7 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
         $this->modelClass = $modelClass;
     }
 
-    abstract protected function prepareAttributes();
+    abstract protected function prepareAttributes() : array;
 
     protected function setCacheService($cacheService)
     {

@@ -10,10 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-interface Serviceable
+interface Serviceable extends Indexable
 {
-    public function index();
-
     public function find(string|array $identifier);
 
     public function store(FormRequest|Request $request);

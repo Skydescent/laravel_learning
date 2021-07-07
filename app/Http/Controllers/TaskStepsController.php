@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 
 class TaskStepsController extends Controller
 {
-
-    //TODO: Добавить TaskService, чтобы использовать модель Task
     /**
      * @var StepsInterface
      */

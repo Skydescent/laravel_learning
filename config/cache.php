@@ -11,6 +11,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\TagsController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TaskStepsController;
 use App\Http\Middleware\BindModelFromCache;
@@ -30,11 +31,17 @@ use App\Repositories\TaggableInterface;
 use App\Repositories\StepEloquentRepository;
 use App\Repositories\TaskEloquentRepository;
 use App\Service\AdminServiceable;
+use App\Service\CommentsInterface;
+use App\Service\CommentsService;
 use App\Service\FeedbacksService;
 use App\Service\NewsService;
 use App\Service\PostsService;
 use App\Service\Serviceable;
+use App\Service\StatisticsService;
+use App\Service\StepsInterface;
 use App\Service\StepsService;
+use App\Service\TagService;
+use App\Service\TagsInterface;
 use App\Service\TasksService;
 use App\Step;
 use App\Tag;
@@ -213,7 +220,7 @@ return [
             ],
         ],
         'simple_services' => [
-            StatisticsRepository::class => [
+            StatisticsService::class => [
                 'tag' => 'statistics',
                 'cached_models_collections' => [
                     User::class,
@@ -229,6 +236,14 @@ return [
         'ttl' => 300,
     ],
     'model_services' => [
+        \App\Service\Indexable::class => [
+            [
+                'controllers' => [StatisticsController::class],
+                'service_closure' => function () {
+                    return new StatisticsService();
+                }
+            ],
+        ],
         Serviceable::class => [
             [
                 'controllers' => [TasksController::class, TaskStepsController::class],
@@ -236,12 +251,18 @@ return [
                     return new TasksService();
                 }
             ],
-//            [
-//                'controllers' => [TasksController::class],
-//                'repository_closure' => function () {
-//                    return TaskEloquentRepository::getInstance();
-//                }
-//            ],
+            [
+                'controllers' => [PostCommentsController::class],
+                'service_closure' => function () {
+                    return new PostsService();
+                }
+            ],
+            [
+                'controllers' => [NewsCommentsController::class],
+                'service_closure' => function () {
+                    return new NewsService();
+                }
+            ],
         ],
         AdminServiceable::class => [
             [
@@ -264,19 +285,27 @@ return [
             ],
         ],
 
-        \App\Service\TagsInterface::class => [
+        TagsInterface::class => [
             [
-                'controllers' => [\App\Http\Controllers\TagsController::class],
+                'controllers' => [TagsController::class],
                 'service_closure' => function () {
-                    return new \App\Service\TagService();
+                    return new TagService();
                 }
             ]
         ],
-        \App\Service\StepsInterface::class => [
+        StepsInterface::class => [
             [
                 'controllers' => [CompletedStepsController::class, TaskStepsController::class],
                 'service_closure' => function () {
                     return new StepsService();
+                }
+            ]
+        ],
+        CommentsInterface::class => [
+            [
+                'controllers' => [PostCommentsController::class, NewsCommentsController::class],
+                'service_closure' => function () {
+                    return new CommentsService();
                 }
             ]
         ]

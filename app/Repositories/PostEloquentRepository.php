@@ -3,7 +3,7 @@
 
 namespace App\Repositories;
 
-class PostEloquentRepository extends  EloquentRepository //implements TagsInterface, CommentableInterface
+class PostEloquentRepository extends  EloquentRepository //implements TagsInterface, CommentsInterface
 {
     /**
      * @param null $request

@@ -4,7 +4,7 @@
 namespace App;
 
 
-interface Commentable
+interface Commentable extends \Illuminate\Contracts\Routing\UrlRoutable
 {
     public function comments();
 }

@@ -1,48 +1,18 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Service;
 
 use App\News;
 use App\Post;
-use App\Service\SimpleCacheService;
 use App\User;
 
-class StatisticsRepository implements SimpleRepositoryInterface
+class StatisticsService implements Indexable
 {
     protected SimpleCacheService $simpleCacheService;
 
-    protected static SimpleRepositoryInterface $instance;
-
-    protected function __clone()
+    public function __construct()
     {
-
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function __wakeup()
-    {
-        throw new \Exception("Cannot unserialize a singleton.");
-    }
-
-
-    /**
-     * @return SimpleRepositoryInterface
-     */
-    public static function getInstance(): SimpleRepositoryInterface
-    {
-        if (!isset(self::$instance)) {
-            self::$instance = new static();
-        }
-
-        return self::$instance;
-    }
-
-
-    protected function __construct()
-    {
-        $this->simpleCacheService = \App\Service\SimpleCacheService::getInstance(__CLASS__);
+        $this->simpleCacheService = SimpleCacheService::getInstance(__CLASS__);
     }
 
     public function index()

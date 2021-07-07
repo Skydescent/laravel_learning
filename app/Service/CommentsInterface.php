@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Service;
 
 use App\Commentable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-interface CommentableInterface
+interface CommentsInterface
 {
     public function storeComment(FormRequest|Request $request, Commentable $model = null);
 }
