@@ -231,7 +231,7 @@ return [
     'model_services' => [
         Serviceable::class => [
             [
-                'controllers' => [TasksController::class],
+                'controllers' => [TasksController::class, TaskStepsController::class],
                 'service_closure' => function () {
                     return new TasksService();
                 }
@@ -274,7 +274,7 @@ return [
         ],
         \App\Service\StepsInterface::class => [
             [
-                'controllers' => [CompletedStepsController::class],
+                'controllers' => [CompletedStepsController::class, TaskStepsController::class],
                 'service_closure' => function () {
                     return new StepsService();
                 }

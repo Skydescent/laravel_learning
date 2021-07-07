@@ -11,22 +11,20 @@ class StepsService extends EloquentService implements StepsInterface
 {
     public array $afterEventMethods = [
         'notifyOwnerTaskStepCompleted' => [
-            'update' =>['добавлена статья', 'posts.show'],
+            'update' =>[],
         ]
     ];
 
     public function addStep(FormRequest|Request $request, \App\Stepable $model)
     {
-        //Сохранить модель
-        $model->addStep( $request->validate([
-            'description' => 'required|min:5'
-        ]));
+        $this->repository->store($request, $model, cachedUser());
     }
 
     public function updateStep(Request $request, $identifier, $user, string $morphedModelName)
     {
         $morphedModel = $this->find($identifier, $user)->$morphedModelName->model;
         $this->repository->update($request, $this->getModelIdentifier($identifier), $user, $morphedModel);
+        $this->callMethodsAfterEvent('update', $user);
     }
 
     protected function setModelClass()
@@ -39,8 +37,8 @@ class StepsService extends EloquentService implements StepsInterface
         $this->repository = \App\Repositories\StepEloquentRepository::getInstance($this->modelClass);
     }
 
-    public function notifyOwnerTaskStepCompleted()
+    public function notifyOwnerTaskStepCompleted($owner)
     {
-        $this->currentModel->task->owner->notify(new TaskStepCompleted());
+        $owner->notify(new TaskStepCompleted());
     }
 }

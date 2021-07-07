@@ -87,7 +87,7 @@ abstract class EloquentService implements Serviceable
         }
     }
 
-    protected function callMethodsAfterEvent(string $currentEvent)
+    protected function callMethodsAfterEvent(string $currentEvent, ...$args)
     {
         if (count($this->flashMessages)!== 0 && key_exists($currentEvent, $this->flashMessages)) {
             $this->flashEventMessage($currentEvent);
@@ -96,7 +96,8 @@ abstract class EloquentService implements Serviceable
             foreach ($this->afterEventMethods as $method => $events) {
 
                 $key = array_values(array_intersect(['all', $currentEvent], array_keys($events)))[0];
-                call_user_func_array([$this,$method],$events[$key]);
+                $arguments = array_merge($events[$key], $args);
+                call_user_func_array([$this,$method],$arguments);
             }
         }
     }

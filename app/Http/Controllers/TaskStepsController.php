@@ -3,20 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\StepableInterface;
+use App\Service\Serviceable;
+use App\Service\StepsInterface;
+use App\Service\TasksService;
 use App\Task;
+use Illuminate\Http\Request;
 
 class TaskStepsController extends Controller
 {
-    protected StepableInterface $modelRepositoryInterface;
 
-    public function __construct(StepableInterface $modelRepositoryInterface)
+    //TODO: Добавить TaskService, чтобы использовать модель Task
+    /**
+     * @var StepsInterface
+     */
+    protected StepsInterface $stepsService;
+
+    protected Serviceable $tasksService;
+
+    /**
+     * @param StepsInterface $stepsService
+     * @param Serviceable $tasksService
+     */
+    public function __construct(StepsInterface $stepsService, Serviceable $tasksService)
     {
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this->stepsService = $stepsService;
+        $this->tasksService = $tasksService;
     }
 
-    public function store(Task $task)
+    public function store(Request $request, $id)
     {
-        $this->modelRepositoryInterface->addStep(\request(), $task);
+        $task = $this
+            ->tasksService
+            ->find($id, cachedUser())
+            ->model;
+
+        $this->stepsService->addStep($request, $task);
 
         return back();
     }
