@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostStoreAndUpdateRequest;
 use App\Post;
 use App\Repositories\EloquentRepositoryInterface;
-use App\Service\RepositoryServiceable;
+use App\Service\AdminServiceable;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -16,14 +16,14 @@ use Illuminate\Http\Request;
 class PostsController extends Controller
 {
     /**
-     * @var RepositoryServiceable
+     * @var AdminServiceable
      */
-    protected RepositoryServiceable $postsService;
+    protected AdminServiceable $postsService;
 
     /**
-     * @param RepositoryServiceable $postsService
+     * @param AdminServiceable $postsService
      */
-    public function __construct(RepositoryServiceable $postsService)
+    public function __construct(AdminServiceable $postsService)
     {
         $this->middleware('model.from.cache:' . get_class($postsService) . ',post');
         $this->postsService = $postsService;

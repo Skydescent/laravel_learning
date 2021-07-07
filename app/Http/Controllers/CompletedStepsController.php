@@ -2,29 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\StepableInterface;
-use App\Step;
+use App\Service\StepsInterface;
+use Illuminate\Http\Request;
 
 class CompletedStepsController extends Controller
 {
-    protected StepableInterface $modelRepositoryInterface;
+    /**
+     * @var StepsInterface
+     */
+    protected StepsInterface $stepsService;
 
-    public function __construct(StepableInterface $modelRepositoryInterface)
+    /**
+     * @param StepsInterface $stepsService
+     */
+    public function __construct(StepsInterface $stepsService)
     {
-        $this->middleware('auth');
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this->stepsService = $stepsService;
     }
 
-    public function store(Step $step)
+
+    public function store(Request $request, $id)
     {
-        $this->modelRepositoryInterface->completeStep($step, $step->task);
+        $this->stepsService->updateStep($request, $id, cachedUser(), 'task');
 
         return back();
     }
 
-    public function destroy(Step $step)
+    public function destroy(Request $request, $id)
     {
-        $this->modelRepositoryInterface->incompleteStep($step, $step->task);
-        return back();
+        return $this->store($request, $id);
     }
 }

@@ -18,7 +18,7 @@ class Post extends \App\Model implements Commentable, Taggable
     protected static function booted()
     {
         static::updated(function (\App\Post $post) {
-            broadcast(new \App\Events\PostUpdated($post, cachedUser(\request())));
+            broadcast(new \App\Events\PostUpdated($post, cachedUser()));
         });
         static::created(function (\App\Post $post) {
             event(new \App\Events\PostCreated($post));
@@ -59,7 +59,7 @@ class Post extends \App\Model implements Commentable, Taggable
     {
         return $query
             ->where('published', 1)
-            ->orWhere('owner_id', '=', cachedUser(\request())->id);
+            ->orWhere('owner_id', '=', cachedUser()->id);
     }
 
     /**

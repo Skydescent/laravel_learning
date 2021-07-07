@@ -3,13 +3,14 @@
 namespace App\Service;
 
 use App\Repositories\EloquentRepositoryInterface;
+use App\Repositories\SimpleEloquentRepository;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-abstract class EloquentService implements RepositoryServiceable
+abstract class EloquentService implements Serviceable
 {
     public array $flashMessages = [];
 
@@ -21,16 +22,27 @@ abstract class EloquentService implements RepositoryServiceable
 
     protected EloquentRepositoryInterface $repository;
 
-    protected abstract function setModelClass();
-
-    protected abstract function setRepository();
-
     public function __construct()
     {
         $this->setModelClass();
         $this->setRepository();
     }
 
+    protected abstract function setModelClass();
+
+    protected function setRepository()
+    {
+        $this->repository = SimpleEloquentRepository::getInstance($this->modelClass);
+    }
+
+    public function index()
+    {
+        $getIndex = function () {
+            return ($this->modelClass)::all();
+        };
+
+        return $this->repository->index($getIndex, null, null, []);
+    }
 
     public function find(string|array $identifier, ?User $user = null)
     {
@@ -98,4 +110,10 @@ abstract class EloquentService implements RepositoryServiceable
     {
         return (new($this->modelClass))->getRouteKeyName();
     }
+
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
 }

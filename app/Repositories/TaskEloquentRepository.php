@@ -8,39 +8,16 @@ use App\Task;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class TaskEloquentRepository extends EloquentRepository implements TaggableInterface, StepableInterface
+class TaskEloquentRepository extends EloquentRepository
 {
-    use HasTags, HasSteps;
-
     /**
-     * @inheritDoc
+     * @param $request
+     * @return array
      */
-    protected static function setModel()
+    protected function prepareAttributes($request = null): array
     {
-        static::$model = Task::class;
+        $attributes = $request->validated();
+        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :cachedUser()->id;
+        return $attributes;
     }
-
-    /**
-     * @inheritDoc
-     */
-    protected function setCacheService()
-    {
-        $this->cacheService = EloquentCacheService::getInstance(static::$model);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function setModelService()
-    {
-        $this->modelService = new TasksService();
-    }
-
-    public function publicIndex(User|Authenticatable|null $user = null, array $postfixes = []): mixed
-    {
-        $collection = $user->tasks()->with('tags')->latest()->get();
-
-        return $this->cacheService->cacheCollection($collection, $user, $postfixes);
-    }
-
 }

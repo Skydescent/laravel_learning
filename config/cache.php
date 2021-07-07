@@ -29,7 +29,13 @@ use App\Repositories\StepableInterface;
 use App\Repositories\TaggableInterface;
 use App\Repositories\StepEloquentRepository;
 use App\Repositories\TaskEloquentRepository;
-use App\Service\RepositoryServiceable;
+use App\Service\AdminServiceable;
+use App\Service\FeedbacksService;
+use App\Service\NewsService;
+use App\Service\PostsService;
+use App\Service\Serviceable;
+use App\Service\StepsService;
+use App\Service\TasksService;
 use App\Step;
 use App\Tag;
 use App\Task;
@@ -191,7 +197,7 @@ return [
                 'tag' => 'steps',
                 'isPersonal' => false,
                 'relations' => [
-                    'tasks' => Task::class
+                    'task' => Task::class
                 ]
             ],
             User::class => [
@@ -223,25 +229,13 @@ return [
         'ttl' => 300,
     ],
     'model_services' => [
-        RepositoryServiceable::class => [
+        Serviceable::class => [
             [
-                'controllers' => [PostsController::class, AdminPostsController::class],
+                'controllers' => [TasksController::class],
                 'service_closure' => function () {
-                    return new \App\Service\PostsService();
+                    return new TasksService();
                 }
             ],
-            [
-                'controllers' => [NewsController::class, AdminNewsController::class],
-                'service_closure' => function () {
-                    return new \App\Service\NewsService();
-                }
-            ],
-//            [
-//                'controllers' => [FeedbacksController::class],
-//                'repository_closure' => function () {
-//                    return FeedbackEloquentRepository::getInstance();
-//                }
-//            ],
 //            [
 //                'controllers' => [TasksController::class],
 //                'repository_closure' => function () {
@@ -249,11 +243,40 @@ return [
 //                }
 //            ],
         ],
+        AdminServiceable::class => [
+            [
+                'controllers' => [PostsController::class, AdminPostsController::class],
+                'service_closure' => function () {
+                    return new PostsService();
+                }
+            ],
+            [
+                'controllers' => [NewsController::class, AdminNewsController::class],
+                'service_closure' => function () {
+                    return new NewsService();
+                }
+            ],
+            [
+                'controllers' => [FeedbacksController::class],
+                'service_closure' => function () {
+                    return new FeedbacksService();
+                }
+            ],
+        ],
+
         \App\Service\TagsInterface::class => [
             [
                 'controllers' => [\App\Http\Controllers\TagsController::class],
                 'service_closure' => function () {
                     return new \App\Service\TagService();
+                }
+            ]
+        ],
+        \App\Service\StepsInterface::class => [
+            [
+                'controllers' => [CompletedStepsController::class],
+                'service_closure' => function () {
+                    return new StepsService();
                 }
             ]
         ]

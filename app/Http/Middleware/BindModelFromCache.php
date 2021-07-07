@@ -2,13 +2,13 @@
 
 namespace App\Http\Middleware;
 
-use App\Service\RepositoryServiceable;
+use App\Service\Serviceable;
 use Closure;
 use Illuminate\Http\Request;
 
 class BindModelFromCache
 {
-    private RepositoryServiceable $modelService;
+    private Serviceable $modelService;
 
     public function initialize(string $modelClass)
     {

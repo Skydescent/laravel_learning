@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class TagEloquentRepository extends EloquentRepository
+class TagEloquentRepository extends SimpleEloquentRepository
 {
 
     public function index(callable $getIndex, string|null $modelKeyName = null, ?User $user = null, array $postfixes = [],  array $dependsOnModels = null)
@@ -26,11 +26,5 @@ class TagEloquentRepository extends EloquentRepository
             }
         }
         return $tags;
-    }
-
-
-    protected function prepareAttributes()
-    {
-        // TODO: Implement prepareAttributes() method.
     }
 }

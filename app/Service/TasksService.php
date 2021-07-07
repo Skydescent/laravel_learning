@@ -2,31 +2,41 @@
 
 namespace App\Service;
 
+use App\Repositories\TaskEloquentRepository;
 use App\Task;
+use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class TasksService extends EloquentService
 {
     public array $flashMessages = [
         'update' => 'Задача успешно обновлена!',
         'store' => 'Задача успешно создана!',
-        'destroy' => ['message' => 'Задача удалена!', 'type' => 'warning']
+        'destroy' => [
+            'message' => 'Задача удалена!',
+            'type' => 'warning'
+        ]
     ];
 
 
-    protected static function setModelClass()
+    protected function setModelClass()
     {
-        static::$modelClass = Task::class;
+        $this->modelClass = Task::class;
     }
 
-    /**
-     * @param $request
-     * @return array
-     */
-    protected function prepareAttributes($request = null): array
+
+    protected function setRepository()
     {
-        $attributes = $request->validated();
-        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :auth()->id();
-        return $attributes;
+        $this->repository = TaskEloquentRepository::getInstance($this->modelClass);
+    }
+
+    public function index(?User $user = null, array $postfixes = []): mixed
+    {
+        $getIndex = function () use ($user) {
+            return $user->tasks()->with('tags')->latest()->get();
+        };
+
+        return $this->repository->index($getIndex, $this->getModelKeyName(), $user,$postfixes);
     }
 
 }

@@ -3,30 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TaskStoreAndUpdateRequest;
-use App\Repositories\EloquentRepositoryInterface;
-use App\Tag;
-use App\Task;
+use App\Service\Serviceable;
+use Illuminate\Http\Request;
 
 class TasksController extends Controller
 {
-    protected EloquentRepositoryInterface $modelRepositoryInterface;
+    /**
+     * @var Serviceable
+     */
+    protected Serviceable $tasksService;
 
-    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
+    /**
+     * @param Serviceable $tasksService
+     */
+    public function __construct(Serviceable $tasksService)
     {
         $this->middleware('auth');
-        $this->middleware('can:update,task')->except(['index', 'store', 'create']);
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this
+            ->middleware('model.from.cache:' . get_class($tasksService) . ',task')
+            ->only(['show', 'edit', 'update', 'destroy']);
+        $this->tasksService = $tasksService;
     }
 
     public function index()
     {
-        $tasks = $this->modelRepositoryInterface->publicIndex(auth()->user());
+        $tasks = $this->tasksService->index(cachedUser());
         return view('tasks.index', compact( 'tasks'));
     }
 
-    public function show(Task $task)
+    public function show(Request $request)
     {
-        $task = $this->modelRepositoryInterface->find($task, auth()->user());
+        $task = $request->attributes->get('task');
         return view('tasks.show', compact('task'));
     }
 
@@ -37,25 +44,35 @@ class TasksController extends Controller
 
     public function store(TaskStoreAndUpdateRequest $request)
     {
-        $this->modelRepositoryInterface->store($request);
+        $this->tasksService->store($request);
         return redirect('/tasks');
     }
 
-    public function edit(Task $task)
+    public function edit(Request $request)
     {
-        $task = $this->modelRepositoryInterface->find($task, auth()->user());
+        $task = $request->attributes->get('task');
+        $this->authorize('update', $task->model);
+
         return view('tasks.edit', compact('task'));
     }
 
-    public function update(TaskStoreAndUpdateRequest $request,Task $task)
+    public function update(TaskStoreAndUpdateRequest $request, $id)
     {
-        $this->modelRepositoryInterface->update($request,$task, auth()->user());
+
+        $task = $request->attributes->get('task');
+        $this->authorize('update', $task->model);
+
+        $this->tasksService->update($request, $id, cachedUser());;
         return redirect('/tasks');
     }
 
-    public function destroy(Task $task)
+    public function destroy(Request $request)
     {
-        $this->modelRepositoryInterface->destroy($task, auth()->user());
+        $task = $request->attributes->get('task');
+        $this->authorize('update', $task->model);
+
+        $this->tasksService->destroy($task->id, cachedUser());
+
         return redirect('/tasks');
     }
 

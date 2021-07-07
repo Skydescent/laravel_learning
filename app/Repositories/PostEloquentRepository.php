@@ -13,7 +13,7 @@ class PostEloquentRepository extends  EloquentRepository //implements TagsInterf
     {
         $attributes = $request->validated();
         $attributes['published'] = $attributes['published'] ?? 0;
-        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :cachedUser(\request())->id;
+        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :cachedUser()->id;
         return $attributes;
     }
 }

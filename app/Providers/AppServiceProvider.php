@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //TODO: May be replace to CacheServiceProvider, or config map
         $this->app->when(\App\Http\Requests\PostStoreAndUpdateRequest::class)
-            ->needs(\App\Service\RepositoryServiceable::class)
+            ->needs(\App\Service\Serviceable::class)
             ->give(\App\Service\PostsService::class);
 
         view()->composer('layout.sidebar', function($view) {

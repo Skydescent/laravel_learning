@@ -3,29 +3,37 @@
 namespace App\Service;
 
 use App\Feedback;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
+use App\Repositories\FeedbackEloquentRepository;
+use App\User;
 
-class FeedbacksService implements RepositoryServiceable
+class FeedbacksService extends EloquentService implements AdminServiceable
 {
 
-    public function store(FormRequest|Request $request)
-    {
-        $attributes = $request->validate([
-            'email' => 'required|email',
-            'body' => 'required'
-        ]);
+    public array $flashMessages = [
+        'store' => 'Ваше обращение получено, мы с вами свяжемся в ближайшее время!',
+    ];
 
-        Feedback::create($attributes);
+    public function adminIndex(User $user, array $postfixes = []) : mixed
+    {
+        $getIndex = function () {
+          return  ($this->modelClass)::latest()->get();
+        };
+        return $this->repository->index($getIndex, $this->getModelKeyName(), $user,$postfixes);
     }
 
-    public function update(FormRequest|Request $request, $model)
+    /**
+     * @return mixed
+     */
+    protected function setModelClass() : void
     {
-
+        $this->modelClass = Feedback::class;
     }
 
-    public function destroy($model)
+    /**
+     * @return mixed
+     */
+    protected function setRepository() : void
     {
-
+        $this->repository = FeedbackEloquentRepository::getInstance($this->modelClass);
     }
 }

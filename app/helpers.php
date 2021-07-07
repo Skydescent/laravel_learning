@@ -38,19 +38,21 @@ if (!function_exists('cachedUser')) {
      * @param $request
      *
      */
-    function cachedUser(): User
+    function cachedUser($id = null): User
     {
-        $request = \request();
+        $userId = $id;
 
-        if (!$request->hasSession()) return new User();
-
-        $sessionKeys = $request->session()->all();
-        $userId = null;
-        foreach ($sessionKeys as $key => $value) {
-            if (str_starts_with($key, 'login_web_')) {
-                $userId = $value;
+        if (!$userId) {
+            $request = \request();
+            if (!$request->hasSession()) return new User();
+            $sessionKeys = $request->session()->all();
+            foreach ($sessionKeys as $key => $value) {
+                if (str_starts_with($key, 'login_web_')) {
+                    $userId = $value;
+                }
             }
         }
+
         $userService = new UsersService();
 
         if (!$userId) return new User();

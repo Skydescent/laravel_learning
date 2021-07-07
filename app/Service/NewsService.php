@@ -7,7 +7,7 @@ use App\News;
 use App\Repositories\NewsEloquentRepository;
 use App\User;
 
-class NewsService extends EloquentService
+class NewsService extends EloquentService implements AdminServiceable
 {
 
     protected function setModelClass()
@@ -23,7 +23,7 @@ class NewsService extends EloquentService
         $this->repository = NewsEloquentRepository::getInstance($this->modelClass);
     }
 
-    public function publicIndex(User $user, array $postfixes = []) : mixed
+    public function index(?User  $user = null, array $postfixes = []) : mixed
     {
         $getIndex = function () {
             return ($this->modelClass)::latest()->where('published', 1)->simplePaginate(10);

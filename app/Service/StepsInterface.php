@@ -6,11 +6,10 @@ use App\Step;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-interface HasStepsServiceable
+interface StepsInterface
 {
     public function addStep(FormRequest|Request $request, \App\Stepable $model);
 
-    public function completeStep(Step $step);
+    public function updateStep(Request $request, $identifier, $user, string $morphedModelName);
 
-    public function incompleteStep(Step $step);
 }

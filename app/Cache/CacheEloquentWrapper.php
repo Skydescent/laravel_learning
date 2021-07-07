@@ -5,6 +5,8 @@ namespace App\Cache;
 
 use App\Service\EloquentCacheService;
 use App\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorInterface;
+use Illuminate\Contracts\Pagination\Paginator as PaginatorInterface;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
@@ -69,15 +72,44 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
         return $paginator->setCollection($modelsCollection);
     }
 
+    public static function getWrapper($cache, $identifier, $cacheService, $user)
+    {
+        if (is_subclass_of($cache, Model::class) ) {
+            return static::wrapModel($cache, $identifier, $cacheService, $user);
+        }
+
+        $indexInterfaces = class_implements($cache);
+        $paginatorInterfaces = [PaginatorInterface::class, LengthAwarePaginatorInterface::class];
+        $collectionInterfaces = [Enumerable::class];
+        $keyName = array_key_first($identifier);
+
+        if(count(array_intersect($paginatorInterfaces, $indexInterfaces)) !== 0) {
+            return static::wrapPaginator($cache, $cacheService, $keyName, $user);
+        }
+
+        if (count(array_intersect($collectionInterfaces, $indexInterfaces)) !== 0) {
+            return static::wrapCollection($cache,$cacheService, $keyName, $user);
+        }
+    }
+
     public function __get(string $name)
     {
+        //Log::info('CachedEloquentWrapper@__get name:' . $name);
         if (in_array($name, $this->cacheService->getRelationsNames())) {
 
             $getRelation = function () use ($name) {
                 return $this->model->$name;
             };
+            //Log::info('CachedEloquentWrapper@__get cache:' . implode(',', $this->identifier));
+            $cache = $this
+                ->cacheService
+                ->cache(
+                    $getRelation,
+                    $this->user,
+                    array_merge($this->identifier, ['relation' => $name])
+                );
 
-            return $this->cacheService->cache($getRelation, $this->user, array_merge($this->identifier, ['relation' => $name]));
+            return static::getWrapper($cache,$this->identifier, $this->cacheService, cachedUser());
         }
 
         if($name === 'model') {
@@ -202,5 +234,4 @@ class CacheEloquentWrapper implements UrlRoutable, \ArrayAccess, Arrayable, Json
     {
         return $this->model->offsetSet($offset);
     }
-
 }

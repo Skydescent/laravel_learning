@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Service\TagsInterface;
-use App\Tag;
 
 class TagsController extends Controller
 {

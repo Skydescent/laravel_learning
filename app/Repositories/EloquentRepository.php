@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 abstract  class EloquentRepository implements EloquentRepositoryInterface
 {
@@ -144,5 +145,10 @@ abstract  class EloquentRepository implements EloquentRepositoryInterface
         }
 
         return $model;
+    }
+
+    public function getCacheService()
+    {
+        return $this->cacheService;
     }
 }

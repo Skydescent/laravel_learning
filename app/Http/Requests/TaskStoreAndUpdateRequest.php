@@ -16,7 +16,8 @@ class TaskStoreAndUpdateRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'body' => 'required'
+            'body' => 'required',
+            'tags' => ''
         ];
     }
 }

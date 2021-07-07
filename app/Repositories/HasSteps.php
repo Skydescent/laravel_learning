@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Service\EloquentCacheService;
-use App\Service\HasStepsServiceable;
+use App\Service\StepsInterface;
 use App\Service\StepsService;
 use App\Step;
 use App\Stepable;
@@ -14,7 +14,7 @@ trait HasSteps
 {
     protected EloquentCacheService $stepsCacheService;
 
-    protected HasStepsServiceable $stepsService;
+    protected StepsInterface $stepsService;
 
     protected function initializeStepServices()
     {

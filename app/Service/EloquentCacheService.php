@@ -7,9 +7,6 @@ use App\Cache\CacheEloquentWrapper;
 use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Pagination\Paginator as PaginatorInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorInterface;
-use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Log;
 
 class EloquentCacheService extends CacheService
@@ -42,17 +39,7 @@ class EloquentCacheService extends CacheService
         $tags = count($tags)!== 0 ? [$this->getTagName() . '_collection', $tags] : [$this->getTagName() . '_collection'];
         $cache = $this->cache($getIndex, $user, $postfixies, $tags);
 
-        $indexInterfaces = class_implements($cache);
-        $paginatorInterfaces = [PaginatorInterface::class, LengthAwarePaginatorInterface::class];
-        $collectionInterfaces = [Enumerable::class];
-
-        if(count(array_intersect($paginatorInterfaces, $indexInterfaces)) !== 0) {
-            return CacheEloquentWrapper::wrapPaginator($cache,$this,$modelKeyName, $user);
-        }
-
-        if (count(array_intersect($collectionInterfaces, $indexInterfaces)) !== 0) {
-            return CacheEloquentWrapper::wrapCollection($cache,$this,$modelKeyName, $user);
-        }
+        return CacheEloquentWrapper::getWrapper($cache, [$modelKeyName => ''], $this, $user);
     }
 
     public function getKeyName(Authenticatable|User $user = null, $postfixes = [] ): string
@@ -122,13 +109,13 @@ class EloquentCacheService extends CacheService
 
         $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
 
-        Log::info('Cache::tags(' . implode(',', $tags) . ')->forget('. $keyName .')');
+        //Log::info('Cache::tags(' . implode(',', $tags) . ')->forget('. $keyName .')');
         \Cache::tags($tags)->forget($keyName);
     }
 
     public function flushCollections()
     {
-        Log::info('Cache::tags(' . $this->getTagName() . '_collection)->flush()');
+        //Log::info('Cache::tags(' . $this->getTagName() . '_collection)->flush()');
         \Cache::tags([$this->getTagName() . '_collection'])->flush();
     }
 
@@ -152,5 +139,4 @@ class EloquentCacheService extends CacheService
         $instanceKeyName = $model->$routeKeyName;
         return [$routeKeyName => $instanceKeyName];
     }
-
 }

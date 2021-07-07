@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\NewsStoreAndUpdateRequest;
 use App\News;
 use App\Repositories\EloquentRepositoryInterface;
-use App\Service\RepositoryServiceable;
+use App\Service\AdminServiceable;
+use App\Service\Serviceable;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,14 +16,14 @@ use Illuminate\View\View;
 class NewsController extends Controller
 {
     /**
-     * @var RepositoryServiceable
+     * @var AdminServiceable
      */
-    protected RepositoryServiceable $newsService;
+    protected AdminServiceable $newsService;
 
     /**
-     * @param RepositoryServiceable $newsService
+     * @param AdminServiceable $newsService
      */
-    public function __construct(RepositoryServiceable $newsService)
+    public function __construct(AdminServiceable $newsService)
     {
         $this
             ->middleware('model.from.cache:' . get_class($newsService) . ',news')
@@ -106,7 +107,7 @@ class NewsController extends Controller
             $request
                 ->attributes
                 ->get('news')->slug,
-            auth()->user());
+            cachedUser());
         return redirect()->route('admin.news.index');
     }
 }

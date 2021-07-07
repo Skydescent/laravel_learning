@@ -2,10 +2,18 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class Step extends Model
 {
     public $guarded = [];
-    public function task()
+
+    protected $casts = [
+        'completed' => 'boolean',
+    ];
+
+
+    public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }

@@ -6,10 +6,9 @@ use App\Notifications\PostStatusChanged;
 use App\Post;
 use App\Recipients\AdminRecipient;
 use App\User;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Log;
 
-class PostsService extends EloquentService
+class PostsService extends EloquentService implements AdminServiceable
 {
 
     public array $flashMessages = [
@@ -56,7 +55,7 @@ class PostsService extends EloquentService
         return $this;
     }
 
-    public function publicIndex(User $user, array $postfixes = []) : mixed
+    public function index(?User $user =  null, array $postfixes = []) : mixed
     {
         $getIndex = function () use ($user) {
             return ($this->modelClass)::latest()

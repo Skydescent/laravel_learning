@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreAndUpdateRequest;
-use App\Service\RepositoryServiceable;
+use App\Service\AdminServiceable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -15,14 +15,14 @@ use Illuminate\Http\Request;
 class PostsController extends Controller
 {
     /**
-     * @var RepositoryServiceable
+     * @var AdminServiceable
      */
-    protected RepositoryServiceable $postsService;
+    protected AdminServiceable $postsService;
 
     /**
-     * @param RepositoryServiceable $postsService
+     * @param AdminServiceable $postsService
      */
-    public function __construct(RepositoryServiceable $postsService)
+    public function __construct(AdminServiceable $postsService)
     {
         $this->middleware('auth')->only(['create','update']);
         $this
@@ -37,7 +37,7 @@ class PostsController extends Controller
     public function index(): Factory|View|Application
     {
         $currentPage = request()->get('page',1);
-        $posts = $this->postsService->publicIndex(cachedUser(), ['page' => $currentPage]);
+        $posts = $this->postsService->index(cachedUser(), ['page' => $currentPage]);
         return view('posts.index', compact( 'posts'));
     }
 

@@ -2,32 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\EloquentRepositoryInterface;
+use App\Service\AdminServiceable;
+
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 
 class FeedbacksController extends Controller
 {
-    protected EloquentRepositoryInterface $modelRepositoryInterface;
 
-    public function __construct(EloquentRepositoryInterface $modelRepositoryInterface)
+    /**
+     * @var AdminServiceable
+     */
+    protected AdminServiceable $feedbacksService;
+
+    /**
+     * @param AdminServiceable $feedbacksService
+     */
+    public function __construct(AdminServiceable $feedbacksService)
     {
-        $this->modelRepositoryInterface = $modelRepositoryInterface;
+        $this->feedbacksService = $feedbacksService;
     }
 
-    public function index()
+    /**
+     * @return Application|Factory|View
+     */
+    public function index(): View|Factory|Application
     {
-        $feedbacks = $this->modelRepositoryInterface->adminIndex(auth()->user());
+        $feedbacks = $this->feedbacksService->adminIndex(cachedUser());
         return view('admin.feedbacks.index', compact( 'feedbacks'));
     }
 
-    public function create()
+    /**
+     * @return Application|Factory|View
+     */
+    public function create(): View|Factory|Application
     {
         return view('feedbacks.create');
     }
 
-    public function store(Request $request)
+    /**
+     * @param Request $request
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function store(Request $request): Redirector|RedirectResponse|Application
     {
-        $this->modelRepositoryInterface->store($request);
+        $this->feedbacksService->store($request);
 
         return redirect('/');
     }

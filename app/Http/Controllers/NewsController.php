@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\RepositoryServiceable;
+use App\Service\AdminServiceable;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -12,14 +12,14 @@ class NewsController extends Controller
 {
 
     /**
-     * @var RepositoryServiceable
+     * @var AdminServiceable
      */
-    protected RepositoryServiceable $newsService;
+    protected AdminServiceable $newsService;
 
     /**
-     * @param RepositoryServiceable $newsService
+     * @param AdminServiceable $newsService
      */
-    public function __construct(RepositoryServiceable $newsService)
+    public function __construct(AdminServiceable $newsService)
     {
         $this
             ->middleware('model.from.cache:' . get_class($newsService) . ',news')
@@ -33,7 +33,7 @@ class NewsController extends Controller
     public function index(): View|Factory|Application
     {
         $currentPage = request()->get('page',1);
-        $news = $this->newsService->publicIndex(cachedUser(), ['page' => $currentPage]);
+        $news = $this->newsService->index(cachedUser(), ['page' => $currentPage]);
         return view('news.index', compact( 'news'));
     }
 
