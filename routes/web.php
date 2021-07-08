@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', function () {
-   $posts = \App\Tag::all();
+   $posts = \App\Models\Tag::all();
    dd($posts);
 });
 
@@ -49,7 +49,7 @@ Route::middleware('auth')->post('/companies', function () {
     $attributes = request()->validate(['name' => 'required']);
     $attributes['owner_id'] = auth()->id();
 
-    \App\Company::create($attributes);
+    \App\Models\Company::create($attributes);
 });
 
 Route::get('/service', 'PushServiceController@form');

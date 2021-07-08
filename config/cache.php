@@ -1,7 +1,8 @@
 <?php
 
-use App\Comment;
-use App\Feedback;
+use App\Models\Comment;
+use App\Models\Company;
+use App\Models\Feedback;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PostsController as AdminPostsController;
 use App\Http\Controllers\CompletedStepsController;
@@ -14,39 +15,26 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TaskStepsController;
-use App\Http\Middleware\BindModelFromCache;
-use App\News;
-use App\Post;
-use App\PostHistory;
-use App\Repositories\CommentableInterface;
-use App\Repositories\CommentEloquentRepository;
-use App\Repositories\EloquentRepositoryInterface;
-use App\Repositories\FeedbackEloquentRepository;
-use App\Repositories\NewsEloquentRepository;
-use App\Repositories\PostEloquentRepository;
-use App\Repositories\SimpleRepositoryInterface;
-use App\Repositories\StatisticsRepository;
-use App\Repositories\StepableInterface;
-use App\Repositories\TaggableInterface;
-use App\Repositories\StepEloquentRepository;
-use App\Repositories\TaskEloquentRepository;
+use App\Models\News;
+use App\Models\Post;
+use App\Models\PostHistory;
 use App\Service\AdminServiceable;
 use App\Service\CommentsInterface;
-use App\Service\CommentsService;
-use App\Service\FeedbacksService;
-use App\Service\NewsService;
-use App\Service\PostsService;
+use App\Service\Eloquent\CommentsService;
+use App\Service\Eloquent\FeedbacksService;
+use App\Service\Eloquent\NewsService;
+use App\Service\Eloquent\PostsService;
 use App\Service\Serviceable;
 use App\Service\StatisticsService;
 use App\Service\StepsInterface;
-use App\Service\StepsService;
-use App\Service\TagService;
+use App\Service\Eloquent\StepsService;
+use App\Service\Eloquent\TagService;
 use App\Service\TagsInterface;
-use App\Service\TasksService;
-use App\Step;
-use App\Tag;
-use App\Task;
-use App\User;
+use App\Service\Eloquent\TasksService;
+use App\Models\Step;
+use App\Models\Tag;
+use App\Models\Task;
+use App\Models\User;
 use Illuminate\Support\Str;
 
 return [
@@ -213,7 +201,7 @@ return [
                 'relations' => [
                     'tasks' => Task::class,
                     'posts' => Post::class,
-                    'company' => \App\Company::class,
+                    'company' => Company::class,
                     'tags' => Tag::class,
                     'comments' => Comment::class
                 ]

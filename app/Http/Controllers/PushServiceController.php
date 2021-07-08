@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\Pushall;
-use Illuminate\Http\Request;
+
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class PushServiceController extends Controller
 {
-    public function form()
+    public function form(): Factory|View|Application
     {
         return view('service');
     }
 
-    public function send()
+    public function send(): RedirectResponse
     {
         $data = \request()->validate([
             'text' => 'required|max:80',

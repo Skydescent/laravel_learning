@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-
-use App\Channels\PushAllChannel;
-use App\Service\RepositoryService;
+use App\Service\Eloquent\TagService;
 use App\View\Components\Alert;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,9 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        \Illuminate\Support\Collection::macro('toUpper', function() {
+        Collection::macro('toUpper', function() {
             return $this->map(function ($item) {
-                return \Illuminate\Support\Str::upper($item);
+                return Str::upper($item);
             });
         });
     }
@@ -34,13 +34,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //TODO: May be replace to CacheServiceProvider, or config map
-        $this->app->when(\App\Http\Requests\PostStoreAndUpdateRequest::class)
-            ->needs(\App\Service\Serviceable::class)
-            ->give(\App\Service\PostsService::class);
-
         view()->composer('layout.sidebar', function($view) {
-            $tagsCloud = (new \App\Service\TagService())->tagsCloud();
+            $tagsCloud = (new TagService())->tagsCloud();
             $view->with('tagsCloud', $tagsCloud);
         });
 
@@ -55,10 +50,10 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('pagination::bootstrap-4');
 
         Relation::morphMap([
-            'tasks' => 'App\Task',
-            'posts' => 'App\Post',
-            'news' => 'App\News',
-            'users' => 'App\User',
+            'tasks' => 'App\Models\Task',
+            'posts' => 'App\Models\Post',
+            'news' => 'App\Models\News',
+            'users' => 'App\Models\User',
         ]);
 
 

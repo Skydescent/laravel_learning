@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Service\TagService;
-use App\Service\TagsInterface;
 use Illuminate\Support\ServiceProvider;
 
 class CacheServiceProvider extends ServiceProvider

@@ -1,12 +1,8 @@
 <?php
 
-
 namespace App\Service;
 
-
-use App\User;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 

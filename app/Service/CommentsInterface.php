@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Commentable;
+use App\Models\Commentable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 

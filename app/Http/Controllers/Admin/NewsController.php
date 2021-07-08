@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NewsStoreAndUpdateRequest;
-use App\News;
-use App\Repositories\EloquentRepositoryInterface;
+use App\Models\News;
 use App\Service\AdminServiceable;
-use App\Service\Serviceable;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

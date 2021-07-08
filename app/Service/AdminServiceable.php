@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\User;
+use App\Models\User;
 
 interface AdminServiceable extends Serviceable
 {

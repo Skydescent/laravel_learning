@@ -3,9 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 
+/**
+ * @property mixed slug
+ */
 class PostStoreAndUpdateRequest extends FormRequest
 {
     /**
@@ -13,7 +14,7 @@ class PostStoreAndUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
 
         if ($this->user()->isAdmin() && !$this->slug) {

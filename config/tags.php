@@ -2,13 +2,13 @@
 
 return [
     'public_visible_related_models' => [
-        'App\Post' => [
+        'App\Models\Post' => [
             'title' => 'Статьи',
             'relation' => 'posts',
             'showView' => 'posts.show',
             'item' => 'post',
         ],
-        'App\News' => [
+        'App\Models\News' => [
             'title' => 'Новости',
             'relation' => 'news',
             'showView' => 'news.show',

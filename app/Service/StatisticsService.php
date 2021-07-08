@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
-use App\News;
-use App\Post;
-use App\User;
+use App\Models\News;
+use App\Models\Post;
+use App\Models\User;
+use App\Service\Cache\SimpleCacheService;
+use DB;
 
 class StatisticsService implements Indexable
 {
@@ -25,11 +27,11 @@ class StatisticsService implements Indexable
                     ->orderByDesc('posts_count')
                     ->first()['name'],
                 'longestPost' => Post::where('published', 1)
-                    ->select(\DB::raw('LENGTH(body) as len_body, title, slug'))
+                    ->select(DB::raw('LENGTH(body) as len_body, title, slug'))
                     ->orderBy('len_body', 'desc')
                     ->first(),
                 'shortestPost' => Post::where('published',1)
-                    ->select(\DB::raw('LENGTH(body) as len_body, title, slug'))
+                    ->select(DB::raw('LENGTH(body) as len_body, title, slug'))
                     ->orderBy('len_body', 'asc')
                     ->first(),
                 'mostChangedPost' => Post::withCount('history')
@@ -41,7 +43,7 @@ class StatisticsService implements Indexable
 
             ];
             $activeUsers =  User::has('posts', '>', 1)->withCount('posts');
-            $statistics['activeUsersAvgPosts'] = floor(\DB::table(\DB::raw("({$activeUsers->toSql()}) as active"))
+            $statistics['activeUsersAvgPosts'] = floor(DB::table(DB::raw("({$activeUsers->toSql()}) as active"))
                 ->avg('posts_count'));
 
             return $statistics;

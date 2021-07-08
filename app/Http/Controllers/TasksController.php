@@ -48,6 +48,9 @@ class TasksController extends Controller
         return redirect('/tasks');
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function edit(Request $request)
     {
         $task = $request->attributes->get('task');
@@ -56,6 +59,9 @@ class TasksController extends Controller
         return view('tasks.edit', compact('task'));
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function update(TaskStoreAndUpdateRequest $request, $id)
     {
 
@@ -66,6 +72,9 @@ class TasksController extends Controller
         return redirect('/tasks');
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function destroy(Request $request)
     {
         $task = $request->attributes->get('task');
