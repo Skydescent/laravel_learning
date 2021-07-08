@@ -24,6 +24,7 @@ class CacheServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->bindAllServices();
         $this->whenControllersNeedsGiveModelService();
     }
 
@@ -37,6 +38,15 @@ class CacheServiceProvider extends ServiceProvider
                     ->needs($interface)
                     ->give($item['service_closure']);
             }
+        }
+    }
+
+    protected function bindAllServices()
+    {
+        $allServices = config('cache.all_services');
+
+        foreach ($allServices as $interface => $service) {
+            $this->app->singleton($interface, $service);
         }
     }
 }

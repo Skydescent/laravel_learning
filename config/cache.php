@@ -24,6 +24,7 @@ use App\Service\Eloquent\CommentsService;
 use App\Service\Eloquent\FeedbacksService;
 use App\Service\Eloquent\NewsService;
 use App\Service\Eloquent\PostsService;
+use App\Service\Indexable;
 use App\Service\Serviceable;
 use App\Service\StatisticsService;
 use App\Service\StepsInterface;
@@ -224,7 +225,7 @@ return [
         'ttl' => 300,
     ],
     'model_services' => [
-        \App\Service\Indexable::class => [
+        Indexable::class => [
             [
                 'controllers' => [StatisticsController::class],
                 'service_closure' => function () {
@@ -272,31 +273,11 @@ return [
                 }
             ],
         ],
-
-        TagsInterface::class => [
-            [
-                'controllers' => [TagsController::class],
-                'service_closure' => function () {
-                    return new TagService();
-                }
-            ]
-        ],
-        StepsInterface::class => [
-            [
-                'controllers' => [CompletedStepsController::class, TaskStepsController::class],
-                'service_closure' => function () {
-                    return new StepsService();
-                }
-            ]
-        ],
-        CommentsInterface::class => [
-            [
-                'controllers' => [PostCommentsController::class, NewsCommentsController::class],
-                'service_closure' => function () {
-                    return new CommentsService();
-                }
-            ]
-        ]
-    ]
+    ],
+    'all_services' => [
+        \App\Service\TagsInterface::class => \App\Service\Eloquent\TagService::class,
+        \App\Service\StepsInterface::class => \App\Service\Eloquent\StepsService::class,
+        \App\Service\CommentsInterface::class => \App\Service\Eloquent\CommentsService::class,
+    ],
 ];
 
