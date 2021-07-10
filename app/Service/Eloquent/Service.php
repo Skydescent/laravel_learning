@@ -7,15 +7,9 @@ use App\Repositories\Eloquent\SimpleRepository;
 use App\Service\Serviceable;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
-use function flash;
 
 abstract class Service implements Serviceable
 {
-    public array $flashMessages = [];
-
-    public array $afterEventMethods = [];
 
     protected Model $currentModel;
 
@@ -57,22 +51,20 @@ abstract class Service implements Serviceable
         return $this->repository->find($getModel, $identifier, $user);
     }
 
-    public function store(FormRequest|Request $request)
+    public function store(array $attributes)
     {
-        $this->currentModel = $this->repository->store($request);
-        $this->callMethodsAfterEvent('store');
+        $this->currentModel = $this->repository->store($attributes);
     }
 
-    public function  update(FormRequest|Request $request,string $identifier, ?User $user = null)
+    public function  update(array $attributes,string $identifier, ?User $user = null)
     {
         $this->currentModel = $this
             ->repository
             ->update(
-                $request,
+                $attributes,
                 $this->getModelIdentifier($identifier),
                 $user
             );
-        $this->callMethodsAfterEvent('update');
     }
 
     public function destroy(string $identifier, ?User $user = null)
@@ -83,37 +75,6 @@ abstract class Service implements Serviceable
                 $this->getModelIdentifier($identifier),
                 $user
             );
-        $this->callMethodsAfterEvent('destroy');
-    }
-
-
-    protected function flashEventMessage(string $eventName)
-    {
-        if (
-            count($this->flashMessages) !== 0 &&
-            array_key_exists($eventName, $this->flashMessages)
-        ) {
-            ['message' => $msg, 'type' => $type] = gettype($this->flashMessages[$eventName]) === 'array' ?
-                $this->flashMessages[$eventName] + ['type' => 'success'] :
-                ['message' => $this->flashMessages[$eventName], 'type' => 'success'];
-
-            flash($msg, $type);
-        }
-    }
-
-    protected function callMethodsAfterEvent(string $currentEvent, ...$args)
-    {
-        if (count($this->flashMessages)!== 0 && key_exists($currentEvent, $this->flashMessages)) {
-            $this->flashEventMessage($currentEvent);
-        }
-        if (count($this->afterEventMethods) !== 0) {
-            foreach ($this->afterEventMethods as $method => $events) {
-
-                $key = array_values(array_intersect(['all', $currentEvent], array_keys($events)))[0];
-                $arguments = array_merge($events[$key], $args);
-                call_user_func_array([$this,$method],$arguments);
-            }
-        }
     }
 
     protected function getModelIdentifier(string $identifier) : array
@@ -126,9 +87,14 @@ abstract class Service implements Serviceable
         return (new($this->modelClass))->getRouteKeyName();
     }
 
-    public function getRepository()
+    public function getRepository(): EloquentRepositoryInterface
     {
         return $this->repository;
+    }
+
+    public function getCurrentModel() : Model
+    {
+        return $this->currentModel;
     }
 
 }

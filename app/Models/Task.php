@@ -7,8 +7,6 @@ use App\Events\TaskUpdated;
 
 class Task extends Model implements Taggable, Stepable
 {
-    use SynchronizeTags;
-
     public $guarded = [];
 
     protected $dispatchesEvents = [

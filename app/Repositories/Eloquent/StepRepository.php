@@ -5,41 +5,26 @@ namespace App\Repositories\Eloquent;
 use App\Models\Stepable;
 use App\Models\User;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 
 class StepRepository extends Repository
 {
 
-    /**
-     * @param null $request
-     * @return array
-     */
-    protected function prepareAttributes($request = null) : array
+    public function store(array $attributes, Stepable $relatedModel = null, ?User $user = null) : mixed
     {
-        if ($request->get('description') !== null) {
-            $request->validate([
-                'description' => 'required|min:5'
-            ]);
-        }
-        $attributes = $request->all();
-        $attributes['completed'] = isset($attributes['completed']) && $attributes['completed'] === 'on';
-
-        return $attributes;
-    }
-
-    public function store($request, Stepable $relatedModel = null, ?User $user = null)
-    {
-        $attributes = $this->prepareAttributes($request);
         $this->cacheService->forgetMorphedModelRelation($relatedModel, ['relation' => 'steps'], $user);
         $this->cacheService->flushCollections();
 
         return $relatedModel->addStep($attributes);
     }
 
-    public function update (FormRequest|Request $request, array $identifier, ?User $user = null, ?UrlRoutable $morphedModel = null,)
+    public function update (
+        array $attributes,
+        array $identifier,
+        ?User $user = null,
+        ?UrlRoutable $morphedModel = null,
+    ) : mixed
     {
         $this->cacheService->forgetMorphedModelRelation($morphedModel, ['relation' => 'steps'], $user);
-        return parent::update($request, $identifier, $user);
+        return parent::update($attributes, $identifier, $user);
     }
 }

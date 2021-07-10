@@ -5,16 +5,16 @@ use App\Models\Company;
 use App\Models\Feedback;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PostsController as AdminPostsController;
-use App\Http\Controllers\CompletedStepsController;
-use App\Http\Controllers\FeedbacksController;
-use App\Http\Controllers\NewsCommentsController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\PostCommentsController;
-use App\Http\Controllers\PostsController;
-use App\Http\Controllers\StatisticsController;
-use App\Http\Controllers\TagsController;
-use App\Http\Controllers\TasksController;
-use App\Http\Controllers\TaskStepsController;
+use App\Http\Controllers\Public\CompletedStepsController;
+use App\Http\Controllers\Public\FeedbacksController;
+use App\Http\Controllers\Public\NewsCommentsController;
+use App\Http\Controllers\Public\NewsController as PublicNewsController;
+use App\Http\Controllers\Public\PostCommentsController;
+use App\Http\Controllers\Public\PostsController as PublicPostsController;
+use App\Http\Controllers\Public\StatisticsController;
+use App\Http\Controllers\Public\TagsController;
+use App\Http\Controllers\Public\TasksController;
+use App\Http\Controllers\Public\TaskStepsController;
 use App\Models\News;
 use App\Models\Post;
 use App\Models\PostHistory;
@@ -255,13 +255,13 @@ return [
         ],
         AdminServiceable::class => [
             [
-                'controllers' => [PostsController::class, AdminPostsController::class],
+                'controllers' => [PublicPostsController::class, AdminPostsController::class],
                 'service_closure' => function () {
                     return new PostsService();
                 }
             ],
             [
-                'controllers' => [NewsController::class, AdminNewsController::class],
+                'controllers' => [PublicNewsController::class, AdminNewsController::class],
                 'service_closure' => function () {
                     return new NewsService();
                 }

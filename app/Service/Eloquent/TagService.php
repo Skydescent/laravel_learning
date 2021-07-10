@@ -3,7 +3,10 @@
 namespace App\Service\Eloquent;
 
 use App\Models\Tag;
+use App\Models\Taggable;
+use App\Models\User;
 use App\Repositories\Eloquent\TagRepository;
+use App\Service\Serviceable;
 use App\Service\TagsInterface;
 
 class TagService extends Service implements TagsInterface
@@ -32,7 +35,33 @@ class TagService extends Service implements TagsInterface
         );
     }
 
-    public function attachTags($tagsToAttach, $morphedModel, $syncIds)
+    public function syncTags(string $requestTags, Taggable $model)
+    {
+        if (is_null($requestTags)) return;
+
+        $syncIds = [];
+        $tags = collect($this->cleanTagsString($requestTags));
+
+        if ($model->tags->isNotEmpty()) {
+            $itemTags = $model->tags->keyBy('name');
+            $tags = $tags->keyBy(function ($item) { return $item; });
+            $syncIds = $itemTags->intersectByKeys($tags)->pluck('id')->toArray();
+            $tagsToAttach = $tags->diffKeys($itemTags);
+        } else {
+            $tagsToAttach = $tags;
+        }
+
+        $this->attachTags($tagsToAttach, $model, $syncIds);
+
+    }
+
+    private function cleanTagsString(string $tags) : array
+    {
+        return preg_split("/(^\s*)|(\s*,\s*)/", $tags, 0,PREG_SPLIT_NO_EMPTY);
+    }
+
+
+    protected function attachTags($tagsToAttach, $morphedModel, $syncIds)
     {
         $tagsToCreate = [];
         foreach ($tagsToAttach as $tag) {
@@ -89,5 +118,29 @@ class TagService extends Service implements TagsInterface
     protected function setRepository() : void
     {
         $this->repository = TagRepository::getInstance($this->modelClass);
+    }
+
+    public function storeWithTagsSync(Serviceable $service, array $attributes)
+    {
+        $this->storeOrUpdateWithTagsSync($service,'store', $attributes);
+    }
+
+    public function updateWithTagsSync(Serviceable $service, array $attributes,string $identifier, ?User $user = null)
+    {
+        $this->storeOrUpdateWithTagsSync($service, 'update', $attributes, $identifier, $user);
+    }
+
+    protected function storeOrUpdateWithTagsSync(Serviceable $service,string $method, array $attributes,...$args)
+    {
+        $tags = $attributes['tags'] ?? null;
+        unset($attributes['tags']);
+
+        $service->$method($attributes, ...$args);
+
+        $model = $service->getCurrentModel();
+
+        if ($model instanceof Taggable && !is_null($tags)) {
+            $this->syncTags($tags,$model);
+        }
     }
 }

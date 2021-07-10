@@ -10,10 +10,6 @@ use App\Models\User;
 class FeedbacksService extends Service implements AdminServiceable
 {
 
-    public array $flashMessages = [
-        'store' => 'Ваше обращение получено, мы с вами свяжемся в ближайшее время!',
-    ];
-
     public function adminIndex(User $user, array $postfixes = []) : mixed
     {
         $getIndex = function () {
@@ -39,5 +35,11 @@ class FeedbacksService extends Service implements AdminServiceable
     protected function setRepository() : void
     {
         $this->repository = FeedbackRepository::getInstance($this->modelClass);
+    }
+
+    public function store(array $attributes)
+    {
+        parent::store($attributes);
+        flash('Ваше обращение получено, мы с вами свяжемся в ближайшее время!');
     }
 }

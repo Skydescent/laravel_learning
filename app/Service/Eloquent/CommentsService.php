@@ -12,9 +12,9 @@ use Illuminate\Http\Request;
 
 class CommentsService extends Service implements CommentsInterface
 {
-    public function storeComment(FormRequest|Request $request, Commentable $model = null, ?User $user = null)
+    public function storeComment(array $attributes, Commentable $model = null, ?User $user = null)
     {
-        $this->repository->store($request, $model, $user);
+        $this->repository->store($attributes, $model, $user);
     }
 
     /**

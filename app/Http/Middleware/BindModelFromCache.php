@@ -26,9 +26,10 @@ class BindModelFromCache
     public function handle(Request $request, Closure $next, $serviceClass, $requestFieldName): mixed
     {
         $this->modelService =  new $serviceClass();
+        //dd($request->$requestFieldName);
 
-        if ($identifier = $request->$requestFieldName) {
-
+        if (isset($request->$requestFieldName)) {
+            $identifier = $request->$requestFieldName;
             $modelInstance = $this->modelService->find($identifier, cachedUser())?:$requestFieldName;
             $request->attributes->set($requestFieldName, $modelInstance);
         }

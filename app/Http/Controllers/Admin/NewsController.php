@@ -2,31 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\NewsController as BaseNewsController;
 use App\Http\Requests\NewsStoreAndUpdateRequest;
 use App\Models\News;
 use App\Service\AdminServiceable;
+use App\Service\TagsInterface;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class NewsController extends Controller
+class NewsController extends BaseNewsController
 {
-    /**
-     * @var AdminServiceable
-     */
-    protected AdminServiceable $newsService;
+    protected TagsInterface $tagsService;
 
-    /**
-     * @param AdminServiceable $newsService
-     */
     public function __construct(AdminServiceable $newsService)
     {
+        parent::__construct($newsService);
+        $this->tagsService = $this->getTagService();
         $this
             ->middleware('model.from.cache:' . get_class($newsService) . ',news')
             ->only(['edit', 'update', 'destroy']);
-        $this->newsService = $newsService;
     }
 
     /**
@@ -62,7 +58,9 @@ class NewsController extends Controller
      */
     public function store(NewsStoreAndUpdateRequest $request) : RedirectResponse
     {
-        $this->newsService->store($request);
+        $this->tagsService->storeWithTagsSync($this->newsService,$this->prepareAttributes($request));
+
+        //$this->newsService->store($this->prepareAttributes($request));
         return redirect()->route('admin.news.index');
     }
 
@@ -88,7 +86,17 @@ class NewsController extends Controller
      */
     public function update(NewsStoreAndUpdateRequest $request, string $slug): RedirectResponse
     {
-        $this->newsService->update($request, $slug, cachedUser());
+        $this
+            ->tagsService
+            ->updateWithTagsSync(
+                $this->newsService,
+                $this->prepareAttributes($request),
+                $slug,
+                cachedUser()
+            );
+
+        //$this->newsService->update($this->prepareAttributes($request), $slug, cachedUser());
+
         return redirect()->route('admin.news.index');
     }
 

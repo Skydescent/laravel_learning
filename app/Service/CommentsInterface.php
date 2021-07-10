@@ -8,5 +8,5 @@ use Illuminate\Http\Request;
 
 interface CommentsInterface
 {
-    public function storeComment(FormRequest|Request $request, Commentable $model = null);
+    public function storeComment(array $attributes, Commentable $model = null);
 }

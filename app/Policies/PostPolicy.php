@@ -25,9 +25,9 @@ class PostPolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Post  $post
-     * @return mixed
+     * @param User|null $user
+     * @param Post $post
+     * @return bool
      */
     public function view(?User $user, Post $post)
     {

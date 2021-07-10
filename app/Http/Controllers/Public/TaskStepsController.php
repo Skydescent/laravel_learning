@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Public;
 
+use App\Http\Controllers\StepsController;
 use App\Service\Serviceable;
 use App\Service\StepsInterface;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class TaskStepsController extends Controller
+class TaskStepsController extends StepsController
 {
-    /**
-     * @var StepsInterface
-     */
-    protected StepsInterface $stepsService;
-
     protected Serviceable $tasksService;
 
     /**
@@ -21,18 +18,18 @@ class TaskStepsController extends Controller
      */
     public function __construct(StepsInterface $stepsService, Serviceable $tasksService)
     {
-        $this->stepsService = $stepsService;
+        parent::__construct($stepsService);
         $this->tasksService = $tasksService;
     }
 
-    public function store(Request $request, $id)
+    public function store(Request $request, $id): RedirectResponse
     {
         $task = $this
             ->tasksService
             ->find($id, cachedUser())
             ->model;
 
-        $this->stepsService->addStep($request, $task);
+        $this->stepsService->addStep($this->prepareAttributes($request), $task);
 
         return back();
     }

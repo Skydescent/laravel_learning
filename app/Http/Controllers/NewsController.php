@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Service\AdminServiceable;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
+use App\Service\TagsInterface;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
-class NewsController extends Controller
+abstract class NewsController extends Controller
 {
 
     /**
@@ -21,30 +20,19 @@ class NewsController extends Controller
      */
     public function __construct(AdminServiceable $newsService)
     {
-        $this
-            ->middleware('model.from.cache:' . get_class($newsService) . ',news')
-            ->only(['show']);
         $this->newsService = $newsService;
     }
 
-    /**
-     * @return Application|Factory|View
-     */
-    public function index(): View|Factory|Application
-    {
-        $currentPage = request()->get('page',1);
-        $news = $this->newsService->index(cachedUser(), ['page' => $currentPage]);
-        return view('news.index', compact( 'news'));
-    }
-
 
     /**
-     * @param Request $request
-     * @return Application|Factory|View
+     * @param FormRequest|Request $request
+     * @return array
      */
-    public function show(Request $request): View|Factory|Application
+    protected function prepareAttributes(FormRequest|Request $request): array
     {
-        $news = $request->attributes->get('news');
-        return view('news.show', compact('news'));
+        $attributes = $request->validated();
+        $attributes['published'] = $attributes['published'] ?? 0;
+
+        return $attributes;
     }
 }

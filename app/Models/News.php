@@ -8,7 +8,6 @@ use Str;
 
 class News extends Model implements Commentable, Taggable
 {
-    use SynchronizeTags;
 
     protected $casts = [
         'published' => 'boolean'

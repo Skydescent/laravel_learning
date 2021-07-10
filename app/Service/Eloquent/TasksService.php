@@ -8,15 +8,6 @@ use App\Models\User;
 
 class TasksService extends Service
 {
-    public array $flashMessages = [
-        'update' => 'Задача успешно обновлена!',
-        'store' => 'Задача успешно создана!',
-        'destroy' => [
-            'message' => 'Задача удалена!',
-            'type' => 'warning'
-        ]
-    ];
-
 
     protected function setModelClass()
     {
@@ -37,5 +28,24 @@ class TasksService extends Service
 
         return $this->repository->index($getIndex, $this->getModelKeyName(), $user,$postfixes);
     }
+
+    public function store(array $attributes)
+    {
+        parent::store($attributes);
+        flash('Задача успешно создана!');
+    }
+
+    public function update(array $attributes, string $identifier, ?User $user = null)
+    {
+        parent::update($attributes, $identifier, $user);
+        flash('Задача успешно обновлена!');
+    }
+
+    public function destroy(string $identifier, ?User $user = null)
+    {
+        parent::destroy($identifier, $user);
+        flash('Задача удалена!', 'warning');
+    }
+
 
 }

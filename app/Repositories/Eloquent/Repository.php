@@ -8,9 +8,6 @@ use App\Service\Eloquent\CacheService;
 use App\Models\Taggable;
 use App\Models\User;
 use Exception;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 abstract  class Repository implements EloquentRepositoryInterface
@@ -31,8 +28,6 @@ abstract  class Repository implements EloquentRepositoryInterface
     {
         $this->modelClass = $modelClass;
     }
-
-    abstract protected function prepareAttributes() : array;
 
     protected function setCacheService($cacheService)
     {
@@ -71,8 +66,9 @@ abstract  class Repository implements EloquentRepositoryInterface
     }
 
     /**
-     * @param string|array $identifier
-     * @param Authenticatable|User|null $user
+     * @param callable $getModel
+     * @param array $identifier
+     * @param User|null $user
      * @return mixed
      */
     public function find(callable $getModel, array $identifier, ?User $user = null): mixed
@@ -81,11 +77,12 @@ abstract  class Repository implements EloquentRepositoryInterface
     }
 
     /**
-     * @param $request
+     * @param array $attributes
+     * @return Taggable|mixed
      */
-    public function store($request)
+    public function store(array $attributes): mixed
     {
-        $model = $this->storeOrUpdate($request);
+        $model = $this->storeOrUpdate($attributes);
         $this->cacheService->flushCollections();
 
         return $model;
@@ -103,14 +100,14 @@ abstract  class Repository implements EloquentRepositoryInterface
     }
 
     /**
-     * @param FormRequest|Request $request
+     * @param array $attributes
      * @param array $identifier
      * @param User|null $user
      * @return Taggable|mixed
      */
-    public function update(FormRequest|Request $request, array $identifier, ?User $user = null)
+    public function update(array $attributes, array $identifier, ?User $user = null): mixed
     {
-        $model = $this->storeOrUpdate($request, $identifier);
+        $model = $this->storeOrUpdate($attributes, $identifier);
         $this->cacheService->flushModelCache($identifier, $user);
 
         return $model;
@@ -130,12 +127,11 @@ abstract  class Repository implements EloquentRepositoryInterface
         return $model;
     }
 
-    protected function storeOrUpdate(FormRequest|Request $request,array $identifier = null)
+    protected function storeOrUpdate(array $attributes,array $identifier = null)
     {
-        $attributes = $this->prepareAttributes($request);
 
-        $tags = $attributes['tags'] ?? null;
-        unset($attributes['tags']);
+//        $tags = $attributes['tags'] ?? null;
+//        unset($attributes['tags']);
 
         if ($identifier) {
            $model = ($this->modelClass)::updateOrCreate($identifier, $attributes);
@@ -143,9 +139,9 @@ abstract  class Repository implements EloquentRepositoryInterface
            $model = ($this->modelClass)::updateOrCreate($attributes);
         }
 
-        if ($model instanceof Taggable) {
-            $model->syncTags($tags);
-        }
+//        if ($model instanceof Taggable) {
+//            $model->syncTags($tags);
+//        }
 
         return $model;
     }

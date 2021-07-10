@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Service\CommentsInterface;
 use App\Service\Serviceable;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 abstract class CommentsController extends Controller
@@ -18,7 +20,17 @@ abstract class CommentsController extends Controller
         $this->postsService = $postsService;
     }
 
-    public function store(Request $request, $id)
+    protected function prepareAttributes(FormRequest|Request $request): array
+    {
+        $attributes = $request->validate([
+            'body' => 'required',
+        ]);
+        $attributes['author_id'] = cachedUser()->id;
+
+        return $attributes;
+    }
+
+    public function store(Request $request, $id): RedirectResponse
     {
         $user = cachedUser();
         $post = $this
@@ -26,7 +38,7 @@ abstract class CommentsController extends Controller
             ->find($id)
             ->model;
 
-        $this->commentsService->storeComment($request, $post, $user);
+        $this->commentsService->storeComment($this->prepareAttributes($request), $post, $user);
 
         return back();
     }

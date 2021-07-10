@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 
 interface StepsInterface
 {
-    public function addStep(FormRequest|Request $request, Stepable $model);
+    public function addStep(array $attributes, Stepable $model);
 
-    public function updateStep(Request $request, $identifier, $user, string $morphedModelName);
+    public function updateStep(array $attributes, $identifier, $user, string $morphedModelName);
 
 }

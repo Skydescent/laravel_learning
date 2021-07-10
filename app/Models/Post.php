@@ -14,9 +14,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  */
 class Post extends Model implements Commentable, Taggable
 {
-    use SynchronizeTags;
-
-
     protected static function booted()
     {
         static::updated(function (Post $post) {

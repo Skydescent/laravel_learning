@@ -12,23 +12,6 @@ use App\Models\User;
 class PostsService extends Service implements AdminServiceable
 {
 
-    public array $flashMessages = [
-        'update' => 'Статья успешно обновлена!',
-        'store' => 'Статья успешно создана!',
-        'destroy' => [
-            'message' => 'Задача удалена!',
-            'type' => 'warning'
-        ],
-    ];
-
-    public array $afterEventMethods = [
-        'notifyAdmin' => [
-            'store' =>['добавлена статья', 'posts.show'],
-            'update'=>['обновлена статья', 'posts.show'],
-            'destroy'=>['статья удалена']
-        ]
-    ];
-
     protected function setModelClass()
     {
        $this->modelClass = Post::class;
@@ -78,6 +61,27 @@ class PostsService extends Service implements AdminServiceable
         $postfixes['panel'] = 'admin';
 
         return $this->repository->index($getIndex, $this->getModelKeyName(), $user, $postfixes);
+    }
+
+    public function store(array $attributes)
+    {
+        parent::store($attributes);
+        flash('Статья успешно добавлена!');
+        $this->notifyAdmin('статья добавлена', 'posts.show');
+    }
+
+    public function update(array $attributes, string $identifier, ?User $user = null)
+    {
+        parent::update($attributes, $identifier, $user);
+        flash('Статья успешно обновлена!');
+        $this->notifyAdmin('статья обновлена', 'posts.show');
+    }
+
+    public function destroy(string $identifier, ?User $user = null)
+    {
+        parent::destroy($identifier, $user);
+        flash('Статья удалена!', 'warning');
+        $this->notifyAdmin('статья удалена');
     }
 
 }
