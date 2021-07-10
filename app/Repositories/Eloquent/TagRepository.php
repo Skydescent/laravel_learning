@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class TagRepository extends SimpleRepository
 {
@@ -15,7 +16,7 @@ class TagRepository extends SimpleRepository
         return $this->cacheService->cache($getIndex, $user, [], $tags);
     }
 
-    protected function getDependsOnModelsTags($dependsOnModels) : array
+    public function getDependsOnModelsTags($dependsOnModels) : array
     {
         $tags = [];
         $map = $this->cacheService->getCurrentCacheServiceConfigMap();

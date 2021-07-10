@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Repositories\Eloquent\TagRepository;
 use App\Service\Serviceable;
 use App\Service\TagsInterface;
+use Illuminate\Support\Facades\Log;
 
 class TagService extends Service implements TagsInterface
 {
@@ -31,6 +32,7 @@ class TagService extends Service implements TagsInterface
             $getTagsCloud,
             null,
             cachedUser(),
+            [],
             $this->dependsOnModels
         );
     }

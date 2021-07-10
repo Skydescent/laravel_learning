@@ -103,7 +103,7 @@ abstract  class Repository implements EloquentRepositoryInterface
      * @param array $attributes
      * @param array $identifier
      * @param User|null $user
-     * @return Taggable|mixed
+     * @return mixed
      */
     public function update(array $attributes, array $identifier, ?User $user = null): mixed
     {
@@ -130,18 +130,11 @@ abstract  class Repository implements EloquentRepositoryInterface
     protected function storeOrUpdate(array $attributes,array $identifier = null)
     {
 
-//        $tags = $attributes['tags'] ?? null;
-//        unset($attributes['tags']);
-
         if ($identifier) {
            $model = ($this->modelClass)::updateOrCreate($identifier, $attributes);
         } else {
            $model = ($this->modelClass)::updateOrCreate($attributes);
         }
-
-//        if ($model instanceof Taggable) {
-//            $model->syncTags($tags);
-//        }
 
         return $model;
     }

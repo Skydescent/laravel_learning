@@ -142,38 +142,19 @@ return [
             Post::class => [
                 'tag' => 'posts',
                 'isPersonal' => true,
-                'relations' => [
-                    'comments' => Comment::class,
-                    'tags' => Tag::class,
-                    'owner' => User::class,
-                    'history' => PostHistory::class
-                ],
             ],
             News::class => [
                 'tag' => 'news',
                 'isPersonal' => false,
-                'relations' => [
-                    'comments' => Comment::class,
-                    'tags' => Tag::class,
-                ],
             ],
             Tag::class => [
                 'tag' => 'tags',
                 'isPersonal' => true,
-                'relations' => [
-                    'tasks' => Task::class,
-                    'posts' => Post::class,
-                    'news' => News::class,
-                    'users' => User::class
-                ],
 
             ],
             Comment::class => [
                 'tag' => 'comments',
                 'isPersonal' => false,
-                'relations' => [
-                    'author' => User::class
-                ]
             ],
             Feedback::class => [
                 'tag' => 'feedbacks',
@@ -182,30 +163,15 @@ return [
             Task::class => [
                 'tag' => 'tasks',
                 'isPersonal' => true,
-                'relations' => [
-                    'steps' => Step::class,
-                    'tags' => Tag::class,
-                    'owner' => User::class,
-                ],
 
             ],
             Step::class => [
                 'tag' => 'steps',
                 'isPersonal' => false,
-                'relations' => [
-                    'task' => Task::class
-                ]
             ],
             User::class => [
                 'tag' => 'users',
                 'isPersonal' => false,
-                'relations' => [
-                    'tasks' => Task::class,
-                    'posts' => Post::class,
-                    'company' => Company::class,
-                    'tags' => Tag::class,
-                    'comments' => Comment::class
-                ]
             ],
         ],
         'simple_services' => [

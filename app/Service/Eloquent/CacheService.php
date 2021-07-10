@@ -9,6 +9,7 @@ use App\Models\User;
 use Cache;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Facades\Log;
 
 class CacheService extends BaseCacheService
 {
@@ -81,7 +82,7 @@ class CacheService extends BaseCacheService
     public function flushModelCache(array $identifier, ?User $user = null)
     {
         $this->forgetModel($identifier, $user);
-        $this->forgetModelRelations($identifier, $user);
+        $this->forgetModelRelations($identifier);
         $this->flushCollections();
     }
 
@@ -93,15 +94,10 @@ class CacheService extends BaseCacheService
         Cache::tags([$tag])->forget($keyName);
     }
 
-    public function forgetModelRelations(array $identifier = null, ?User $user = null)
+    public function forgetModelRelations(array $identifier)
     {
-        foreach ($this->getRelationsNames() as $relationName) {
-            $this->forgetModelRelation(
-                $identifier,
-                ['relation' => $relationName],
-                $user
-            );
-        }
+        $tag = $this->getRelationTag($identifier);
+        Cache::tags($tag)->flush();
     }
 
     public function forgetMorphedModelRelation(
@@ -119,25 +115,17 @@ class CacheService extends BaseCacheService
         array $identifier,
         array $relationName,
         ?User $user = null,
-        array $tags = []
     )
     {
         $postfixes = array_merge( $identifier, $relationName);
         $keyName = $this->getKeyName($user, $postfixes);
-
-        $tags = count($tags) !== 0 ? $tags : [$this->getTagName()];
-
-        Cache::tags($tags)->forget($keyName);
+        $tag = $this->getRelationTag($identifier);
+        Cache::tags($tag)->forget($keyName);
     }
 
     public function flushCollections()
     {
         Cache::tags([$this->getTagName() . '_collection'])->flush();
-    }
-
-    public function getRelationsNames(): array
-    {
-        return isset($this->configs['relations']) ? array_keys($this->configs['relations']) : [];
     }
 
     public function getModelIdentifier(
@@ -158,4 +146,10 @@ class CacheService extends BaseCacheService
         $instanceKeyName = $model->$routeKeyName;
         return [$routeKeyName => $instanceKeyName];
     }
+
+    public function getRelationTag(array $identifier) : array
+    {
+        return [$this->getTagName() . '_' . implode($identifier) . '_relations'];
+    }
+
 }

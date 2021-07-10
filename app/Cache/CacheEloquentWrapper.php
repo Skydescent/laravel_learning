@@ -108,22 +108,21 @@ class CacheEloquentWrapper implements UrlRoutable, ArrayAccess, Arrayable, Jsona
 
     public function __get(string $name)
     {
-        //Log::info('CachedEloquentWrapper@__get name:' . $name);
-        if (in_array($name, $this->cacheService->getRelationsNames())) {
+        if ($this->isModelRelation($name)) {
 
             $getRelation = function () use ($name) {
                 return $this->model->$name;
             };
-            //Log::info('CachedEloquentWrapper@__get cache:' . implode(',', $this->identifier));
             $cache = $this
                 ->cacheService
                 ->cache(
                     $getRelation,
                     $this->user,
-                    array_merge($this->identifier, ['relation' => $name])
+                    array_merge($this->identifier, ['relation' => $name]),
+                    $this->cacheService->getRelationTag($this->identifier)
                 );
 
-            return static::getWrapper($cache,$this->identifier, $this->cacheService, cachedUser());
+            return static::getWrapper($cache,$this->identifier, $this->cacheService, $this->user);
         }
 
         if($name === 'model') {
@@ -247,5 +246,14 @@ class CacheEloquentWrapper implements UrlRoutable, ArrayAccess, Arrayable, Jsona
     public function offsetUnset($offset)
     {
         return $this->model->offsetSet($offset);
+    }
+
+    private function isModelRelation(string $propName): bool
+    {
+        return method_exists($this->model, $propName) &&
+            str_starts_with(
+                get_class($this->model->$propName()),
+                'Illuminate\Database\Eloquent\Relations\\'
+            );
     }
 }

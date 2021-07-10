@@ -5,6 +5,7 @@ namespace App\Service\Cache;
 use App\Models\User;
 use Cache;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Log;
 use function config;
 
 abstract class CacheService

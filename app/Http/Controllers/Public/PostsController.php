@@ -30,9 +30,10 @@ class PostsController extends BasePostController
     public function index(): Factory|View|Application
     {
         $currentPage = request()->get('page',1);
-        $posts = $this->postsService->index(cachedUser(), ['page' => $currentPage]);
+        $user = cachedUser();
+        $posts = $this->postsService->index($user, ['page' => $currentPage]);
 
-        return view('posts.index', compact( 'posts'));
+        return view('posts.index', compact( 'posts', 'user'));
     }
 
     /**
