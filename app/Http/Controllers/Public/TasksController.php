@@ -2,64 +2,36 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Contracts\Service\Task\CreateTaskServiceContract;
+use App\Contracts\Repository\TaskRepositoryContract;
+use App\Contracts\Service\Task\UpdateTaskServiceContract;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TaskStoreAndUpdateRequest;
-use App\Service\Serviceable;
-use App\Service\TagsInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 class TasksController extends Controller
 {
-    /**
-     * @var Serviceable
-     */
-    protected Serviceable $tasksService;
-
-    /**
-     * @var TagsInterface
-     */
-    protected TagsInterface $tagsService;
-
-    /**
-     * @param Serviceable $tasksService
-     */
-    public function __construct(Serviceable $tasksService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this
-            ->middleware('model.from.cache:' . get_class($tasksService) . ',task')
-            ->only(['show', 'edit', 'update', 'destroy']);
-        $this->tasksService = $tasksService;
-        $this->tagsService = $this->getTagService();
     }
 
-    /**
-     * @param Request|FormRequest|null $request
-     * @return array
-     */
-    protected function prepareAttributes(Request|FormRequest $request = null): array
-    {
-        $attributes = $request->validated();
-        $attributes['owner_id'] = isset($this->model->owner) ? $this->model->owner->id :cachedUser()->id;
-        return $attributes;
-    }
 
-    public function index(): Factory|View|Application
+    public function index(TaskRepositoryContract $repository): Factory|View|Application
     {
-        $tasks = $this->tasksService->index(cachedUser());
+        $tasks = $repository->getTasks(cachedUser());
         return view('tasks.index', compact( 'tasks'));
     }
 
-    public function show(Request $request): Factory|View|Application
+    public function show(TaskRepositoryContract $repository, $id): Factory|View|Application
     {
-        $task = $request->attributes->get('task');
+        $task = $repository->find($id);
+        $this->authorize('update', $task);
         return view('tasks.show', compact('task'));
     }
 
@@ -68,60 +40,47 @@ class TasksController extends Controller
         return view('tasks.create');
     }
 
-    public function store(TaskStoreAndUpdateRequest $request): Redirector|Application|RedirectResponse
+    public function store(
+        TaskStoreAndUpdateRequest $request,
+        CreateTaskServiceContract $createTaskService
+    ): Redirector|Application|RedirectResponse
     {
-        $this
-            ->tagsService
-            ->storeWithTagsSync(
-                $this->tasksService,
-                $this->prepareAttributes($request)
-            );
-
-        //$this->tasksService->store($this->prepareAttributes($request));
+        $createTaskService->create($request->validated(), getUserId());
         return redirect('/tasks');
     }
 
-    /**
-     * @throws AuthorizationException
-     */
-    public function edit(Request $request): Factory|View|Application
-    {
-        $task = $request->attributes->get('task');
-        $this->authorize('update', $task->model);
 
+    public function edit(TaskRepositoryContract $repository, $id): Factory|View|Application
+    {
+        $task = $repository->find($id);
+        $this->authorize('update', $task);
         return view('tasks.edit', compact('task'));
     }
 
-    /**
-     * @throws AuthorizationException
-     */
-    public function update(TaskStoreAndUpdateRequest $request): Redirector|Application|RedirectResponse
+
+    public function update(
+        TaskStoreAndUpdateRequest $request,
+        UpdateTaskServiceContract $updateTaskService,
+        TaskRepositoryContract $repository,
+        $id
+    ): Redirector|Application|RedirectResponse
     {
-        $task = $request->attributes->get('task');
-        $this->authorize('update', $task->model);
+        $task = $repository->find($id);
+        $this->authorize('update', $task);
+        $updateTaskService->update($request->validated(), $id, getUserId());
 
-        $this
-            ->tagsService
-            ->updateWithTagsSync(
-                $this->tasksService,
-                $this->prepareAttributes($request),
-                $task->id,
-                cachedUser()
-            );
-
-        //$this->tasksService->update($this->prepareAttributes($request), $id, cachedUser());;
         return redirect('/tasks');
     }
 
     /**
      * @throws AuthorizationException
      */
-    public function destroy(Request $request): Redirector|Application|RedirectResponse
+    public function destroy(TaskRepositoryContract $repository, $id): Redirector|Application|RedirectResponse
     {
-        $task = $request->attributes->get('task');
-        $this->authorize('update', $task->model);
+        $task = $repository->find($id);
+        $this->authorize('update', $task);
 
-        $this->tasksService->destroy($task->id, cachedUser());
+        $repository->delete($id, getUserId());
 
         return redirect('/tasks');
     }

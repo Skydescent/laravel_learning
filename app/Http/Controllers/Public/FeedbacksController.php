@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Contracts\Repository\FeedbackRepositoryContract;
 use App\Http\Controllers\Controller;
-use App\Service\AdminServiceable;
-
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -17,35 +15,12 @@ class FeedbacksController extends Controller
 {
 
     /**
-     * @var AdminServiceable
-     */
-    protected AdminServiceable $feedbacksService;
-
-    /**
-     * @param AdminServiceable $feedbacksService
-     */
-    public function __construct(AdminServiceable $feedbacksService)
-    {
-        $this->feedbacksService = $feedbacksService;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function prepareAttributes(Request|FormRequest $request) : array
-    {
-        return $request->validate([
-            'email' => 'required|email',
-            'body' => 'required'
-        ]);
-    }
-
-    /**
+     * @param FeedbackRepositoryContract $repository
      * @return Application|Factory|View
      */
-    public function index(): View|Factory|Application
+    public function index(FeedbackRepositoryContract $repository): View|Factory|Application
     {
-        $feedbacks = $this->feedbacksService->adminIndex(cachedUser());
+        $feedbacks = $repository->getFeedbacks();
         return view('admin.feedbacks.index', compact( 'feedbacks'));
     }
 
@@ -59,12 +34,19 @@ class FeedbacksController extends Controller
 
     /**
      * @param Request $request
+     * @param FeedbackRepositoryContract $repository
      * @return Application|RedirectResponse|Redirector
      */
-    public function store(Request $request): Redirector|RedirectResponse|Application
+    public function store(
+        Request $request,
+        FeedbackRepositoryContract $repository
+    ): Redirector|RedirectResponse|Application
     {
-        $this->feedbacksService->store($this->prepareAttributes($request));
-
+        $repository->store($request->validate([
+            'email' => 'required|email',
+            'body' => 'required'
+        ]));
+        flash('Мы ответим на ваше обращение в ближайшее время!');
         return redirect('/');
     }
 }

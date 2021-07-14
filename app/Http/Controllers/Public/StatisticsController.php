@@ -2,25 +2,18 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Contracts\Repository\StatisticsRepositoryContract;
 use App\Http\Controllers\Controller;
-use App\Service\Indexable;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 
 class StatisticsController extends Controller
 {
-    protected Indexable $statisticsService;
-
-    public function __construct(Indexable $statisticsService)
+    public function index(StatisticsRepositoryContract $statisticsRepository): Factory|View|Application
     {
-        $this->statisticsService = $statisticsService;
-    }
 
-    public function index(): Factory|View|Application
-    {
-        $statistics = $this->statisticsService->index();
-
+        $statistics = $statisticsRepository->getStatistics();
         return view('statistics.index', compact( 'statistics'));
     }
 }

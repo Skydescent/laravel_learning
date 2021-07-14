@@ -2,18 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use App\Contracts\PostRepositoryContract;
 use App\Service\Serviceable;
 use Closure;
 use Illuminate\Http\Request;
 
 class BindModelFromCache
 {
-    private Serviceable $modelService;
-
-    public function initialize(string $modelClass)
-    {
-        $this->modelService = new $modelClass();
-    }
 
     /**
      * Handle an incoming request.
@@ -23,15 +18,16 @@ class BindModelFromCache
      * @param $model
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $serviceClass, $requestFieldName): mixed
+    public function handle(Request $request, Closure $next, $repositoryContract, $requestFieldName): mixed
     {
-        $this->modelService =  new $serviceClass();
-        //dd($request->$requestFieldName);
+        $repository = app()->make($repositoryContract);
+
 
         if (isset($request->$requestFieldName)) {
             $identifier = $request->$requestFieldName;
-            $modelInstance = $this->modelService->find($identifier, cachedUser())?:$requestFieldName;
-            $request->attributes->set($requestFieldName, $modelInstance);
+            $modelInstance = $repository->find($identifier);
+            //$request->attributes->set($requestFieldName, $modelInstance);
+            $request->$requestFieldName = $modelInstance;
         }
 
         return $next($request);

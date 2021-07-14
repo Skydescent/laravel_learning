@@ -2,95 +2,30 @@
 
 namespace App\Service\Cache;
 
-use App\Models\User;
+use App\Contracts\Service\CacheServiceContract;
 use Cache;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Support\Facades\Log;
-use function config;
 
-abstract class CacheService
+class CacheService implements CacheServiceContract
 {
-    const CACHE_SERVICE_CONFIG_KEY = 'cache.cache_service';
 
-    protected static array $instances = [];
-
-    protected static string $configsMap;
-
-    protected string $configKey;
-
-    public array $configs;
-
-    protected function __construct(string $configKey)
+    public function forget(array $tag, string $cacheKey)
     {
-        $this->configKey = $configKey;
-        $this->initialize();
+        Cache::tags($tag)->forget($cacheKey);
     }
 
-    protected function __clone()
+    public function flushCollections(array $collections)
     {
-
-    }
-
-    abstract protected static function setConfigsMap();
-
-    protected function initialize()
-    {
-        $allConfigs = config(self::CACHE_SERVICE_CONFIG_KEY);
-        $this->configs = array_diff_key($allConfigs, [static::$configsMap => '']);
-
-        if (array_key_exists($this->configKey,$allConfigs[static::$configsMap])) {
-            $this->configs = array_merge($this->configs, $allConfigs[static::$configsMap][$this->configKey]);
-        }
-    }
-
-    public static function getInstance(string $configKey)
-    {
-        static::setConfigsMap();
-
-        if (!config('cache.cache_service.' . static::$configsMap . '.' . $configKey)) return null;
-
-        if (!isset(self::$instances[$configKey])) {
-            self::$instances[$configKey] = new static($configKey);
-        }
-
-        return self::$instances[$configKey];
+        Cache::tags($collections)->flush();
     }
 
     public function cache(
-        callable             $queryData ,
-        Authenticatable|User $user = null,
-        array                $postfixes = [],
-        array|null           $tags = null
+        array          $tags,
+        string     $cacheKey,
+        int             $ttl,
+        \Closure $queryData ,
     )
     {
-        $tags = $tags ??  [$this->getTagName()];
-        $user = !$user || !$user->id ? null : $user;
-        $key = $this->getKeyName($user, $postfixes);
-
-        $data = Cache::tags($tags)->get($key);
-
-        if (! is_null($data)) {
-            return $data;
-        }
-
-        if ($data = $queryData()) {
-            Cache::tags($tags)->put($key, $data, $this->configs['ttl']);
-            return $data;
-        }
-
-        return null;
-    }
-
-    public function getTagName()
-    {
-        return  $this->configs['tag'] ??  $this->configKey;
-    }
-
-    abstract protected function getKeyName(Authenticatable|User $user = null, $postfixes = []): string;
-
-    public function getCurrentCacheServiceConfigMap()
-    {
-        return config(self::CACHE_SERVICE_CONFIG_KEY . '.' . static::$configsMap);
+        return Cache::tags($tags)->remember($cacheKey,$ttl,$queryData);
     }
 
 }

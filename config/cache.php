@@ -5,7 +5,7 @@ use App\Models\Company;
 use App\Models\Feedback;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PostsController as AdminPostsController;
-use App\Http\Controllers\Public\CompletedStepsController;
+use App\Http\Controllers\Public\CompletedTaskStepsController;
 use App\Http\Controllers\Public\FeedbacksController;
 use App\Http\Controllers\Public\NewsCommentsController;
 use App\Http\Controllers\Public\NewsController as PublicNewsController;
@@ -29,7 +29,7 @@ use App\Service\Serviceable;
 use App\Service\StatisticsService;
 use App\Service\StepsInterface;
 use App\Service\Eloquent\StepsService;
-use App\Service\Eloquent\TagService;
+use App\Service\Eloquent\SyncTagsService;
 use App\Service\TagsInterface;
 use App\Service\Eloquent\TasksService;
 use App\Models\Step;
@@ -241,7 +241,7 @@ return [
         ],
     ],
     'all_services' => [
-        \App\Service\TagsInterface::class => \App\Service\Eloquent\TagService::class,
+        \App\Service\TagsInterface::class => \App\Service\Eloquent\SyncTagsService::class,
         \App\Service\StepsInterface::class => \App\Service\Eloquent\StepsService::class,
         \App\Service\CommentsInterface::class => \App\Service\Eloquent\CommentsService::class,
     ],

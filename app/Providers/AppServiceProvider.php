@@ -2,8 +2,7 @@
 
 namespace App\Providers;
 
-use App\Service\Eloquent\TagService;
-use App\Service\TagsInterface;
+use App\Contracts\Service\Tag\TagsCloudServiceContract;
 use App\View\Components\Alert;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -36,8 +35,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('layout.sidebar', function($view) {
-            //$tagsCloud = (new TagService())->tagsCloud();
-            $tagsCloud = $this->app->get(TagsInterface::class)->tagsCloud();;
+            $tagsCloud = $this->app->get(TagsCloudServiceContract::class)->tagsCloud(getUserId());
             $view->with('tagsCloud', $tagsCloud);
         });
 

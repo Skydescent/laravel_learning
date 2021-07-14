@@ -4,7 +4,7 @@
 <div class="col-md-8 blog-main">
     <h3 class="pb-4 mb-4 font-italic border-bottom">
         {{ $task->title }}
-        @can('update', $task->model)
+        @can('update', $task)
             <a href="{{route('tasks.edit', ['task' => $task])}}">Изменить</a>
         @endcan
     </h3>
@@ -15,7 +15,7 @@
         <ul class="list-group">
             @foreach($task->steps as $step)
                 <li class="list-group-item">
-                    <form method="POST" action="/completed-steps/{{ $step->id }}">
+                    <form method="POST" action="/completed-steps/{{ $step->id }}/{{$task->id}}">
                         @if ($step->completed)
                             @method('DELETE')
                         @endif

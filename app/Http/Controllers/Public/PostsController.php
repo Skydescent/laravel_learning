@@ -2,47 +2,47 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\PostsController as BasePostController;
+use App\Contracts\Service\Post\CreatePostServiceContract;
+use App\Contracts\Service\Post\DestroyPostServiceContract;
+use App\Contracts\Repository\PostRepositoryContract;
+use App\Contracts\Service\Post\UpdatePostServiceContract;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\PostStoreAndUpdateRequest;
-use App\Service\AdminServiceable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
-
-class PostsController extends BasePostController
+class PostsController extends Controller
 {
-    public function __construct(AdminServiceable $postsService)
+    public function __construct()
     {
-        parent::__construct($postsService);
         $this->middleware('auth')->only(['create','update']);
-        $this
-            ->middleware('model.from.cache:' . get_class($postsService) . ',post')
-            ->only(['show', 'edit', 'update', 'destroy']);
     }
 
     /**
+     * @param PostRepositoryContract $repository
      * @return Factory|View|Application
      */
-    public function index(): Factory|View|Application
+    public function index(PostRepositoryContract $repository): Factory|View|Application
     {
         $currentPage = request()->get('page',1);
         $user = cachedUser();
-        $posts = $this->postsService->index($user, ['page' => $currentPage]);
+        $posts = $repository->getPosts(10,$currentPage,$user->id);
 
         return view('posts.index', compact( 'posts', 'user'));
     }
 
     /**
-     * @param Request $request
+     * @param PostRepositoryContract $repository
+     * @param $slug
      * @return Factory|View|Application
      */
-    public function show(Request $request): Factory|View|Application
+    public function show(PostRepositoryContract $repository, $slug): Factory|View|Application
     {
-        $post = $request->attributes->get('post');
+        $post = $repository->find($slug);
+
         return view('posts.show', compact('post'));
     }
 
@@ -56,28 +56,32 @@ class PostsController extends BasePostController
 
     /**
      * @param PostStoreAndUpdateRequest $request
+     * @param CreatePostServiceContract $createPostService
      * @return RedirectResponse
      */
-    public function store(PostStoreAndUpdateRequest $request): RedirectResponse
+    public function store(
+        PostStoreAndUpdateRequest $request,
+        CreatePostServiceContract $createPostService
+    ): RedirectResponse
     {
-        $this
-            ->tagsService
-            ->storeWithTagsSync(
-                $this->postsService,
-                $this->prepareAttributes($request)
-            );
-
+        $createPostService->create($request->validated(), getUserId());
+        flash('Сообщение успешно добавлено!');
         return redirect()->route('posts.index');
     }
 
     /**
+     * @param PostRepositoryContract $repository
+     * @param $slug
      * @return Factory|View|Application
      * @throws AuthorizationException
      */
-    public function edit(): Factory|View|Application
+    public function edit(
+        PostRepositoryContract $repository,
+        $slug
+    ): Factory|View|Application
     {
-        $post = \request()->attributes->get('post');
-        $this->authorizeIfNeeded('update', $post->model);
+        $post = $repository->find($slug);
+        $this->authorize('update', $post);
         $isAdmin = false;
         return view('posts.edit', compact('post', 'isAdmin'));
     }
@@ -85,36 +89,40 @@ class PostsController extends BasePostController
     /**
      * @throws AuthorizationException
      */
-    public function update(PostStoreAndUpdateRequest $request): RedirectResponse
+    public function update(
+        PostStoreAndUpdateRequest $request,
+        PostRepositoryContract $repository,
+        UpdatePostServiceContract $updatePostService,
+        $slug
+    ): RedirectResponse
     {
-        $attributes = $this->prepareAttributes($request);
-        $post = $request->attributes->get('post');
-        $this->authorizeIfNeeded('update', $post->model);
+        $post = $repository->find($slug);
+        $this->authorize('update', $post);
+        $updatePostService->update($request->validated(), ['slug' => $slug]);
 
-        $this
-            ->tagsService
-            ->updateWithTagsSync(
-                $this->postsService,
-                $attributes,
-                $post->slug,
-                cachedUser()
-            );
-
+        flash('Статья успешно обновлено!');
         return redirect()->route('posts.index');
     }
 
     /**
-     * @param Request $request
+     * @param PostRepositoryContract $repository
+     * @param DestroyPostServiceContract $destroyPostService
+     * @param $slug
      * @return RedirectResponse
      * @throws AuthorizationException
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(
+        PostRepositoryContract $repository,
+        DestroyPostServiceContract $destroyPostService,
+        $slug
+    ): RedirectResponse
     {
-        $post = $request->attributes->get('post');
-        $this->authorizeIfNeeded('update', $post->model);
+        $post = $repository->find($slug);
+        $this->authorize('update', $post);
 
-        $this->postsService->destroy($post->slug, cachedUser());
+        $destroyPostService->delete($slug);
 
+        flash('Статья удалена!', 'warning');
         return redirect()->route('posts.index');
     }
 }

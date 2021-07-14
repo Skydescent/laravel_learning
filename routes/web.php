@@ -9,8 +9,8 @@ Route::get('/tags/{tag}', 'Public\TagsController@index')->name('tags.cloud');
 Route::resource('/tasks', 'Public\TasksController');
 
 Route::post('/tasks/{task}/steps', 'Public\TaskStepsController@store');
-Route::post('/completed-steps/{step}', 'Public\CompletedStepsController@store');
-Route::delete('/completed-steps/{step}', 'Public\CompletedStepsController@destroy');
+Route::post('/completed-steps/{step}/{task}', 'Public\CompletedTaskStepsController@store');
+Route::delete('/completed-steps/{step}/{task}', 'Public\CompletedTaskStepsController@destroy');
 
 
 Route::resource('/posts', 'Public\PostsController');
@@ -18,7 +18,6 @@ Route::resource('/news', 'Public\NewsController')->only('index','show');
 
 Route::view('/about', 'about')->name('about');
 Route::get('/contacts', 'Public\FeedbacksController@create')->name('feedbacks.create');
-//Route::get('/feedbacks','FeedbacksController@index')->name('feedbacks.index');
 Route::post('/feedbacks','Public\FeedbacksController@store')->name('feedbacks.store');
 Route::get('/greeting', function () {
     return 'Hello World';
@@ -42,7 +41,7 @@ Auth::routes();
 
 Route::middleware('auth')->post('/companies', function () {
     $attributes = request()->validate(['name' => 'required']);
-    $attributes['owner_id'] = auth()->id();
+    $attributes['owner_id'] = getUserId();
 
     \App\Models\Company::create($attributes);
 });
@@ -59,7 +58,7 @@ Route::middleware('auth')
     ->name('news.comments.store');
 
 Route::post('/chat', function () {
-    broadcast(new \App\Events\ChatMessage(request('message'), auth()->user()))->toOthers();
+    broadcast(new \App\Events\ChatMessage(request('message'), cachedUser()))->toOthers();
 })->middleware('auth');
 
 Route::get('/send', function () {

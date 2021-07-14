@@ -6,4 +6,5 @@ use App\Http\Controllers\CommentsController;
 
 class PostCommentsController extends CommentsController
 {
+
 }

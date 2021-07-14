@@ -8,6 +8,7 @@ use App\Http\Middleware\CheckForMaintenanceMode;
 use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\Permissions;
 use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\TestAuthMiddleware;
 use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\VerifyCsrfToken;
@@ -29,6 +30,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class Kernel extends HttpKernel
 {
+
     /**
      * The application's global HTTP middleware stack.
      *
@@ -76,6 +78,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        'test' => TestAuthMiddleware::class,
         'model.from.cache' => BindModelFromCache::class,
         'permissions' => Permissions::class,
         'auth' => Authenticate::class,

@@ -7,9 +7,9 @@
     <h3 class="mb-2 font-italic">
         {{ $post->title }}
     </h3>
-    @can('update', $post->model)
+    @can('update', $post)
         <h5>
-            <a href="{{ route('posts.edit', ['post' => $post->model]) }}" class="badge badge-primary">Изменить</a>
+            <a href="{{ route('posts.edit', ['post' => $post]) }}" class="badge badge-primary">Изменить</a>
         </h5>
     @endcan
     <p class="blog-post-meta">{{$post->created_at}} </p>
@@ -21,6 +21,7 @@
     @auth
         @include('comments.create', ['action' => route('post.comments.store', ['post' => $post])])
     @endauth
+
     @include('comments.index', ['model' => $post])
     <hr>
     @forelse($post->history as $item)

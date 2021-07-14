@@ -2,34 +2,30 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\StepsController;
-use App\Service\Serviceable;
-use App\Service\StepsInterface;
+use App\Contracts\Service\CreateStepServiceContract;
+use App\Contracts\Repository\RepositoryStepableContract;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class TaskStepsController extends StepsController
+class TaskStepsController
 {
-    protected Serviceable $tasksService;
+    private RepositoryStepableContract $stepableRepository;
 
-    /**
-     * @param StepsInterface $stepsService
-     * @param Serviceable $tasksService
-     */
-    public function __construct(StepsInterface $stepsService, Serviceable $tasksService)
+    public function __construct(RepositoryStepableContract $stepableRepository)
     {
-        parent::__construct($stepsService);
-        $this->tasksService = $tasksService;
+        $this->stepableRepository = $stepableRepository;
     }
 
-    public function store(Request $request, $id): RedirectResponse
+    public function store(
+        Request $request,
+        CreateStepServiceContract $createStepService,
+        $id
+    ): RedirectResponse
     {
-        $task = $this
-            ->tasksService
-            ->find($id, cachedUser())
-            ->model;
-
-        $this->stepsService->addStep($this->prepareAttributes($request), $task);
+        $createStepService->create(
+            $request->validate(['description' => 'required|min:5']),
+            $id,
+            $this->stepableRepository);
 
         return back();
     }

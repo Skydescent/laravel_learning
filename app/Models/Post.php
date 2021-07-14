@@ -17,7 +17,8 @@ class Post extends Model implements Commentable, Taggable
     protected static function booted()
     {
         static::updated(function (Post $post) {
-            broadcast(new PostUpdated($post, cachedUser()));
+            broadcast(new PostUpdated($post, auth()->user()));
+            event();
         });
         static::created(function (Post $post) {
             event(new PostCreated($post));
@@ -29,7 +30,7 @@ class Post extends Model implements Commentable, Taggable
         parent::boot();
 
             static::updating(function($post) {
-		    $post->history()->attach(auth()->id(),
+		    $post->history()->attach(getUserId(),
                 [
                     'changed_fields' =>json_encode(array_keys($post->getDirty())),
                 ]
@@ -50,7 +51,7 @@ class Post extends Model implements Commentable, Taggable
             return $query->orWhereHas('posts', function (Builder $subQuery) {
                 $subQuery
                     ->where('published', 1)
-                    ->orWhere('owner_id', '=', auth()->id());
+                    ->orWhere('owner_id', '=', getUserId());
             });
     }
 

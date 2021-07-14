@@ -2,11 +2,32 @@
 
 namespace App\Repositories\Eloquent;
 
-class UserRepository extends Repository
-{
+use App\Contracts\Service\CacheServiceContract;
+use App\Contracts\Repository\UserRepositoryContract;
+use App\Models\User;
 
-    protected function prepareAttributes($request = null): array
+class UserRepository implements UserRepositoryContract
+{
+    private CacheServiceContract $cacheService;
+
+    public function __construct(CacheServiceContract $cacheService)
     {
-        return $request->toArray();
+        $this->cacheService = $cacheService;
+    }
+
+    public function find($id) : ?User
+    {
+        $getUserCallback = function () use ($id) {
+            return User::find($id);
+        };
+
+        return $this
+            ->cacheService
+            ->cache(
+                ['users_collection'],
+                'users|id=' . $id,
+                600,
+                $getUserCallback
+            );
     }
 }

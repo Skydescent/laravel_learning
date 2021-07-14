@@ -2,43 +2,35 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Service\AdminServiceable;
-use App\Http\Controllers\NewsController as BaseNewsController;
+use App\Contracts\Repository\NewsRepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
-class NewsController extends BaseNewsController
+class NewsController
 {
-    public function __construct(AdminServiceable $newsService)
-    {
-        parent::__construct($newsService);
-        $this
-            ->middleware('model.from.cache:' . get_class($newsService) . ',news')
-            ->only(['show']);
-    }
-
 
     /**
+     * @param NewsRepositoryContract $repository
      * @return Application|Factory|View
      */
-    public function index(): View|Factory|Application
+    public function index(NewsRepositoryContract $repository): View|Factory|Application
     {
         $currentPage = request()->get('page',1);
-        $news = $this->newsService->index(cachedUser(), ['page' => $currentPage]);
+        $news = $repository->getNews(10,$currentPage);
+
         return view('news.index', compact( 'news'));
     }
 
 
     /**
-     * @param Request $request
+     * @param NewsRepositoryContract $repository
+     * @param $slug
      * @return Application|Factory|View
      */
-    public function show(Request $request): View|Factory|Application
+    public function show(NewsRepositoryContract $repository, $slug): View|Factory|Application
     {
-
-        $news = $request->attributes->get('news');
+        $news = $repository->find($slug);
         return view('news.show', compact('news'));
     }
 }

@@ -20,25 +20,4 @@ abstract class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-
-    protected function prepareAttributes(Request|FormRequest $request): array
-    {
-        return $request->all();
-    }
-
-    /**
-     * @throws AuthorizationException
-     */
-    protected function authorizeIfNeeded(?string $policyAuthMethod, $model)
-    {
-        if ($policyAuthMethod) {
-            $this->authorize($policyAuthMethod, $model);
-        }
-    }
-
-    protected function getTagService(): TagsInterface
-    {
-        return app()->get(TagsInterface::class);
-    }
-
 }

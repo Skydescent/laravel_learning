@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'public_visible_related_models' => [
+    'models_with_tags' => [
         'App\Models\Post' => [
             'title' => 'Статьи',
             'relation' => 'posts',

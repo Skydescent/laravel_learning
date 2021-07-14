@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Contracts\PostRepositoryContract;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -24,7 +26,7 @@ class PostStoreAndUpdateRequest extends FormRequest
 
         if ($this->route()->hasParameter('post')) {
 
-            $slugRule .= ',slug,' . $this->attributes->get('post')->id;
+            $slugRule .= ',slug,' . $this->getPostId($this->post);
         }
 
         return [
@@ -33,8 +35,19 @@ class PostStoreAndUpdateRequest extends FormRequest
             'short_text' => 'required|max:255',
             'body' => 'required',
             'published' => '',
-            'tags' => ''
+            'tags' => '',
+            'owner_id' => '',
         ];
 
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    private function getPostId($slug)
+    {
+        return app()
+            ->make(PostRepositoryContract::class)
+            ->find($slug)->id;
     }
 }

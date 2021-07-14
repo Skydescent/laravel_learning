@@ -2,38 +2,30 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\NewsController as BaseNewsController;
+use App\Contracts\Service\News\CreateNewsServiceContract;
+use App\Contracts\Service\News\DestroyNewsServiceContract;
+use App\Contracts\Repository\NewsRepositoryContract;
+use App\Contracts\Service\News\UpdateNewsServiceContract;
 use App\Http\Requests\NewsStoreAndUpdateRequest;
 use App\Models\News;
-use App\Service\AdminServiceable;
-use App\Service\TagsInterface;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class NewsController extends BaseNewsController
+class NewsController
 {
-    protected TagsInterface $tagsService;
-
-    public function __construct(AdminServiceable $newsService)
-    {
-        parent::__construct($newsService);
-        $this->tagsService = $this->getTagService();
-        $this
-            ->middleware('model.from.cache:' . get_class($newsService) . ',news')
-            ->only(['edit', 'update', 'destroy']);
-    }
 
     /**
      * Display a listing of the resource.
      *
+     * @param NewsRepositoryContract $repository
      * @return View
      */
-    public function index(): View
+    public function index(NewsRepositoryContract $repository): View
     {
         $currentPage = request()->get('page',1);
-        $news = $this->newsService->adminIndex(cachedUser(), ['page' => $currentPage]);
+        $news = $repository->getAdminNews(10,$currentPage);
 
         return view('admin.news.index', compact( 'news'));
     }
@@ -52,50 +44,49 @@ class NewsController extends BaseNewsController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  NewsStoreAndUpdateRequest $request
+     * @param NewsStoreAndUpdateRequest $request
+     * @param CreateNewsServiceContract $createNewsService
      * @return RedirectResponse
-     * @throws Exception
      */
-    public function store(NewsStoreAndUpdateRequest $request) : RedirectResponse
+    public function store(
+        NewsStoreAndUpdateRequest $request,
+        CreateNewsServiceContract $createNewsService
+    ) : RedirectResponse
     {
-        $this->tagsService->storeWithTagsSync($this->newsService,$this->prepareAttributes($request));
-
-        //$this->newsService->store($this->prepareAttributes($request));
+        $createNewsService->create($request->validated());
         return redirect()->route('admin.news.index');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  Request $request
+     * @param NewsRepositoryContract $repository
+     * @param $slug
      * @return View
      */
-    public function edit(Request $request) : View
+    public function edit(NewsRepositoryContract $repository, $slug) : View
     {
-        $news = $request->attributes->get('news');
+        $news = $repository->find($slug);
         return view('admin.news.edit', compact('news'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  NewsStoreAndUpdateRequest  $request
-     * @param  string $slug
+     * @param NewsStoreAndUpdateRequest $request
+     * @param UpdateNewsServiceContract $updateNewsService
+     * @param $slug
      * @return RedirectResponse
-     * @throws Exception
      */
-    public function update(NewsStoreAndUpdateRequest $request, string $slug): RedirectResponse
+    public function update(
+        NewsStoreAndUpdateRequest $request,
+        UpdateNewsServiceContract $updateNewsService,
+        $slug
+    ): RedirectResponse
     {
-        $this
-            ->tagsService
-            ->updateWithTagsSync(
-                $this->newsService,
-                $this->prepareAttributes($request),
-                $slug,
-                cachedUser()
-            );
+        $updateNewsService->update($request->validated(), ['slug' => $slug]);
 
-        //$this->newsService->update($this->prepareAttributes($request), $slug, cachedUser());
+        flash('Новость успешно обновлена!');
 
         return redirect()->route('admin.news.index');
     }
@@ -103,17 +94,15 @@ class NewsController extends BaseNewsController
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
+     * @param DestroyNewsServiceContract $destroyNewsService
+     * @param $slug
      * @return RedirectResponse
-     * @throws Exception
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(DestroyNewsServiceContract $destroyNewsService, $slug): RedirectResponse
     {
-        $this->newsService->destroy(
-            $request
-                ->attributes
-                ->get('news')->slug,
-            cachedUser());
+        $destroyNewsService->delete($slug);
+
+        flash('Статья удалена!', 'warning');
         return redirect()->route('admin.news.index');
     }
 }

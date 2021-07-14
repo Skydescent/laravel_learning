@@ -1,5 +1,6 @@
 <?php
 
+use App\Contracts\Repository\UserRepositoryContract;
 use App\Service\Eloquent\UsersService;
 use App\Models\User;
 use App\Service\Pushall;
@@ -44,21 +45,33 @@ if (!function_exists('cachedUser')) {
         $userId = $id;
 
         if (!$userId) {
-            $request = request();
-            if (!$request->hasSession()) return new User();
-            $sessionKeys = $request->session()->all();
-            foreach ($sessionKeys as $key => $value) {
-                if (str_starts_with($key, 'login_web_')) {
-                    $userId = $value;
-                }
-            }
+           $userId = getUserId();
         }
 
-        $userService = new UsersService();
+       $repository = app()->make(UserRepositoryContract::class);
+
 
         if (!$userId) return new User();
 
-        return $userService->find($userId)->model;
+        return $repository->find($userId);
+    }
+}
+
+if (!function_exists('getUserId')) {
+    /**
+     * @return string|null
+     */
+    function getUserId() : ?string
+    {
+        $request = request();
+        if (!$request->hasSession()) return new User();
+        $sessionKeys = $request->session()->all();
+        foreach ($sessionKeys as $key => $value) {
+            if (str_starts_with($key, 'login_web_')) {
+                return $value;
+            }
+        }
+        return null;
     }
 }
 
