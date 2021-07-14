@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\RepositoryCommentableContract;
+use App\Contracts\Repository\RepositoryCommentableContract;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 

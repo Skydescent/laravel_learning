@@ -17,8 +17,7 @@ class Post extends Model implements Commentable, Taggable
     protected static function booted()
     {
         static::updated(function (Post $post) {
-            broadcast(new PostUpdated($post, auth()->user()));
-            event();
+            broadcast(new PostUpdated($post, cachedUser()));
         });
         static::created(function (Post $post) {
             event(new PostCreated($post));
