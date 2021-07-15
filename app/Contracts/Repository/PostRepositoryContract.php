@@ -17,4 +17,6 @@ interface PostRepositoryContract
     public function update(array $attributes, array $identifier) : Model;
 
     public function delete($slug) : Model;
+
+    public function addComment(array $attributes, string $postId );
 }

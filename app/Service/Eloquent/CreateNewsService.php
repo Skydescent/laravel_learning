@@ -27,7 +27,7 @@ class CreateNewsService implements CreateNewsServiceContract
 
         $news = $this->repository->store($attributes);
 
-        $this->syncTagsService->syncTags($tags,$news);
+        if (!is_null($tags)) $this->syncTagsService->syncTags($tags,$news);
 
     }
 

@@ -30,7 +30,7 @@ class CreatePostService implements CreatePostServiceContract
 
         $post = $this->repository->store($attributes);
 
-        $this->syncTagsService->syncTags($tags,$post);
+        if (!is_null($tags)) $this->syncTagsService->syncTags($tags,$post);
 
         (new AdminRecipient())->notify(new PostStatusChanged(
             'добавлена статья',

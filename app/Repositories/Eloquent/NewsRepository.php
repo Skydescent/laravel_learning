@@ -5,11 +5,10 @@ namespace App\Repositories\Eloquent;
 
 use App\Contracts\Service\CacheServiceContract;
 use App\Contracts\Repository\NewsRepositoryContract;
-use App\Contracts\Repository\RepositoryCommentableContract;
 use App\Models\News;
 use Illuminate\Database\Eloquent\Model;
 
-class NewsRepository implements NewsRepositoryContract, RepositoryCommentableContract
+class NewsRepository implements NewsRepositoryContract
 {
     private CacheServiceContract $cacheService;
 
@@ -58,19 +57,19 @@ class NewsRepository implements NewsRepositoryContract, RepositoryCommentableCon
 
     public function store(array $attributes) : Model
     {
-        $this->cacheService->flushCollections(['news_collection']);
-
         return News::create($attributes);
+
+        $this->cacheService->flushCollections(['news_collection']);
     }
 
     public function update(array $attributes, array $identifier): Model
     {
         $slug = $identifier[array_key_first($identifier)];
-        $this->cacheService->forget(['news'], 'news|news=' . $slug);
-        $this->cacheService->flushCollections(['news_collection']);
 
         $news = News::firstWhere($identifier);
         $news->update($attributes);
+        $this->cacheService->forget(['news'], 'news|news=' . $slug);
+        $this->cacheService->flushCollections(['news_collection']);
 
         return $news;
     }

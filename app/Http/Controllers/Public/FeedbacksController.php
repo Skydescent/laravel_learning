@@ -47,6 +47,6 @@ class FeedbacksController extends Controller
             'body' => 'required'
         ]));
         flash('Мы ответим на ваше обращение в ближайшее время!');
-        return redirect('/');
+        return redirect()->route('posts.index');
     }
 }

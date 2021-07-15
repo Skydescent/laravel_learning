@@ -13,7 +13,6 @@ use App\Contracts\Service\Post\DestroyPostServiceContract;
 use App\Contracts\Repository\FeedbackRepositoryContract;
 use App\Contracts\Repository\NewsRepositoryContract;
 use App\Contracts\Repository\PostRepositoryContract;
-use App\Contracts\Repository\RepositoryCommentableContract;
 use App\Contracts\Repository\RepositoryStepableContract;
 use App\Contracts\Repository\StatisticsRepositoryContract;
 use App\Contracts\Service\Tag\SyncTagsServiceContract;
@@ -47,8 +46,6 @@ use App\Service\Eloquent\TagsCloudService;
 use App\Service\Eloquent\UpdateNewsService;
 use App\Service\Eloquent\UpdatePostService;
 use App\Service\Eloquent\UpdateTaskService;
-use App\Service\TagsInterface;
-use App\Service\WrapService;
 use Illuminate\Support\ServiceProvider;
 
 class CacheServiceProvider extends ServiceProvider
@@ -98,14 +95,6 @@ class CacheServiceProvider extends ServiceProvider
         $this->app->when([TaskStepsController::class, CompletedTaskStepsController::class])
             ->needs(RepositoryStepableContract::class)
             ->give(TaskRepository::class);
-
-        $this->app->when(NewsCommentsController::class)
-            ->needs(RepositoryCommentableContract::class)
-            ->give(NewsRepository::class);
-
-        $this->app->when(PostCommentsController::class)
-            ->needs(RepositoryCommentableContract::class)
-            ->give(PostRepository::class);
 
         //$this->bindAllServices();
         //$this->whenControllersNeedsGiveModelService();

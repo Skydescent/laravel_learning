@@ -15,4 +15,6 @@ interface NewsRepositoryContract
     public function store(array $attributes) : Model;
 
     public function update(array $attributes, array $identifier): Model;
+
+    public function addComment(array $attributes, string $newsId );
 }

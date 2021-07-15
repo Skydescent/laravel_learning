@@ -4,11 +4,10 @@ namespace App\Repositories\Eloquent;
 
 use App\Contracts\Service\CacheServiceContract;
 use App\Contracts\Repository\PostRepositoryContract;
-use App\Contracts\Repository\RepositoryCommentableContract;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 
-class PostRepository implements PostRepositoryContract, RepositoryCommentableContract
+class PostRepository implements PostRepositoryContract
 {
     private CacheServiceContract $cacheService;
 
@@ -32,19 +31,21 @@ class PostRepository implements PostRepositoryContract, RepositoryCommentableCon
 
     public function store(array $attributes) : Model
     {
+        $post =  Post::create($attributes);
         $this->cacheService->flushCollections(['posts_collection']);
 
-        return Post::create($attributes);
+        return $post;
     }
 
     public function update(array $attributes, array $identifier): Model
     {
         $slug = $identifier[array_key_first($identifier)];
-        $this->cacheService->forget(['posts'], 'posts|post=' . $slug);
-        $this->cacheService->flushCollections(['posts_collection']);
 
         $post = Post::firstWhere($identifier);
         $post->update($attributes);
+
+        $this->cacheService->forget(['posts'], 'posts|post=' . $slug);
+        $this->cacheService->flushCollections(['posts_collection']);
 
         return $post;
     }

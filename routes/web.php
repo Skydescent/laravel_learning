@@ -9,8 +9,8 @@ Route::get('/tags/{tag}', 'Public\TagsController@index')->name('tags.cloud');
 Route::resource('/tasks', 'Public\TasksController');
 
 Route::post('/tasks/{task}/steps', 'Public\TaskStepsController@store');
-Route::post('/completed-steps/{step}/{task}', 'Public\CompletedTaskStepsController@store');
-Route::delete('/completed-steps/{step}/{task}', 'Public\CompletedTaskStepsController@destroy');
+Route::post('/completed-steps/{step}/{task}', 'Public\CompletedTaskStepsController@store')->name('step.complete');
+Route::delete('/completed-steps/{step}/{task}', 'Public\CompletedTaskStepsController@destroy')->name('step.incomplete');
 
 
 Route::resource('/posts', 'Public\PostsController');
@@ -50,11 +50,11 @@ Route::get('/service', 'Public\PushServiceController@form');
 Route::post('/service', 'Public\PushServiceController@send');
 
 Route::middleware('auth')
-    ->post('/posts/{post}/comment', 'Public\PostCommentsController@store')
+    ->post('/posts/{post}/comment', 'Public\CommentsController@storePostComment')
     ->name('post.comments.store');
 
 Route::middleware('auth')
-    ->post('/news/{news}/comment', 'Public\NewsCommentsController@store')
+    ->post('/news/{news}/comment', 'Public\CommentsController@storeNewsComment')
     ->name('news.comments.store');
 
 Route::post('/chat', function () {
