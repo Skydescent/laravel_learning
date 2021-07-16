@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Contracts\PostRepositoryContract;
+use App\Contracts\Repository\PostRepositoryContract;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Http\FormRequest;
 

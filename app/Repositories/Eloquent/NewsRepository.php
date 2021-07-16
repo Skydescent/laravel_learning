@@ -57,9 +57,10 @@ class NewsRepository implements NewsRepositoryContract
 
     public function store(array $attributes) : Model
     {
-        return News::create($attributes);
-
+        $news = News::create($attributes);
         $this->cacheService->flushCollections(['news_collection']);
+
+        return $news;
     }
 
     public function update(array $attributes, array $identifier): Model

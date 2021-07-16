@@ -33,9 +33,10 @@ class FeedbackRepository implements FeedbackRepositoryContract
 
     public function store(array $attributes) : Model
     {
-        return Feedback::create($attributes);
-
+        $feedback = Feedback::create($attributes);
         $this->cacheService->flushCollections(['feedbacks_collection']);
+
+        return $feedback;
     }
 
 }
